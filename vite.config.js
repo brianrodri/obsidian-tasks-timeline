@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => ({
         coverage: {
             all: true,
             include: ["src/"],
-            exclude: ["src/main.tsx"],
+            exclude: ["src/main.tsx", "src/compat/"],
         },
     },
 }));
