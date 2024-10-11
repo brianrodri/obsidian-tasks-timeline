@@ -1,5 +1,5 @@
 {
-    "name": "obsidian-sample-plugin",
+    "name": "obsidian-tasks-timeline",
     "version": "1.0.0",
     "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
     "main": "dist/main.js",
@@ -7,7 +7,7 @@
         "test": "vitest run",
         "watch": "vitest run --watch",
         "coverage": "vitest run --coverage",
-        "hotreload": "git submodule init && git submodule update && vite build --mode development --outDir ./test-vault/.obsidian/plugins/sample-plugin/ --watch",
+        "hotreload": "vite build --mode development --outDir ./test-vault/.obsidian/plugins/obsidian-tasks-timeline/ --watch",
         "dev": "vite serve",
         "build": "tsc && vite build",
         "docs": "typedoc src/main.tsx --plugin typedoc-plugin-coverage --out docs/ --excludeExternals --excludePrivate --excludeProtected",
