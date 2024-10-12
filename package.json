@@ -47,6 +47,7 @@
         "husky": "latest",
         "jsdom": "latest",
         "obsidian": "latest",
+        "obsidian-dataview": "latest",
         "semantic-release": "latest",
         "semantic-release-obsidian-plugin": "latest",
         "tslib": "latest",

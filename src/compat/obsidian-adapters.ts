@@ -51,3 +51,11 @@ export class ObsidianView extends ItemView {
         render(null, this.container);
     }
 }
+
+export class NoticeMessage extends DocumentFragment {
+    public constructor(header: string, content: string) {
+        super();
+        this.createEl("h4", { text: header });
+        this.createEl("p", { text: content });
+    }
+}
