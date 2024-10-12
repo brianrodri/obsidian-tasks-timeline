@@ -15,6 +15,29 @@ export class Obsidian {
     public async saveSettings(settings: TasksTimelineSettings): Promise<void> {
         await this.plugin.saveData(settings);
     }
+
+    public async attachView(type: string): Promise<void> {
+        const [leaf] = this.plugin.app.workspace.getLeavesOfType(type);
+        if (!leaf) {
+            await this.detachView(type);
+            await this.plugin.app.workspace.getRightLeaf(false)?.setViewState({ type });
+        }
+    }
+
+    public async detachView(type: string): Promise<void> {
+        return this.plugin.app.workspace.detachLeavesOfType(type);
+    }
+
+    public async revealView(type: string): Promise<void> {
+        const [leaf] = this.plugin.app.workspace.getLeavesOfType(type);
+        if (leaf) {
+            await this.plugin.app.workspace.revealLeaf(leaf);
+        } else {
+            await this.detachView(type);
+            await this.plugin.app.workspace.getRightLeaf(false)?.setViewState({ type, active: true });
+            this.plugin.app.workspace.rightSplit.expand();
+        }
+    }
 }
 
 export class ObsidianView extends ItemView {
