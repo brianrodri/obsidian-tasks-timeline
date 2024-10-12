@@ -2,17 +2,15 @@ import type { Plugin } from "obsidian";
 import { IconName, ItemView, WorkspaceLeaf } from "obsidian";
 import { ComponentChild, ContainerNode, render } from "preact";
 
-import { DEFAULT_SETTINGS, TasksTimelineSettings } from "../config/settings";
-
 export class Obsidian {
     public constructor(public readonly plugin: Plugin) {}
 
-    public async loadSettings(): Promise<TasksTimelineSettings> {
+    public async loadData<T>(defaults: T): Promise<T> {
         const data = (await this.plugin.loadData()) ?? {};
-        return { ...DEFAULT_SETTINGS, ...data };
+        return { ...defaults, ...data };
     }
 
-    public async saveSettings(settings: TasksTimelineSettings): Promise<void> {
+    public async saveData<T>(settings: T): Promise<void> {
         await this.plugin.saveData(settings);
     }
 
