@@ -1,4 +1,4 @@
-import { Notice, Plugin } from "obsidian";
+import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
 
 import { DoneIcon } from "./assets/icons";
 import { ensureDataviewReady } from "./compat/dataview-adapters";
@@ -10,19 +10,35 @@ const VIEW_ICON = "list-todo" as const;
 
 export default class TasksTimelinePlugin extends Plugin {
     public override onload(): void {
-        ensureDataviewReady(this).then(
-            () => this.initialize(),
-            (e) => new Notice(new NoticeMessage(`Failed to load ${VIEW_TYPE}`, e)),
-        );
+        this.registerView(VIEW_TYPE, (leaf) => this.createView(leaf));
+
+        this.app.workspace.onLayoutReady(async () => {
+            try {
+                await ensureDataviewReady(this);
+                await this.attachView();
+            } catch (error: unknown) {
+                new Notice(new NoticeMessage(`Failed to load ${VIEW_TYPE}`, `${error}`));
+            }
+        });
     }
 
-    public override onunload(): void {
-        this.app.workspace.detachLeavesOfType(VIEW_TYPE);
+    public override async onunload(): Promise<void> {
+        await this.detachView();
     }
 
-    private initialize(): void {
-        this.registerView(VIEW_TYPE, (leaf) => new ObsidianView(leaf, VIEW_TYPE, VIEW_HEADER, VIEW_ICON, DoneIcon));
-        this.app.workspace.detachLeavesOfType(VIEW_TYPE);
-        this.app.workspace.getRightLeaf(false)?.setViewState({ type: VIEW_TYPE, active: true });
+    private async attachView(): Promise<void> {
+        const [leaf] = this.app.workspace.getLeavesOfType(VIEW_TYPE);
+        if (!leaf) {
+            await this.detachView();
+            await this.app.workspace.getRightLeaf(false)?.setViewState({ type: VIEW_TYPE });
+        }
+    }
+
+    private async detachView(): Promise<void> {
+        return this.app.workspace.detachLeavesOfType(VIEW_TYPE);
+    }
+
+    private createView(leaf: WorkspaceLeaf): ObsidianView {
+        return new ObsidianView(leaf, VIEW_TYPE, VIEW_HEADER, VIEW_ICON, DoneIcon);
     }
 }
