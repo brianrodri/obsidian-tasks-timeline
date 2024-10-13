@@ -1,7 +1,7 @@
 import type { EventRef, Plugin, TFile } from "obsidian";
 import { getAPI, isPluginEnabled } from "obsidian-dataview";
 import type { DataviewApi } from "obsidian-dataview/lib/api/plugin-api";
-import type { PageMetadata } from "obsidian-dataview/lib/data-model/markdown";
+import type { ListItem, PageMetadata } from "obsidian-dataview/lib/data-model/markdown";
 
 export class Dataview {
     private readonly dv: DataviewApi;
@@ -53,4 +53,8 @@ export async function ensureDataviewReady(plugin: Plugin): Promise<void> {
             plugin.registerEvent(plugin.app.metadataCache.on("dataview:index-ready", resolve));
         }
     });
+}
+
+export function getTasks(page: PageMetadata): ListItem[] {
+    return page.lists.filter((item) => item.task);
 }
