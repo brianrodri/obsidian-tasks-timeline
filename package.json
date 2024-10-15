@@ -22,10 +22,12 @@
     "license": "MIT",
     "type": "module",
     "dependencies": {
+        "@preact/signals": "latest",
+        "lodash": "latest",
         "luxon": "latest",
         "obsidian": "latest",
         "preact": "latest",
-        "react": "@preact/compat@latest"
+        "usehooks-ts": "latest"
     },
     "devDependencies": {
         "@commitlint/cli": "latest",
@@ -34,6 +36,7 @@
         "@preact/preset-vite": "latest",
         "@semantic-release/git": "latest",
         "@testing-library/preact": "latest",
+        "@types/lodash": "latest",
         "@types/luxon": "latest",
         "@types/react": "latest",
         "@typescript-eslint/eslint-plugin": "latest",
@@ -43,6 +46,7 @@
         "eslint-config-preact": "latest",
         "eslint-config-prettier": "latest",
         "eslint-plugin-prettier": "latest",
+        "eslint-plugin-react-hooks": "latest",
         "globals": "latest",
         "husky": "latest",
         "jsdom": "latest",
