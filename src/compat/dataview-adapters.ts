@@ -1,43 +1,32 @@
-import type { EventRef, Plugin, TFile } from "obsidian";
+import { signal, Signal } from "@preact/signals";
+import type { Plugin } from "obsidian";
 import { getAPI, isPluginEnabled } from "obsidian-dataview";
-import type { DataviewApi } from "obsidian-dataview/lib/api/plugin-api";
-import type { ListItem, PageMetadata } from "obsidian-dataview/lib/data-model/markdown";
+
+import { DataviewApi, Page } from "./dataview-types";
 
 export class Dataview {
     private readonly dv: DataviewApi;
+    public readonly revision: Signal<number>;
 
-    public constructor(public readonly plugin: Plugin) {
-        this.dv = getAPI(this.plugin.app);
-    }
+    public constructor(private readonly plugin: Plugin) {
+        this.dv = getAPI(this.plugin.app) as DataviewApi;
+        this.revision = signal(this.dv.index.revision);
 
-    public getPages(source = ""): PageMetadata[] {
-        return this.dv.pages(source).array() as PageMetadata[];
-    }
-
-    public onFileUpdate(callback: (file: TFile) => any): EventRef {
-        return this.onFileChange("update", callback);
-    }
-
-    public onFileRename(callback: (file: TFile, oldPath: string) => any): EventRef {
-        return this.onFileChange("rename", callback);
-    }
-
-    public onFileDelete(callback: (file: TFile) => any): EventRef {
-        return this.onFileChange("delete", callback);
-    }
-
-    private onFileChange<F extends (...args: any[]) => any>(changeTypeTarget: string, callback: F): EventRef {
-        const ref = this.plugin.app.metadataCache.on(
-            // @ts-ignore
-            "dataview:metadata-change",
-            (changeType: string, ...rest: Parameters<F>) => {
-                if (changeType === changeTypeTarget) {
-                    callback(...rest);
-                }
-            },
+        this.plugin.registerEvent(
+            this.plugin.app.metadataCache.on(
+                // @ts-expect-error - obsidian doesn't define overloads for third-party events.
+                "dataview:metadata-change",
+                () => (this.revision.value = this.dv.index.revision),
+            ),
         );
-        this.plugin.registerEvent(ref);
-        return ref;
+    }
+
+    public getPage(path: string): Page | undefined {
+        return this.dv.page(path) as Page | undefined;
+    }
+
+    public getPages(query: string, originFile?: string): Page[] {
+        return this.dv.pages(query, originFile).array() as Page[];
     }
 }
 
@@ -49,12 +38,8 @@ export async function ensureDataviewReady(plugin: Plugin): Promise<void> {
         } else if (getAPI(plugin.app)?.index.initialized) {
             resolve();
         } else {
-            // @ts-ignore
+            // @ts-expect-error - obsidian doesn't define types for third-party events.
             plugin.registerEvent(plugin.app.metadataCache.on("dataview:index-ready", resolve));
         }
     });
-}
-
-export function getTasks(page: PageMetadata): ListItem[] {
-    return page.lists.filter((item) => item.task);
 }
