@@ -4,25 +4,25 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Obsidian } from "../compat/obsidian-adapters";
 import { DEFAULT_SETTINGS } from "../config/settings";
-import { TasksTimelineContextProvider, useTasksTimelineContext } from "./use-tasks-timeline-context";
+import { TimelineContextProvider, useTimelineContext } from "./use-timeline-context";
 
 vi.mock("../compat/dataview-adapters", () => ({ Dataview: vi.fn() }));
 vi.mock("../compat/obsidian-adapters", () => ({ Obsidian: vi.fn() }));
 
 describe("TasksTimelineContext", () => {
     it("throws when used outside of context", () => {
-        expect(() => renderHook(useTasksTimelineContext)).toThrowError("context must be used from within a provider");
+        expect(() => renderHook(useTimelineContext)).toThrowError("context must be used from within a provider");
     });
 
     it("returns provided values", () => {
         const settings = { ...DEFAULT_SETTINGS };
         const obsidian = new Obsidian({} as Plugin);
 
-        const { result } = renderHook(useTasksTimelineContext, {
+        const { result } = renderHook(useTimelineContext, {
             wrapper: ({ children }) => (
-                <TasksTimelineContextProvider settings={settings} obsidian={obsidian}>
+                <TimelineContextProvider settings={settings} obsidian={obsidian}>
                     {children}
-                </TasksTimelineContextProvider>
+                </TimelineContextProvider>
             ),
         });
 
