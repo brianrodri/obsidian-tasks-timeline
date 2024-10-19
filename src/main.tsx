@@ -4,6 +4,7 @@ import { Dataview, ensureDataviewReady } from "./compat/dataview-adapters";
 import { NoticeMessage, Obsidian, ObsidianView } from "./compat/obsidian-adapters";
 import { DEFAULT_SETTINGS } from "./config/settings";
 import { TimelineContextProvider } from "./hooks/use-timeline-context";
+import { TimelineView } from "./components/timeline-view";
 
 const VIEW_TYPE = "obsidian-tasks-timeline" as const;
 const VIEW_HEADER = "Tasks timeline" as const;
@@ -36,7 +37,7 @@ export default class TasksTimelinePlugin extends Plugin {
         const dataview = new Dataview(this);
         const timelineView = (
             <TimelineContextProvider settings={this.settings} obsidian={this.obsidian} dataview={dataview}>
-                Hello, World!
+                <TimelineView />
             </TimelineContextProvider>
         );
         return new ObsidianView(leaf, VIEW_TYPE, VIEW_HEADER, VIEW_ICON, timelineView);
