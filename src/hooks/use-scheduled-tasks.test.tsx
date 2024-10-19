@@ -1,5 +1,6 @@
 import { renderHook, RenderHookOptions } from "@testing-library/preact";
 import { DateTime } from "luxon";
+import type { Plugin } from "obsidian";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { FileBuilder, mockDataArray, TaskBuilder } from "../compat/dataview-mocks";
@@ -20,10 +21,11 @@ describe("useScheduledTasks", () => {
     const JAN_1ST = DateTime.fromISO("2024-01-01") as DateTime<true>;
     const JAN_2ND = DateTime.fromISO("2024-01-02") as DateTime<true>;
     const JAN_3RD = DateTime.fromISO("2024-01-03") as DateTime<true>;
+    const dataview = new Dataview({} as Plugin);
 
     const RENDER_OPTIONS: RenderHookOptions<ScheduledTasksValue> = {
         wrapper: ({ children }) => (
-            <TimelineContextProvider obsidian={{} as Obsidian} settings={DEFAULT_SETTINGS}>
+            <TimelineContextProvider obsidian={{} as Obsidian} settings={DEFAULT_SETTINGS} dataview={dataview}>
                 {children}
             </TimelineContextProvider>
         ),

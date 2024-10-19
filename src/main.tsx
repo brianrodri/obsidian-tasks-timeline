@@ -1,7 +1,6 @@
 import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
 
-import { DoneIcon } from "./assets/icons";
-import { ensureDataviewReady } from "./compat/dataview-adapters";
+import { Dataview, ensureDataviewReady } from "./compat/dataview-adapters";
 import { NoticeMessage, Obsidian, ObsidianView } from "./compat/obsidian-adapters";
 import { DEFAULT_SETTINGS } from "./config/settings";
 import { TimelineContextProvider } from "./hooks/use-timeline-context";
@@ -34,11 +33,12 @@ export default class TasksTimelinePlugin extends Plugin {
     }
 
     private createView(leaf: WorkspaceLeaf): ObsidianView {
-        const timeline = (
-            <TimelineContextProvider settings={this.settings} obsidian={this.obsidian}>
-                {DoneIcon}
+        const dataview = new Dataview(this);
+        const timelineView = (
+            <TimelineContextProvider settings={this.settings} obsidian={this.obsidian} dataview={dataview}>
+                Hello, World!
             </TimelineContextProvider>
         );
-        return new ObsidianView(leaf, VIEW_TYPE, VIEW_HEADER, VIEW_ICON, timeline);
+        return new ObsidianView(leaf, VIEW_TYPE, VIEW_HEADER, VIEW_ICON, timelineView);
     }
 }

@@ -2,6 +2,7 @@ import { renderHook } from "@testing-library/preact";
 import type { Plugin } from "obsidian";
 import { describe, expect, it, vi } from "vitest";
 
+import { Dataview } from "../compat/dataview-adapters";
 import { Obsidian } from "../compat/obsidian-adapters";
 import { DEFAULT_SETTINGS } from "../config/settings";
 import { TimelineContextProvider, useTimelineContext } from "./use-timeline-context";
@@ -17,18 +18,18 @@ describe("TasksTimelineContext", () => {
     it("returns provided values", () => {
         const settings = { ...DEFAULT_SETTINGS };
         const obsidian = new Obsidian({} as Plugin);
+        const dataview = new Dataview({} as Plugin);
 
         const { result } = renderHook(useTimelineContext, {
             wrapper: ({ children }) => (
-                <TimelineContextProvider settings={settings} obsidian={obsidian}>
+                <TimelineContextProvider settings={settings} obsidian={obsidian} dataview={dataview}>
                     {children}
                 </TimelineContextProvider>
             ),
         });
 
-        expect(result.current.valid).toBe(true);
         expect(result.current.settings).toBe(settings);
         expect(result.current.obsidian).toBe(obsidian);
-        expect(result.current.dataview).toBeDefined();
+        expect(result.current.dataview).toBe(dataview);
     });
 });
