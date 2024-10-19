@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Dataview } from "../compat/dataview-adapters";
 import { FileBuilder, mockDataArray, Page, Task, TaskBuilder } from "../compat/dataview-types";
-import { Obsidian } from "../compat/obsidian-adapters";
+import { Obsidian, WorkspaceLeaf } from "../compat/obsidian-adapters";
 import { DEFAULT_SETTINGS } from "../config/settings";
 import { useScheduledTasks } from "./use-scheduled-tasks";
 import { TimelineContextProvider } from "./use-timeline-context";
@@ -20,9 +20,10 @@ vi.mock("../compat/obsidian-adapters");
 describe("useScheduledTasks", () => {
     const obsidian = vi.mocked(new Obsidian(), true);
     const dataview = vi.mocked(new Dataview(), true);
+    const leaf = vi.mocked(new WorkspaceLeaf(), true);
 
     const wrapper = ({ children }: PropsWithChildren) => (
-        <TimelineContextProvider obsidian={obsidian} dataview={dataview} settings={DEFAULT_SETTINGS}>
+        <TimelineContextProvider obsidian={obsidian} dataview={dataview} settings={DEFAULT_SETTINGS} leaf={leaf}>
             {children}
         </TimelineContextProvider>
     );

@@ -1,6 +1,8 @@
-import type { IconName, Plugin, WorkspaceLeaf } from "obsidian";
-import { ItemView } from "obsidian";
+import type { IconName, Plugin, UserEvent, WorkspaceLeaf } from "obsidian";
+import { ItemView, Keymap } from "obsidian";
 import { ComponentChild, ContainerNode, render } from "preact";
+
+export { WorkspaceLeaf } from "obsidian";
 
 export class Obsidian {
     public readonly plugin: Plugin;
@@ -17,6 +19,23 @@ export class Obsidian {
 
     public async saveData<T>(settings: T): Promise<void> {
         await this.plugin.saveData(settings);
+    }
+
+    public async openVaultLink(event: Event, linktext: string, sourcePath: string) {
+        event.preventDefault();
+        await this.plugin.app.workspace.openLinkText(linktext, sourcePath, Keymap.isModEvent(event as UserEvent));
+    }
+
+    public openVaultHover(leaf: WorkspaceLeaf, event: Event, linktext: string, sourcePath: string) {
+        event.preventDefault();
+        this.plugin.app.workspace.trigger("hover-link", {
+            source: "preview",
+            hoverParent: leaf.view.containerEl,
+            targetEl: event.target,
+            event,
+            linktext,
+            sourcePath,
+        });
     }
 
     public async attachView(type: string): Promise<void> {

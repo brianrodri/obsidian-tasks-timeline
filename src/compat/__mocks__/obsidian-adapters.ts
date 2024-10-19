@@ -7,6 +7,8 @@ const saveData = vi.fn();
 const attachView = vi.fn();
 const detachView = vi.fn();
 const revealView = vi.fn();
+const openVaultLink = vi.fn();
+const openVaultHover = vi.fn();
 
 export class Obsidian implements Partial<RealObsidian> {
     public loadData = loadData;
@@ -14,4 +16,8 @@ export class Obsidian implements Partial<RealObsidian> {
     public attachView = attachView;
     public detachView = detachView;
     public revealView = revealView;
+    public openVaultLink = openVaultLink;
+    public openVaultHover = openVaultHover;
 }
+
+export const WorkspaceLeaf = vi.fn();
