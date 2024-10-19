@@ -2,6 +2,7 @@ import { createContext, PropsWithChildren, useContext } from "preact/compat";
 
 import { Dataview } from "../compat/dataview-adapters";
 import { Obsidian, WorkspaceLeaf } from "../compat/obsidian-adapters";
+import { TasksApi } from "../compat/tasks-api-adapters";
 import { TasksTimelineSettings as Settings } from "../config/settings";
 
 const TimelineContext = createContext<TimelineContextValue | null>(null);
@@ -11,6 +12,7 @@ export interface TimelineContextValue {
     settings: Settings;
     obsidian: Obsidian;
     dataview: Dataview;
+    tasksApi: TasksApi;
 }
 
 export function useTimelineContext(): TimelineContextValue {

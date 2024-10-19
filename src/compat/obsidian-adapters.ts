@@ -1,5 +1,4 @@
-import type { IconName, Plugin, UserEvent, WorkspaceLeaf } from "obsidian";
-import { ItemView, Keymap } from "obsidian";
+import { IconName, ItemView, Keymap, Plugin, Pos, UserEvent, WorkspaceLeaf } from "obsidian";
 import { ComponentChild, ContainerNode, render } from "preact";
 
 export { WorkspaceLeaf } from "obsidian";
@@ -21,12 +20,24 @@ export class Obsidian {
         await this.plugin.saveData(settings);
     }
 
+    public processFilePosition(path: string, { start, end }: Pos, process: (content: string) => string) {
+        const file = this.plugin.app.vault.getFileByPath(path);
+        if (file) {
+            this.plugin.app.vault.process(file, (fileText: string) => {
+                const head = fileText.slice(0, start.offset);
+                const processed = process(fileText.slice(start.offset, end.offset));
+                const tail = fileText.slice(end.offset);
+                return `${head}${processed}${tail}`;
+            });
+        }
+    }
+
     public async openVaultLink(event: Event, linktext: string, sourcePath: string) {
         event.preventDefault();
         await this.plugin.app.workspace.openLinkText(linktext, sourcePath, Keymap.isModEvent(event as UserEvent));
     }
 
-    public openVaultHover(leaf: WorkspaceLeaf, event: Event, linktext: string, sourcePath: string) {
+    public openVaultHover(event: Event, linktext: string, sourcePath: string, leaf: WorkspaceLeaf) {
         event.preventDefault();
         this.plugin.app.workspace.trigger("hover-link", {
             source: "preview",

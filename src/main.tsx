@@ -5,6 +5,7 @@ import { NoticeMessage, Obsidian, ObsidianView, WorkspaceLeaf } from "./compat/o
 import { DEFAULT_SETTINGS } from "./config/settings";
 import { TimelineContextProvider } from "./hooks/use-timeline-context";
 import { TimelineView } from "./components/timeline-view";
+import { TasksApi } from "./compat/tasks-api-adapters";
 
 const VIEW_TYPE = "obsidian-tasks-timeline" as const;
 const VIEW_HEADER = "Tasks timeline" as const;
@@ -34,9 +35,14 @@ export default class TasksTimelinePlugin extends Plugin {
     }
 
     private createView(leaf: WorkspaceLeaf): ObsidianView {
-        const dataview = new Dataview(this);
         const timelineView = (
-            <TimelineContextProvider leaf={leaf} settings={this.settings} obsidian={this.obsidian} dataview={dataview}>
+            <TimelineContextProvider
+                leaf={leaf}
+                settings={this.settings}
+                obsidian={this.obsidian}
+                dataview={new Dataview(this)}
+                tasksApi={new TasksApi(this)}
+            >
                 <TimelineView />
             </TimelineContextProvider>
         );
