@@ -1,5 +1,5 @@
 /* v8 ignore next */
-import assign from "lodash/assign";
+import { assign } from "lodash";
 
 export class Builder<T extends object> extends Object {
     public constructor(private readonly item: Partial<T> = {}) {

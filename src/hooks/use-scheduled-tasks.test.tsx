@@ -1,43 +1,46 @@
-import { renderHook, RenderHookOptions } from "@testing-library/preact";
+import { renderHook } from "@testing-library/preact";
 import { DateTime } from "luxon";
-import type { Plugin } from "obsidian";
+import { PropsWithChildren } from "preact/compat";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { FileBuilder, mockDataArray, TaskBuilder } from "../compat/dataview-mocks";
-import { Page, Task } from "../compat/dataview-types";
+import { Dataview } from "../compat/dataview-adapters";
+import { FileBuilder, mockDataArray, Page, Task, TaskBuilder } from "../compat/dataview-types";
 import { Obsidian } from "../compat/obsidian-adapters";
 import { DEFAULT_SETTINGS } from "../config/settings";
-import { ScheduledTasksValue, useScheduledTasks } from "./use-scheduled-tasks";
+import { useScheduledTasks } from "./use-scheduled-tasks";
 import { TimelineContextProvider } from "./use-timeline-context";
-import { Dataview } from "../compat/dataview-adapters";
 
-const getPage = vi.fn<Dataview["getPage"]>();
-const getPages = vi.fn<Dataview["getPages"]>();
-const revision = { value: 1 };
+const JAN_1ST = DateTime.fromISO("2024-01-01") as DateTime<true>;
+const JAN_2ND = DateTime.fromISO("2024-01-02") as DateTime<true>;
+const JAN_3RD = DateTime.fromISO("2024-01-03") as DateTime<true>;
 
-vi.mock("../compat/dataview-adapters", () => ({ Dataview: vi.fn(() => ({ getPage, getPages, revision })) }));
+vi.mock("../compat/dataview-adapters");
+vi.mock("../compat/obsidian-adapters");
 
 describe("useScheduledTasks", () => {
-    const JAN_1ST = DateTime.fromISO("2024-01-01") as DateTime<true>;
-    const JAN_2ND = DateTime.fromISO("2024-01-02") as DateTime<true>;
-    const JAN_3RD = DateTime.fromISO("2024-01-03") as DateTime<true>;
-    const dataview = new Dataview({} as Plugin);
+    const obsidian = vi.mocked(new Obsidian(), true);
+    const dataview = vi.mocked(new Dataview(), true);
 
-    const RENDER_OPTIONS: RenderHookOptions<ScheduledTasksValue> = {
-        wrapper: ({ children }) => (
-            <TimelineContextProvider obsidian={{} as Obsidian} settings={DEFAULT_SETTINGS} dataview={dataview}>
-                {children}
-            </TimelineContextProvider>
-        ),
+    const wrapper = ({ children }: PropsWithChildren) => (
+        <TimelineContextProvider obsidian={obsidian} dataview={dataview} settings={DEFAULT_SETTINGS}>
+            {children}
+        </TimelineContextProvider>
+    );
+
+    const mockPageWithTasks = (tasks: Task[] | undefined, fileBuilder = new FileBuilder()): Task[] => {
+        const page: Page = { file: fileBuilder.with("tasks", tasks ? mockDataArray(tasks) : tasks).build() };
+        dataview.getPage.mockReturnValue(page);
+        dataview.getPages.mockReturnValue([page]);
+        return tasks ?? [];
     };
 
     afterEach(vi.restoreAllMocks);
 
     it("works with empty vaults", () => {
-        getPage.mockReturnValue(undefined);
-        getPages.mockReturnValue([]);
+        dataview.getPage.mockReturnValue(undefined);
+        dataview.getPages.mockReturnValue([]);
 
-        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, RENDER_OPTIONS).result.current;
+        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, { wrapper }).result.current;
 
         expect(unscheduled).toEqual([]);
         expect(getScheduledOn(JAN_1ST)).toEqual([]);
@@ -45,17 +48,10 @@ describe("useScheduledTasks", () => {
         expect(getScheduledOn(JAN_3RD)).toEqual([]);
     });
 
-    const mockPageWithTasks = (tasks: Task[] | undefined, fileBuilder = new FileBuilder()): Task[] => {
-        const page: Page = { file: fileBuilder.with("tasks", tasks ? mockDataArray(tasks) : tasks).build() };
-        getPage.mockReturnValue(page);
-        getPages.mockReturnValue([page]);
-        return tasks ?? [];
-    };
-
     it("groups unscheduled tasks", () => {
         const tasks = mockPageWithTasks([new TaskBuilder().build()]);
 
-        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, RENDER_OPTIONS).result.current;
+        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, { wrapper }).result.current;
 
         expect(unscheduled).toEqual(tasks);
         expect(getScheduledOn(JAN_1ST)).toEqual([]);
@@ -70,7 +66,7 @@ describe("useScheduledTasks", () => {
             new TaskBuilder({ scheduled: JAN_2ND }).withState("cancelled").build(),
         ]);
 
-        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, RENDER_OPTIONS).result.current;
+        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, { wrapper }).result.current;
 
         expect(unscheduled).toEqual([]);
         expect(getScheduledOn(JAN_1ST)).toEqual([]);
@@ -84,7 +80,7 @@ describe("useScheduledTasks", () => {
             new TaskBuilder({ scheduled: JAN_2ND }).withState("done").build(),
         ]);
 
-        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, RENDER_OPTIONS).result.current;
+        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, { wrapper }).result.current;
 
         expect(unscheduled).toEqual([]);
         expect(getScheduledOn(JAN_1ST)).toEqual([done1st]);
@@ -100,7 +96,7 @@ describe("useScheduledTasks", () => {
             new TaskBuilder({ scheduled: JAN_2ND }).withState("done").build(),
         ]);
 
-        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, RENDER_OPTIONS).result.current;
+        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, { wrapper }).result.current;
 
         expect(unscheduled).toEqual([]);
         expect(getScheduledOn(JAN_1ST)).toEqual([open1st, done1st]);
@@ -115,7 +111,7 @@ describe("useScheduledTasks", () => {
             new TaskBuilder({ scheduled: JAN_2ND, start: JAN_3RD }).build(),
         ]);
 
-        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, RENDER_OPTIONS).result.current;
+        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, { wrapper }).result.current;
 
         expect(unscheduled).toEqual([]);
         expect(getScheduledOn(JAN_1ST)).toEqual([]);
@@ -126,7 +122,7 @@ describe("useScheduledTasks", () => {
     it("uses page date if tasks are otherwise unscheduled", () => {
         const [task] = mockPageWithTasks([new TaskBuilder().build()], new FileBuilder({ day: JAN_2ND }));
 
-        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, RENDER_OPTIONS).result.current;
+        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, { wrapper }).result.current;
 
         expect(unscheduled).toEqual([]);
         expect(getScheduledOn(JAN_1ST)).toEqual([]);
@@ -137,7 +133,7 @@ describe("useScheduledTasks", () => {
     it("skips pages with undefined tasks", () => {
         mockPageWithTasks(undefined);
 
-        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, RENDER_OPTIONS).result.current;
+        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, { wrapper }).result.current;
 
         expect(unscheduled).toEqual([]);
         expect(getScheduledOn(JAN_1ST)).toEqual([]);

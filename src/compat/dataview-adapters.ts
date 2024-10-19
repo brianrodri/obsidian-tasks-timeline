@@ -5,10 +5,13 @@ import { getAPI, isPluginEnabled } from "obsidian-dataview";
 import { DataviewApi, Page } from "./dataview-types";
 
 export class Dataview {
+    private readonly plugin: Plugin;
     private readonly dv: DataviewApi;
     public readonly revision: Signal<number>;
 
-    public constructor(private readonly plugin: Plugin) {
+    public constructor(plugin?: Plugin) {
+        if (!plugin) throw new Error("plugin is required");
+        this.plugin = plugin;
         this.dv = getAPI(this.plugin.app) as DataviewApi;
         this.revision = signal(this.dv.index.revision);
 

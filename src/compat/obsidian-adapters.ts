@@ -1,9 +1,14 @@
-import type { Plugin } from "obsidian";
-import { IconName, ItemView, WorkspaceLeaf } from "obsidian";
+import type { IconName, Plugin, WorkspaceLeaf } from "obsidian";
+import { ItemView } from "obsidian";
 import { ComponentChild, ContainerNode, render } from "preact";
 
 export class Obsidian {
-    public constructor(public readonly plugin: Plugin) {}
+    public readonly plugin: Plugin;
+
+    public constructor(plugin?: Plugin) {
+        if (!plugin) throw new Error("plugin is required");
+        this.plugin = plugin;
+    }
 
     public async loadData<T>(defaults: T): Promise<T> {
         const data = (await this.plugin.loadData()) ?? {};
