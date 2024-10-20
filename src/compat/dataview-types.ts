@@ -6,6 +6,7 @@ import type { SMarkdownPage, STask } from "obsidian-dataview/lib/data-model/seri
 
 export type { DataArray } from "obsidian-dataview/lib/api/data-array";
 export type { FullIndex } from "obsidian-dataview/lib/data-index/index";
+export type { Link } from "obsidian-dataview/lib/data-model/value";
 
 import { Builder } from "../utils/interface-builder";
 

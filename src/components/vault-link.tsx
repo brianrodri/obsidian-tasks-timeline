@@ -1,14 +1,14 @@
-import { PropsWithChildren } from "preact/compat";
+import { HTMLAttributes, PropsWithChildren } from "preact/compat";
 import { useCallback } from "preact/hooks";
 
 import { useTimelineContext } from "../hooks/use-timeline-context";
 
-export interface VaultLinkProps {
+export interface VaultLinkProps extends HTMLAttributes<HTMLAnchorElement> {
     href: string;
     sourcePath: string;
 }
 
-export function VaultLink({ href, sourcePath, children }: PropsWithChildren<VaultLinkProps>) {
+export function VaultLink({ href, sourcePath, children, ...rest }: PropsWithChildren<VaultLinkProps>) {
     const { leaf, obsidian } = useTimelineContext();
 
     const onClick = useCallback(
@@ -22,7 +22,7 @@ export function VaultLink({ href, sourcePath, children }: PropsWithChildren<Vaul
     );
 
     return (
-        <a class="internal-link" href={"#"} onClick={onClick} onMouseOver={onMouseOver}>
+        <a href="#" onClick={onClick} onMouseOver={onMouseOver} {...rest}>
             {children}
         </a>
     );

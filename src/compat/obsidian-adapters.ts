@@ -20,13 +20,17 @@ export class Obsidian {
         await this.plugin.saveData(settings);
     }
 
-    public processFilePosition(path: string, { start, end }: Pos, process: (content: string) => string) {
-        const file = this.plugin.app.vault.getFileByPath(path);
+    public async processFilePosition(
+        filePath: string,
+        filePosition: Pos,
+        process: (payload: string) => string,
+    ): Promise<void> {
+        const file = this.plugin.app.vault.getFileByPath(filePath);
         if (file) {
-            this.plugin.app.vault.process(file, (fileText: string) => {
-                const head = fileText.slice(0, start.offset);
-                const processed = process(fileText.slice(start.offset, end.offset));
-                const tail = fileText.slice(end.offset);
+            await this.plugin.app.vault.process(file, (fileContent: string) => {
+                const head = fileContent.slice(0, filePosition.start.offset);
+                const processed = process(fileContent.slice(filePosition.start.offset, filePosition.end.offset));
+                const tail = fileContent.slice(filePosition.end.offset);
                 return `${head}${processed}${tail}`;
             });
         }
