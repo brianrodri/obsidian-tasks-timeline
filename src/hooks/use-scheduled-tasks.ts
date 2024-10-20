@@ -27,8 +27,21 @@ export function useScheduledTasks(): ScheduledTasksValue {
         const sortedDates = Object.keys(scheduledByDate).sort();
         accumulateOpenTasks(scheduledByDate, sortedDates);
 
+        const getScheduledOn: (date: DateTime<true>) => Task[] = memoize(
+            (date) => {
+                const key = date.toISODate();
+                const lowerBound = sortedIndex(sortedDates, key);
+                if (sortedDates[lowerBound] === key) {
+                    return scheduledByDate[key];
+                } else {
+                    const prevKey = sortedDates[lowerBound - 1];
+                    return prevKey ? scheduledByDate[prevKey].filter((task) => !task.checked) : [];
+                }
+            },
+            (date) => date.toISODate(),
+        );
 
-        return { unscheduled, getScheduledOn, revision } as const;
+        return { revision, unscheduled, getScheduledOn } as const;
     }, [dataview, pageQuery, revision]);
 }
 
