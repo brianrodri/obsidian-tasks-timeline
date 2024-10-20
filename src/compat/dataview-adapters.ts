@@ -2,7 +2,7 @@ import { signal, Signal } from "@preact/signals";
 import type { Plugin } from "obsidian";
 import { getAPI, isPluginEnabled } from "obsidian-dataview";
 
-import { DataviewApi, Page } from "./dataview-types";
+import { DataviewApi, Page, Task } from "./dataview-types";
 
 export class Dataview {
     private readonly plugin: Plugin;
@@ -30,6 +30,12 @@ export class Dataview {
 
     public getPages(query: string, originFile?: string): Page[] {
         return this.dv.pages(query, originFile).array() as Page[];
+    }
+
+    public getScheduledDate(task: Task): string {
+        const scheduled = task.scheduled?.toISODate() ?? this.getPage(task.path)?.file.day?.toISODate() ?? null;
+        const start = task.start?.toISODate() ?? null;
+        return scheduled && start && scheduled < start ? start : (scheduled ?? "");
     }
 }
 
