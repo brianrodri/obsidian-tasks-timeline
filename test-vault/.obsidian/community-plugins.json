@@ -1,5 +1,6 @@
 [
   "hot-reload",
-  "obsidian-tasks-timeline",
-  "dataview"
+  "dataview",
+  "obsidian-tasks-plugin",
+  "obsidian-tasks-timeline"
 ]

@@ -16,10 +16,7 @@ export function useScheduledTasks(): ScheduledTasksValue {
     const pageQuery = settings.pageQuery;
 
     return useMemo(() => {
-        const getScheduledDate = memoize(
-            (task) => dataview.getScheduledDate(task),
-            (task) => `${task.path}@${revision}`,
-        );
+        const getScheduledDate = (task: Task) => dataview.getScheduledDate(task);
 
         const tasks = dataview.getPages(pageQuery).flatMap((page) => page.file.tasks?.array() ?? []);
         const [scheduled, unscheduled] = partition(tasks, getScheduledDate);
@@ -33,10 +30,9 @@ export function useScheduledTasks(): ScheduledTasksValue {
                 const lowerBound = sortedIndex(sortedDates, key);
                 if (sortedDates[lowerBound] === key) {
                     return scheduledByDate[key];
-                } else {
-                    const prevKey = sortedDates[lowerBound - 1];
-                    return prevKey ? scheduledByDate[prevKey].filter((task) => !task.checked) : [];
                 }
+                const prevKey = sortedDates[lowerBound - 1];
+                return prevKey ? scheduledByDate[prevKey].filter((task) => !task.checked) : [];
             },
             (date) => date.toISODate(),
         );
