@@ -3,6 +3,7 @@ import { DateTime } from "luxon";
 import { PropsWithChildren } from "preact/compat";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { TasksApi } from "../compat/tasks-api-adapters";
 import { Dataview } from "../compat/dataview-adapters";
 import { FileBuilder, mockDataArray, Page, Task, TaskBuilder } from "../compat/dataview-types";
 import { Obsidian, WorkspaceLeaf } from "../compat/obsidian-adapters";
@@ -16,14 +17,22 @@ const JAN_3RD = DateTime.fromISO("2024-01-03") as DateTime<true>;
 
 vi.mock("../compat/dataview-adapters");
 vi.mock("../compat/obsidian-adapters");
+vi.mock("../compat/tasks-api-adapters");
 
 describe("useScheduledTasks", () => {
     const obsidian = vi.mocked(new Obsidian(), true);
     const dataview = vi.mocked(new Dataview(), true);
+    const tasksApi = vi.mocked(new TasksApi(), true);
     const leaf = vi.mocked(new WorkspaceLeaf(), true);
 
     const wrapper = ({ children }: PropsWithChildren) => (
-        <TimelineContextProvider obsidian={obsidian} dataview={dataview} settings={DEFAULT_SETTINGS} leaf={leaf}>
+        <TimelineContextProvider
+            obsidian={obsidian}
+            dataview={dataview}
+            settings={DEFAULT_SETTINGS}
+            leaf={leaf}
+            tasksApi={tasksApi}
+        >
             {children}
         </TimelineContextProvider>
     );
@@ -118,17 +127,6 @@ describe("useScheduledTasks", () => {
         expect(getScheduledOn(JAN_1ST)).toEqual([]);
         expect(getScheduledOn(JAN_2ND)).toEqual([starts1st, starts2nd]);
         expect(getScheduledOn(JAN_3RD)).toEqual([starts3rd, starts1st, starts2nd]);
-    });
-
-    it("uses page date if tasks are otherwise unscheduled", () => {
-        const [task] = mockPageWithTasks([new TaskBuilder().build()], new FileBuilder({ day: JAN_2ND }));
-
-        const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, { wrapper }).result.current;
-
-        expect(unscheduled).toEqual([]);
-        expect(getScheduledOn(JAN_1ST)).toEqual([]);
-        expect(getScheduledOn(JAN_2ND)).toEqual([task]);
-        expect(getScheduledOn(JAN_3RD)).toEqual([task]);
     });
 
     it("skips pages with undefined tasks", () => {

@@ -24,6 +24,7 @@
     "dependencies": {
         "@preact/signals": "latest",
         "lodash": "latest",
+        "lucide-preact": "latest",
         "luxon": "latest",
         "obsidian": "latest",
         "preact": "latest",
@@ -32,6 +33,7 @@
     "devDependencies": {
         "@commitlint/cli": "latest",
         "@commitlint/config-conventional": "latest",
+        "@eslint/eslintrc": "latest",
         "@eslint/js": "latest",
         "@preact/preset-vite": "latest",
         "@semantic-release/git": "latest",
@@ -46,6 +48,7 @@
         "eslint-config-preact": "latest",
         "eslint-config-prettier": "latest",
         "eslint-plugin-prettier": "latest",
+        "eslint-plugin-react": "latest",
         "eslint-plugin-react-hooks": "latest",
         "globals": "latest",
         "husky": "latest",

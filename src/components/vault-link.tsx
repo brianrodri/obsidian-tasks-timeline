@@ -22,7 +22,7 @@ export function VaultLink({ href, sourcePath, children, ...rest }: PropsWithChil
     );
 
     return (
-        <a href="#" onClick={onClick} onMouseOver={onMouseOver} {...rest}>
+        <a {...rest} href="#" onClick={onClick} onMouseOver={onMouseOver}>
             {children}
         </a>
     );
