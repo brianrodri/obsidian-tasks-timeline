@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 
-import type { TasksApi as RealTasksApi } from "../tasks-api-adapters";
+import type { TasksApi as RealTasksApi } from "../api";
 
 const createTaskLineModal = vi.fn();
 const executeToggleTaskDoneCommand = vi.fn();

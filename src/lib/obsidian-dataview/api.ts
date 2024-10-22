@@ -2,7 +2,7 @@ import { signal, Signal } from "@preact/signals";
 import type { Plugin } from "obsidian";
 import { getAPI, isPluginEnabled } from "obsidian-dataview";
 
-import { DataviewApi, Page, Task } from "./dataview-types";
+import { DataviewApi, Page, Task } from "./types";
 
 export class Dataview {
     private readonly plugin: Plugin;

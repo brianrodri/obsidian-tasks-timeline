@@ -3,10 +3,10 @@ import { DateTime } from "luxon";
 import { PropsWithChildren } from "preact/compat";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { TasksApi } from "../../lib/tasks-api-adapters";
-import { Dataview } from "../../lib/dataview-adapters";
-import { FileBuilder, mockDataArray, Page, Task, TaskBuilder } from "../../lib/dataview-types";
-import { Obsidian, WorkspaceLeaf } from "../../lib/obsidian-adapters";
+import { TasksApi } from "../../lib/obsidian-tasks/api";
+import { Dataview } from "../../lib/obsidian-dataview/api";
+import { FileBuilder, mockDataArray, Page, Task, TaskBuilder } from "../../lib/obsidian-dataview/types";
+import { Obsidian, WorkspaceLeaf } from "../../lib/obsidian/api";
 import { DEFAULT_SETTINGS } from "../../data/settings";
 import { useScheduledTasks } from "../use-scheduled-tasks";
 import { PluginContextProvider } from "../../context/plugin-context";
@@ -15,9 +15,9 @@ const JAN_1ST = DateTime.fromISO("2024-01-01") as DateTime<true>;
 const JAN_2ND = DateTime.fromISO("2024-01-02") as DateTime<true>;
 const JAN_3RD = DateTime.fromISO("2024-01-03") as DateTime<true>;
 
-vi.mock("../../lib/dataview-adapters");
-vi.mock("../../lib/obsidian-adapters");
-vi.mock("../../lib/tasks-api-adapters");
+vi.mock("../../lib/obsidian-dataview/api");
+vi.mock("../../lib/obsidian/api");
+vi.mock("../../lib/obsidian-tasks/api");
 
 describe("useScheduledTasks", () => {
     const obsidian = vi.mocked(new Obsidian(), true);

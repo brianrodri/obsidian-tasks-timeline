@@ -16,7 +16,7 @@ import {
     TagsIcon,
     TaskIcon,
 } from "../assets/icons";
-import { Link, Task } from "../lib/dataview-types";
+import { Link, Task } from "../lib/obsidian-dataview/types";
 import { VaultLink } from "./vault-link";
 import { extractTaskMetadata } from "../features/tasks/parse-task";
 import { usePluginContext } from "../context/plugin-context";

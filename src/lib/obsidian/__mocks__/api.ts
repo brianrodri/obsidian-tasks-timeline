@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 
-import { Obsidian as RealObsidian } from "../obsidian-adapters";
+import { Obsidian as RealObsidian } from "../api";
 
 const loadData = vi.fn();
 const saveData = vi.fn();
