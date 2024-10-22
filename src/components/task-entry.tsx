@@ -16,10 +16,10 @@ import {
     TagsIcon,
     TaskIcon,
 } from "../assets/icons";
-import { Link, Task } from "../compat/dataview/types/dataview-types";
+import { Link, Task } from "../compat/dataview-types";
 import { VaultLink } from "./vault-link";
 import { extractTaskMetadata } from "../features/tasks/parse-task";
-import { useTimelineContext } from "../hooks/use-timeline-context";
+import { usePluginContext } from "../context/plugin-context";
 
 export interface TaskEntryProps {
     task: Task;
@@ -39,7 +39,7 @@ export const TaskEntry = ({ task: { checked, completed, path, position, section,
         startDate,
     } = useMemo(() => extractTaskMetadata(text, tags), [text, tags]);
 
-    const { obsidian, tasksApi } = useTimelineContext();
+    const { obsidian, tasksApi } = usePluginContext();
 
     const onToggleTask = useCallback(() => {
         obsidian.processFilePosition(path, position, (taskContent: string) =>

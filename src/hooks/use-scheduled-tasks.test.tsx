@@ -9,7 +9,7 @@ import { FileBuilder, mockDataArray, Page, Task, TaskBuilder } from "../compat/d
 import { Obsidian, WorkspaceLeaf } from "../compat/obsidian-adapters";
 import { DEFAULT_SETTINGS } from "../config/settings";
 import { useScheduledTasks } from "./use-scheduled-tasks";
-import { TimelineContextProvider } from "./use-timeline-context";
+import { PluginContextProvider } from "../context/plugin-context";
 
 const JAN_1ST = DateTime.fromISO("2024-01-01") as DateTime<true>;
 const JAN_2ND = DateTime.fromISO("2024-01-02") as DateTime<true>;
@@ -26,7 +26,7 @@ describe("useScheduledTasks", () => {
     const leaf = vi.mocked(new WorkspaceLeaf(), true);
 
     const wrapper = ({ children }: PropsWithChildren) => (
-        <TimelineContextProvider
+        <PluginContextProvider
             obsidian={obsidian}
             dataview={dataview}
             settings={DEFAULT_SETTINGS}
@@ -34,7 +34,7 @@ describe("useScheduledTasks", () => {
             tasksApi={tasksApi}
         >
             {children}
-        </TimelineContextProvider>
+        </PluginContextProvider>
     );
 
     const mockPageWithTasks = (tasks: Task[] | undefined, fileBuilder = new FileBuilder()): Task[] => {

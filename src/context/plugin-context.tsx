@@ -5,9 +5,9 @@ import { Obsidian, WorkspaceLeaf } from "../compat/obsidian-adapters";
 import { TasksApi } from "../compat/tasks-api-adapters";
 import { TasksTimelineSettings as Settings } from "../config/settings";
 
-const TimelineContext = createContext<TimelineContextValue | null>(null);
+const PluginContext = createContext<PluginContextValue | null>(null);
 
-export interface TimelineContextValue {
+export interface PluginContextValue {
     leaf: WorkspaceLeaf;
     settings: Settings;
     obsidian: Obsidian;
@@ -15,14 +15,14 @@ export interface TimelineContextValue {
     tasksApi: TasksApi;
 }
 
-export function useTimelineContext(): TimelineContextValue {
-    const value = useContext(TimelineContext);
+export function usePluginContext(): PluginContextValue {
+    const value = useContext(PluginContext);
     if (!value) {
         throw new Error("context must be used from within a provider");
     }
     return value;
 }
 
-export function TimelineContextProvider({ children, ...value }: PropsWithChildren<TimelineContextValue>) {
-    return <TimelineContext.Provider value={value}>{children}</TimelineContext.Provider>;
+export function PluginContextProvider({ children, ...value }: PropsWithChildren<PluginContextValue>) {
+    return <PluginContext.Provider value={value}>{children}</PluginContext.Provider>;
 }

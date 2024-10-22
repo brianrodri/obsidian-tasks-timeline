@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { useMemo } from "preact/hooks";
 
 import { Task } from "../compat/dataview-types";
-import { useTimelineContext } from "./use-timeline-context";
+import { usePluginContext } from "../context/plugin-context";
 
 export interface ScheduledTasksValue {
     unscheduled: Task[];
@@ -11,7 +11,7 @@ export interface ScheduledTasksValue {
 }
 
 export function useScheduledTasks(): ScheduledTasksValue {
-    const { dataview, settings } = useTimelineContext();
+    const { dataview, settings } = usePluginContext();
     const revision = dataview.revision.value;
     const pageQuery = settings.pageQuery;
 

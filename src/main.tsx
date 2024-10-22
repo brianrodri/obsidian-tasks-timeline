@@ -3,7 +3,7 @@ import { Notice, Plugin } from "obsidian";
 import { Dataview, ensureDataviewReady } from "./compat/dataview-adapters";
 import { NoticeMessage, Obsidian, ObsidianView, WorkspaceLeaf } from "./compat/obsidian-adapters";
 import { DEFAULT_SETTINGS } from "./config/settings";
-import { TimelineContextProvider } from "./hooks/use-timeline-context";
+import { PluginContextProvider } from "./context/plugin-context";
 import { TimelineView } from "./components/timeline-view";
 import { TasksApi } from "./compat/tasks-api-adapters";
 
@@ -36,7 +36,7 @@ export default class TasksTimelinePlugin extends Plugin {
 
     private createView(leaf: WorkspaceLeaf): ObsidianView {
         const timelineView = (
-            <TimelineContextProvider
+            <PluginContextProvider
                 leaf={leaf}
                 settings={this.settings}
                 obsidian={this.obsidian}
@@ -44,7 +44,7 @@ export default class TasksTimelinePlugin extends Plugin {
                 tasksApi={new TasksApi(this)}
             >
                 <TimelineView />
-            </TimelineContextProvider>
+            </PluginContextProvider>
         );
         return new ObsidianView(leaf, VIEW_TYPE, VIEW_HEADER, VIEW_ICON, timelineView);
     }
