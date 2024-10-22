@@ -1,15 +1,15 @@
 import { renderHook } from "@testing-library/preact";
 import { describe, expect, it, vi } from "vitest";
 
-import { Dataview } from "../lib/dataview-adapters";
-import { Obsidian, WorkspaceLeaf } from "../lib/obsidian-adapters";
-import { DEFAULT_SETTINGS } from "../data/settings";
-import { PluginContextProvider, usePluginContext } from "./plugin-context";
-import { TasksApi } from "../lib/tasks-api-adapters";
+import { Dataview } from "../../lib/dataview-adapters";
+import { Obsidian, WorkspaceLeaf } from "../../lib/obsidian-adapters";
+import { DEFAULT_SETTINGS } from "../../data/settings";
+import { PluginContextProvider, usePluginContext } from "../plugin-context";
+import { TasksApi } from "../../lib/tasks-api-adapters";
 
-vi.mock("../lib/dataview-adapters");
-vi.mock("../lib/obsidian-adapters");
-vi.mock("../lib/tasks-api-adapters");
+vi.mock("../../lib/dataview-adapters");
+vi.mock("../../lib/obsidian-adapters");
+vi.mock("../../lib/tasks-api-adapters");
 
 describe("useTimelineContext", () => {
     it("throws when used outside of context", () => {

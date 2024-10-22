@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, it } from "vitest";
 
-import { DEFAULT_SETTINGS, PluginSettings } from "./settings";
+import { DEFAULT_SETTINGS, PluginSettings } from "../settings";
 
 describe("TasksTimelineSettings", () => {
     it("has correct types", () => {

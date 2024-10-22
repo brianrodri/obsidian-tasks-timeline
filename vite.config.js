@@ -27,10 +27,11 @@ export default defineConfig(({ mode }) => ({
     },
     test: {
         environment: "jsdom",
+        include: ["src/**/__tests__/*.{ts,tsx}"],
         coverage: {
             all: true,
             include: ["src/"],
-            exclude: ["src/main.tsx", "src/compat/", "**/__mocks__/"],
+            exclude: ["src/main.tsx", "**/__mocks__/", "**/__tests__/"],
         },
     },
 }));

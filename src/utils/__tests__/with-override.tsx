@@ -1,7 +1,7 @@
 import { VNode } from "preact";
 import { describe, expectTypeOf, it } from "vitest";
 
-import type { WithOverride } from "./with-override";
+import type { WithOverride } from "../with-override";
 
 type RawData = { title: string; items: Array<{ icon: string }> };
 type RichData = { items: Array<{ icon: VNode }> };
