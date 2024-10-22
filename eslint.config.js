@@ -54,6 +54,7 @@ export default [
     },
 
     {
+        files: ["src/**/*.{ts,tsx}", "*.config.js"],
         plugins: { prettier: prettierPlugin },
         rules: {
             ...prettierConfig.rules,

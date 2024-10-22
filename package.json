@@ -55,6 +55,7 @@
         "jsdom": "latest",
         "obsidian": "latest",
         "obsidian-dataview": "latest",
+        "@trivago/prettier-plugin-sort-imports": "latest",
         "semantic-release": "latest",
         "semantic-release-obsidian-plugin": "latest",
         "tslib": "latest",
