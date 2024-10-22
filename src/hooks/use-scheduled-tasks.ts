@@ -2,7 +2,7 @@ import { Dictionary, groupBy, memoize, partition, sortedIndex } from "lodash";
 import { DateTime } from "luxon";
 import { useMemo } from "preact/hooks";
 
-import { Task } from "../compat/dataview-types";
+import { Task } from "../lib/dataview-types";
 import { usePluginContext } from "../context/plugin-context";
 
 export interface ScheduledTasksValue {

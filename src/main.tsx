@@ -1,11 +1,11 @@
 import { Notice, Plugin } from "obsidian";
 
-import { Dataview, ensureDataviewReady } from "./compat/dataview-adapters";
-import { NoticeMessage, Obsidian, ObsidianView, WorkspaceLeaf } from "./compat/obsidian-adapters";
+import { Dataview, ensureDataviewReady } from "./lib/dataview-adapters";
+import { NoticeMessage, Obsidian, ObsidianView, WorkspaceLeaf } from "./lib/obsidian-adapters";
 import { DEFAULT_SETTINGS } from "./data/settings";
 import { PluginContextProvider } from "./context/plugin-context";
 import { TimelineView } from "./components/timeline-view";
-import { TasksApi } from "./compat/tasks-api-adapters";
+import { TasksApi } from "./lib/tasks-api-adapters";
 
 const VIEW_TYPE = "obsidian-tasks-timeline" as const;
 const VIEW_HEADER = "Tasks timeline" as const;

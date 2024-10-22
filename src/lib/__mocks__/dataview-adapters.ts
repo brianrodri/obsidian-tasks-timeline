@@ -2,7 +2,7 @@ import { Signal } from "@preact/signals";
 import { vi } from "vitest";
 
 import { Dataview as RealDataview } from "../dataview-adapters";
-import { Task } from "compat/dataview-types";
+import { Task } from "lib/dataview-types";
 
 const getPage = vi.fn();
 const getPages = vi.fn();
