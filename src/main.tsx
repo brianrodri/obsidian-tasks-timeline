@@ -4,7 +4,7 @@ import { Dataview, ensureDataviewReady } from "./lib/obsidian-dataview/api";
 import { NoticeMessage, Obsidian, ObsidianView, WorkspaceLeaf } from "./lib/obsidian/api";
 import { DEFAULT_SETTINGS } from "./data/settings";
 import { PluginContextProvider } from "./context/plugin-context";
-import { TimelineView } from "./components/timeline-view";
+import { TimelineView } from "./features/timeline/components/timeline-view";
 import { TasksApi } from "./lib/obsidian-tasks/api";
 
 const VIEW_TYPE = "obsidian-tasks-timeline" as const;

@@ -15,11 +15,11 @@ import {
     StartedIcon,
     TagsIcon,
     TaskIcon,
-} from "../assets/icons";
-import { Link, Task } from "../lib/obsidian-dataview/types";
-import { VaultLink } from "./vault-link";
-import { extractTaskMetadata } from "../features/tasks/parse-task";
-import { usePluginContext } from "../context/plugin-context";
+} from "../../../assets/icons";
+import { Link, Task } from "../../../lib/obsidian-dataview/types";
+import { VaultLink } from "../../../components/vault-link";
+import { extractTaskMetadata } from "../../../data/lib/obsidian-tasks/task-resolver";
+import { usePluginContext } from "../../../context/plugin-context";
 
 export interface TaskEntryProps {
     task: Task;
