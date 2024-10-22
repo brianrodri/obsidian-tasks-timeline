@@ -1,7 +1,7 @@
 import { HTMLAttributes, PropsWithChildren } from "preact/compat";
 import { useCallback } from "preact/hooks";
 
-import { useTimelineContext } from "../hooks/use-timeline-context";
+import { usePluginContext } from "../context/plugin-context";
 
 export interface VaultLinkProps extends HTMLAttributes<HTMLAnchorElement> {
     href: string;
@@ -9,7 +9,7 @@ export interface VaultLinkProps extends HTMLAttributes<HTMLAnchorElement> {
 }
 
 export function VaultLink({ href, sourcePath, children, ...rest }: PropsWithChildren<VaultLinkProps>) {
-    const { leaf, obsidian } = useTimelineContext();
+    const { leaf, obsidian } = usePluginContext();
 
     const onClick = useCallback(
         (event: Event) => obsidian.openVaultLink(event, href, sourcePath),

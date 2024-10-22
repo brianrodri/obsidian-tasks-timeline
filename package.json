@@ -23,6 +23,8 @@
     "type": "module",
     "dependencies": {
         "@preact/signals": "latest",
+        "assert": "latest",
+        "core-js": "latest",
         "lodash": "latest",
         "lucide-preact": "latest",
         "luxon": "latest",
@@ -38,6 +40,9 @@
         "@preact/preset-vite": "latest",
         "@semantic-release/git": "latest",
         "@testing-library/preact": "latest",
+        "@testing-library/user-event": "latest",
+        "@trivago/prettier-plugin-sort-imports": "latest",
+        "@types/core-js": "latest",
         "@types/lodash": "latest",
         "@types/luxon": "latest",
         "@types/react": "latest",

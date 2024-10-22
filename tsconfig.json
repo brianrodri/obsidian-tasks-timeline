@@ -23,6 +23,6 @@
         "jsx": "react-jsx",
         "jsxImportSource": "preact",
         "skipLibCheck": true, // Only concerned w/ type checking the package code.
-        "target": "ES2018" // Use same target as obsidian-dataview.
+        "target": "ESNext"
     }
 }
