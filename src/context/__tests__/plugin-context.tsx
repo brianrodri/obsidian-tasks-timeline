@@ -1,11 +1,11 @@
 import { renderHook } from "@testing-library/preact";
 import { describe, expect, it, vi } from "vitest";
 
-import { Dataview } from "../../lib/obsidian-dataview/api";
-import { Obsidian, WorkspaceLeaf } from "../../lib/obsidian/api";
 import { DEFAULT_SETTINGS } from "../../data/settings";
-import { PluginContextProvider, usePluginContext } from "../plugin-context";
+import { Dataview } from "../../lib/obsidian-dataview/api";
 import { TasksApi } from "../../lib/obsidian-tasks/api";
+import { Obsidian, WorkspaceLeaf } from "../../lib/obsidian/api";
+import { PluginContextProvider, usePluginContext } from "../plugin-context";
 
 vi.mock("../../lib/obsidian-dataview/api");
 vi.mock("../../lib/obsidian/api");

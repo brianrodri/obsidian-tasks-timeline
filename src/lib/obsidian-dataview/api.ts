@@ -1,4 +1,4 @@
-import { signal, Signal } from "@preact/signals";
+import { Signal, signal } from "@preact/signals";
 import type { Plugin } from "obsidian";
 import { getAPI, isPluginEnabled } from "obsidian-dataview";
 

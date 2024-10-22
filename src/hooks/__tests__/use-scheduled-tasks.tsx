@@ -3,13 +3,13 @@ import { DateTime } from "luxon";
 import { PropsWithChildren } from "preact/compat";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { TasksApi } from "../../lib/obsidian-tasks/api";
-import { Dataview } from "../../lib/obsidian-dataview/api";
-import { FileBuilder, mockDataArray, Page, Task, TaskBuilder } from "../../lib/obsidian-dataview/types";
-import { Obsidian, WorkspaceLeaf } from "../../lib/obsidian/api";
-import { DEFAULT_SETTINGS } from "../../data/settings";
-import { useScheduledTasks } from "../use-scheduled-tasks";
 import { PluginContextProvider } from "../../context/plugin-context";
+import { DEFAULT_SETTINGS } from "../../data/settings";
+import { Dataview } from "../../lib/obsidian-dataview/api";
+import { FileBuilder, Page, Task, TaskBuilder, mockDataArray } from "../../lib/obsidian-dataview/types";
+import { TasksApi } from "../../lib/obsidian-tasks/api";
+import { Obsidian, WorkspaceLeaf } from "../../lib/obsidian/api";
+import { useScheduledTasks } from "../use-scheduled-tasks";
 
 const JAN_1ST = DateTime.fromISO("2024-01-01") as DateTime<true>;
 const JAN_2ND = DateTime.fromISO("2024-01-02") as DateTime<true>;

@@ -1,9 +1,9 @@
-import { createContext, PropsWithChildren, useContext } from "preact/compat";
+import { PropsWithChildren, createContext, useContext } from "preact/compat";
 
-import { Dataview } from "../lib/obsidian-dataview/api";
-import { Obsidian, WorkspaceLeaf } from "../lib/obsidian/api";
-import { TasksApi } from "../lib/obsidian-tasks/api";
 import { PluginSettings as Settings } from "../data/settings";
+import { Dataview } from "../lib/obsidian-dataview/api";
+import { TasksApi } from "../lib/obsidian-tasks/api";
+import { Obsidian, WorkspaceLeaf } from "../lib/obsidian/api";
 
 const PluginContext = createContext<PluginContextValue | null>(null);
 

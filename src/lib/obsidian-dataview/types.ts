@@ -1,7 +1,7 @@
-import type { DateTime } from "luxon";
 import type { DataArray } from "obsidian-dataview/lib/api/data-array";
-import type { DataviewApi as RealDataviewApi } from "obsidian-dataview/lib/api/plugin-api";
+import type { DateTime } from "luxon";
 import type { FullIndex } from "obsidian-dataview/lib/data-index/index";
+import type { DataviewApi as RealDataviewApi } from "obsidian-dataview/lib/api/plugin-api";
 import type { SMarkdownPage, STask } from "obsidian-dataview/lib/data-model/serialized/markdown";
 
 export type { DataArray } from "obsidian-dataview/lib/api/data-array";
