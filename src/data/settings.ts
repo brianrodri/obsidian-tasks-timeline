@@ -1,4 +1,4 @@
-export interface TasksTimelineSettings {
+export interface PluginSettings {
     pageQuery: string;
     checked: boolean;
     forward: boolean;
@@ -6,7 +6,7 @@ export interface TasksTimelineSettings {
     dailyNoteFormat: string;
 }
 
-export const DEFAULT_SETTINGS: Readonly<TasksTimelineSettings> = {
+export const DEFAULT_SETTINGS: Readonly<PluginSettings> = {
     pageQuery: "",
     checked: true,
     forward: true,

@@ -2,7 +2,7 @@ import { Notice, Plugin } from "obsidian";
 
 import { Dataview, ensureDataviewReady } from "./compat/dataview-adapters";
 import { NoticeMessage, Obsidian, ObsidianView, WorkspaceLeaf } from "./compat/obsidian-adapters";
-import { DEFAULT_SETTINGS } from "./config/settings";
+import { DEFAULT_SETTINGS } from "./data/settings";
 import { PluginContextProvider } from "./context/plugin-context";
 import { TimelineView } from "./components/timeline-view";
 import { TasksApi } from "./compat/tasks-api-adapters";

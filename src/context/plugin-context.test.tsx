@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Dataview } from "../compat/dataview-adapters";
 import { Obsidian, WorkspaceLeaf } from "../compat/obsidian-adapters";
-import { DEFAULT_SETTINGS } from "../config/settings";
+import { DEFAULT_SETTINGS } from "../data/settings";
 import { PluginContextProvider, usePluginContext } from "./plugin-context";
 import { TasksApi } from "../compat/tasks-api-adapters";
 

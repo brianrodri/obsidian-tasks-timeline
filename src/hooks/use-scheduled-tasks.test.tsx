@@ -7,7 +7,7 @@ import { TasksApi } from "../compat/tasks-api-adapters";
 import { Dataview } from "../compat/dataview-adapters";
 import { FileBuilder, mockDataArray, Page, Task, TaskBuilder } from "../compat/dataview-types";
 import { Obsidian, WorkspaceLeaf } from "../compat/obsidian-adapters";
-import { DEFAULT_SETTINGS } from "../config/settings";
+import { DEFAULT_SETTINGS } from "../data/settings";
 import { useScheduledTasks } from "./use-scheduled-tasks";
 import { PluginContextProvider } from "../context/plugin-context";
 
