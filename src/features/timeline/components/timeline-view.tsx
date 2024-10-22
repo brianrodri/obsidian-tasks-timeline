@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 
 import { useScheduledTasks } from "../../../hooks/use-scheduled-tasks";
-import { TaskEntry } from "../../tasks/components/task-line";
+import { TaskEntry } from "./task-line";
 
 export function TimelineView() {
     const { unscheduled, getScheduledOn } = useScheduledTasks();
