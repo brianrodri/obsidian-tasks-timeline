@@ -8,7 +8,7 @@ export type { DataArray } from "obsidian-dataview/lib/api/data-array";
 export type { FullIndex } from "obsidian-dataview/lib/data-index/index";
 export type { Link } from "obsidian-dataview/lib/data-model/value";
 
-import { Builder } from "../utils/interface-builder";
+import { Builder } from "../utils/builder";
 
 export interface DataviewApi extends RealDataviewApi {
     index: FullIndex;

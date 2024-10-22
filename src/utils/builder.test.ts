@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Builder } from "./interface-builder";
+import { Builder } from "./builder";
 
 type RGB = { red: boolean; green: boolean; blue: boolean };
 const BLACK: RGB = { red: false, green: false, blue: false };
