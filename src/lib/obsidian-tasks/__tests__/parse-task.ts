@@ -1,33 +1,46 @@
 import { DateTime } from "luxon";
 import { describe, expect, it } from "vitest";
 
-import { TaskFields } from "@/data/task";
-import { parseTask } from "../parse-task";
-
-const TEST_CASES: [sourceText: string, parsedResult: Partial<TaskFields>][] = [
-    // Description
-    ["task text", { description: "task text" }],
-    // Priority
-    ["", { priority: 3 }], // Default value when omitted
-    ["⏬", { priority: 5 }],
-    ["🔽", { priority: 4 }],
-    ["🔼", { priority: 2 }],
-    ["⏫", { priority: 1 }],
-    ["🔺", { priority: 0 }],
-    // Recurrence Rule
-    ["🔁 every day when done", { recurrenceRule: "every day when done" }],
-    // Dates
-    ["➕ 2024-10-25", { createdDate: DateTime.fromISO("2024-10-25") }],
-    ["⏳ 2024-10-26", { scheduledDate: DateTime.fromISO("2024-10-26") }],
-    ["⏳ 2024-10-26", { scheduledDate: DateTime.fromISO("2024-10-26") }],
-    ["🛫 2024-10-27", { startDate: DateTime.fromISO("2024-10-27") }],
-    ["📅 2024-10-28", { dueDate: DateTime.fromISO("2024-10-28") }],
-    ["✅ 2024-10-29", { doneDate: DateTime.fromISO("2024-10-29") }],
-    ["❌ 2024-10-30", { cancelledDate: DateTime.fromISO("2024-10-30") }],
-];
+import { parseEmojiTaskFields } from "../parse-task";
 
 describe("parseText", () => {
-    it.each(TEST_CASES)('parses "%s" and extracts %s="%s"', (sourceText, parsedResult) => {
-        expect(parseTask(sourceText)).toEqual(expect.objectContaining(parsedResult));
+    it.each([
+        [{ description: "task text" }, " \t task text \t "],
+        [{ priority: 0 }, "🔺"],
+        [{ priority: 1 }, "⏫"],
+        [{ priority: 2 }, "🔼"],
+        [{ priority: 3 }, ""],
+        [{ priority: 4 }, "🔽"],
+        [{ priority: 5 }, "⏬"],
+        [{ recurrenceRule: "every day" }, "🔁 every day"],
+        [{ createdDate: DateTime.fromISO("2024-10-25") }, "➕ 2024-10-25"],
+        [{ scheduledDate: DateTime.fromISO("2024-10-26") }, "⏳ 2024-10-26"],
+        [{ scheduledDate: DateTime.fromISO("2024-10-27") }, "⏳ 2024-10-27"],
+        [{ startDate: DateTime.fromISO("2024-10-28") }, "🛫 2024-10-28"],
+        [{ dueDate: DateTime.fromISO("2024-10-29") }, "📅 2024-10-29"],
+        [{ doneDate: DateTime.fromISO("2024-10-30") }, "✅ 2024-10-30"],
+        [{ cancelledDate: DateTime.fromISO("2024-10-31") }, "❌ 2024-10-31"],
+    ])("parses %j from input=%j", (expectedPart, inputText) => {
+        expect(parseEmojiTaskFields(inputText)).toEqual(expect.objectContaining(expectedPart));
+    });
+
+    it("parses sequential fields", () => {
+        expect(
+            parseEmojiTaskFields(`
+                TODO ⏫ 🔁 every day ➕ 2024-10-25 ⏳ 2024-10-26 🛫 2024-10-27 📅 2024-10-28 ✅ 2024-10-29 ❌ 2024-10-30
+            `),
+        ).toEqual(
+            expect.objectContaining({
+                description: "TODO",
+                priority: 1,
+                recurrenceRule: "every day",
+                createdDate: DateTime.fromISO("2024-10-25"),
+                scheduledDate: DateTime.fromISO("2024-10-26"),
+                startDate: DateTime.fromISO("2024-10-27"),
+                dueDate: DateTime.fromISO("2024-10-28"),
+                doneDate: DateTime.fromISO("2024-10-29"),
+                cancelledDate: DateTime.fromISO("2024-10-30"),
+            }),
+        );
     });
 });

@@ -1,56 +1,69 @@
-import { chunk, escapeRegExp, uniq } from "lodash";
+import { chunk } from "lodash";
 import { DateTime } from "luxon";
 
 import { Task, TaskFields } from "@/data/task";
 import { splitAtRegExp } from "@/utils/regexp-utils";
+import { KeysWithValueOf } from "@/utils/type-utils";
 
-export function parseTask(text: string): Task {
-    const symbolRegExp = RegExp(uniq(TASK_FIELD_SYMBOLS.values().toArray().flat()).map(escapeRegExp).join("|"), "g");
-    const [description, ...symbolValuePairs] = splitAtRegExp(text, symbolRegExp);
-    const rawEntries = [["description", description], ...chunk(symbolValuePairs, 2)];
+export function parseEmojiTaskFields(text: string): Task {
+    const anySymbolsPattern = new RegExp(Object.keys(TASK_FIELD_KEY_BY_SYMBOL).join("|"), "g");
+    const [description, ...symbolValuePairs] = splitAtRegExp(text, anySymbolsPattern);
+
+    const rawEntries = chunk(symbolValuePairs, 2).map(([symbol, value]) => {
+        const key = TASK_FIELD_KEY_BY_SYMBOL[symbol as keyof TaskFieldKeyBySymbol];
+        switch (key) {
+            case "priority":
+                // TODO: Why can't TypeScript figure this out on its own?
+                return ["priority", symbol as KeysWithValueOf<TaskFieldKeyBySymbol, "priority">] as const;
+            default:
+                return [key, value.trim()] as const;
+        }
+    });
 
     return Task.fromFields(
-        Object.fromEntries(
-            rawEntries.map(([symbol, value]) => {
-                const [fieldName = "description"] = TASK_FIELD_SYMBOLS.entries()
-                    .filter(([, symbols]) => symbols.includes(symbol))
-                    .map(([fieldName]) => fieldName)
-                    .take(1);
-
-                switch (fieldName) {
-                    case "description":
+        Object.fromEntries([
+            ["description", description.trim()],
+            ...rawEntries.map(([key, rawValue]) => {
+                switch (key) {
                     case "recurrenceRule":
-                        return [fieldName, value.trim()];
+                        return [key, rawValue];
                     case "priority":
-                        return [fieldName, PRIORITY_SYMBOL_VALUES.get(symbol)];
+                        return [key, PRIORITY_VALUE_BY_SYMBOL[rawValue]];
                     case "cancelledDate":
                     case "createdDate":
                     case "doneDate":
                     case "dueDate":
                     case "scheduledDate":
                     case "startDate":
-                        return [fieldName, DateTime.fromISO(value.trim())];
+                        return [key, DateTime.fromISO(rawValue)];
                 }
             }),
-        ),
+        ]),
     );
 }
 
-const TASK_FIELD_SYMBOLS: ReadonlyMap<keyof TaskFields, string[]> = new Map([
-    ["createdDate", ["➕"]],
-    ["scheduledDate", ["⌛", "⏳"]],
-    ["startDate", ["🛫"]],
-    ["dueDate", ["📅"]],
-    ["doneDate", ["✅"]],
-    ["cancelledDate", ["❌"]],
-    ["recurrenceRule", ["🔁"]],
-    ["priority", ["⏬", "🔽", "🔼", "⏫", "🔺"]],
-]);
+const TASK_FIELD_KEY_BY_SYMBOL = {
+    "➕": "createdDate",
+    "⌛": "scheduledDate",
+    "⏳": "scheduledDate",
+    "🛫": "startDate",
+    "📅": "dueDate",
+    "✅": "doneDate",
+    "❌": "cancelledDate",
+    "🔁": "recurrenceRule",
+    "🔺": "priority",
+    "⏫": "priority",
+    "🔼": "priority",
+    "🔽": "priority",
+    "⏬": "priority",
+} as const satisfies Record<string, keyof TaskFields>;
 
-const PRIORITY_SYMBOL_VALUES: ReadonlyMap<string, number> = new Map([
-    ["🔺", 0],
-    ["⏫", 1],
-    ["🔼", 2],
-    ["🔽", 4],
-    ["⏬", 5],
-]);
+type TaskFieldKeyBySymbol = typeof TASK_FIELD_KEY_BY_SYMBOL;
+
+const PRIORITY_VALUE_BY_SYMBOL = {
+    "🔺": 0,
+    "⏫": 1,
+    "🔼": 2,
+    "🔽": 4,
+    "⏬": 5,
+} as const satisfies Record<KeysWithValueOf<TaskFieldKeyBySymbol, "priority">, number>;

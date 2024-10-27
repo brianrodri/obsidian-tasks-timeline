@@ -99,7 +99,7 @@ export class Task<
             dueDate,
             scheduledDate,
             startDate,
-        } = { ...this.toFields(), [key]: value } as TaskFields;
+        } = { ...this, [key]: value } as TaskFields;
         return new Task(
             status,
             customStatus,
@@ -113,29 +113,6 @@ export class Task<
             scheduledDate,
             startDate,
         );
-    }
-
-    public toFields(): TaskFields<
-        CancelledDateIsValid,
-        CreatedDateIsValid,
-        DoneDateIsValid,
-        DueDateIsValid,
-        ScheduledDateIsValid,
-        StartDateIsValid
-    > {
-        return {
-            status: this.status,
-            customStatus: this.customStatus,
-            description: this.description,
-            priority: this.priority,
-            recurrenceRule: this.recurrenceRule,
-            cancelledDate: this.cancelledDate,
-            createdDate: this.createdDate,
-            doneDate: this.doneDate,
-            dueDate: this.dueDate,
-            scheduledDate: this.scheduledDate,
-            startDate: this.startDate,
-        };
     }
 }
 

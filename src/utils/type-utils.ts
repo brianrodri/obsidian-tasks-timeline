@@ -9,3 +9,5 @@ export type DeepReadonly<T> =
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Constructor<T> = abstract new (...args: any[]) => T;
+
+export type KeysWithValueOf<T extends object, V> = keyof { [K in keyof T as T[K] extends V ? K : never]: never };
