@@ -1,19 +1,13 @@
 import { Signal } from "@preact/signals";
 import { vi } from "vitest";
 
-import { Dataview as RealDataview, Task } from "../api";
+import { Dataview as RealDataview } from "../api";
 
-const getPage = vi.fn();
-const getPages = vi.fn();
-const getScheduledDate = vi.fn(({ scheduled, start }: Task) =>
-    start && scheduled && start > scheduled ? start.toISODate() : (scheduled?.toISODate() ?? ""),
-);
+const getTasks = vi.fn();
 
 export class Dataview implements Partial<RealDataview> {
     public revision = { value: 1 } as Signal<number>;
-    public getPage = getPage;
-    public getPages = getPages;
-    public getScheduledDate = getScheduledDate;
+    public getTasks = getTasks;
 }
 
 export const ensureDataviewReady = vi.fn();

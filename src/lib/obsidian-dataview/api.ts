@@ -1,22 +1,23 @@
 import { Signal, signal } from "@preact/signals";
-import type { DateTime } from "luxon";
 import type { Plugin } from "obsidian";
 import { getAPI, isPluginEnabled } from "obsidian-dataview";
-import type { DataArray } from "obsidian-dataview/lib/api/data-array";
-import type { DataviewApi as RealDataviewApi } from "obsidian-dataview/lib/api/plugin-api";
-import type { FullIndex } from "obsidian-dataview/lib/data-index/index";
-import type { SMarkdownPage, STask } from "obsidian-dataview/lib/data-model/serialized/markdown";
+import { DataviewApi } from "obsidian-dataview/lib/api/plugin-api";
+import { STask } from "obsidian-dataview/lib/data-model/serialized/markdown";
 export type { Link } from "obsidian-dataview/lib/data-model/value";
+
+import { Task } from "@/data/task";
 
 export class Dataview {
     private readonly plugin: Plugin;
     private readonly dv: DataviewApi;
+
     public readonly revision: Signal<number>;
 
     public constructor(plugin?: Plugin) {
         if (!plugin) throw new Error("plugin is required");
         this.plugin = plugin;
         this.dv = getAPI(this.plugin.app) as DataviewApi;
+
         this.revision = signal(this.dv.index.revision);
 
         this.plugin.registerEvent(
@@ -28,18 +29,27 @@ export class Dataview {
         );
     }
 
-    public getPage(path: string): Page | undefined {
-        return this.dv.page(path) as Page | undefined;
-    }
-
-    public getPages(query: string, originFile?: string): Page[] {
-        return this.dv.pages(query, originFile).array() as Page[];
-    }
-
-    public getScheduledDate(task: Task): string {
-        const scheduled = task.scheduled?.toISODate() ?? this.getPage(task.path)?.file.day?.toISODate() ?? null;
-        const start = task.start?.toISODate() ?? null;
-        return scheduled && start && scheduled < start ? start : (scheduled ?? "");
+    public getTasks(pageQuery: string, originFile?: string): Task[] {
+        return this.dv
+            .pages(pageQuery, originFile)
+            .flatMap(
+                (page) =>
+                    page.file.tasks.array().map((sTask: STask) =>
+                        Task.fromFields({
+                            status:
+                                sTask.completed ? "DONE"
+                                : sTask.checked ? "DROPPED"
+                                : "OPEN",
+                            description: sTask.text,
+                            createdDate: sTask.created,
+                            doneDate: sTask.completion,
+                            dueDate: sTask.due,
+                            scheduledDate: sTask.scheduled,
+                            startDate: sTask.start,
+                        }),
+                    ) as Task[],
+            )
+            .array();
     }
 }
 
@@ -55,28 +65,4 @@ export async function ensureDataviewReady(plugin: Plugin): Promise<void> {
             plugin.registerEvent(plugin.app.metadataCache.on("dataview:index-ready", resolve));
         }
     });
-}
-
-export interface DataviewApi extends RealDataviewApi {
-    index: FullIndex;
-}
-
-export interface Page extends Omit<SMarkdownPage, "file"> {
-    file: File;
-}
-
-export interface File extends Omit<SMarkdownPage["file"], "tasks" | "ctime" | "cday" | "mtime" | "mday"> {
-    tasks?: DataArray<Task>;
-    ctime?: DateTime<true>;
-    cday?: DateTime<true>;
-    mtime?: DateTime<true>;
-    mday?: DateTime<true>;
-}
-
-export interface Task extends STask {
-    start?: DateTime<true>;
-    created?: DateTime<true>;
-    due?: DateTime<true>;
-    completion?: DateTime<true>;
-    scheduled?: DateTime<true>;
 }

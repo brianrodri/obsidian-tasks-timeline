@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { useMemo } from "preact/hooks";
 
 import { usePluginContext } from "@/context/plugin-context";
-import { Task } from "@/lib/obsidian-dataview/api";
+import { Task } from "@/data/task";
 
 export interface ScheduledTasksValue {
     unscheduled: Task[];
@@ -16,11 +16,9 @@ export function useScheduledTasks(): ScheduledTasksValue {
     const pageQuery = settings.pageQuery;
 
     return useMemo(() => {
-        const getScheduledDate = (task: Task) => dataview.getScheduledDate(task);
-
-        const tasks = dataview.getPages(pageQuery).flatMap((page) => page.file.tasks?.array() ?? []);
-        const [scheduled, unscheduled] = partition(tasks, getScheduledDate);
-        const scheduledByDate = groupBy(scheduled, getScheduledDate);
+        const tasks = dataview.getTasks(pageQuery);
+        const [scheduled, unscheduled] = partition(tasks, ({ scheduledDate }) => scheduledDate.isValid);
+        const scheduledByDate = groupBy(scheduled, (task) => task.scheduledDate?.toISODate());
         const sortedDates = Object.keys(scheduledByDate).sort();
         accumulateOpenTasks(scheduledByDate, sortedDates);
 
@@ -32,7 +30,7 @@ export function useScheduledTasks(): ScheduledTasksValue {
                     return scheduledByDate[key];
                 }
                 const prevKey = sortedDates[lowerBound - 1];
-                return prevKey ? scheduledByDate[prevKey].filter((task) => !task.checked) : [];
+                return prevKey ? scheduledByDate[prevKey].filter((task) => task.status === "OPEN") : [];
             },
             (date) => date.toISODate(),
         );
@@ -44,7 +42,7 @@ export function useScheduledTasks(): ScheduledTasksValue {
 function accumulateOpenTasks(tasksByDate: Dictionary<Task[]>, sortedDates: string[]) {
     const forwardedTasks = [];
     for (const date of sortedDates) {
-        const openTasks = tasksByDate[date].filter((task) => !task.checked);
+        const openTasks = tasksByDate[date].filter((task) => task.status === "OPEN");
         tasksByDate[date].push(...forwardedTasks);
         forwardedTasks.push(...openTasks);
     }

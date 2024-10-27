@@ -14,6 +14,10 @@
 import { isNumber, isString } from "lodash";
 import { DateTime } from "luxon";
 
+export const TASK_STATUSES = ["OPEN", "DONE", "DROPPED", "CUSTOM"] as const;
+
+export type TaskStatus = typeof TASK_STATUSES extends ReadonlyArray<infer T> ? T : never;
+
 export class Task<
     CancelledDateIsValid extends boolean = boolean,
     CreatedDateIsValid extends boolean = boolean,
@@ -32,6 +36,8 @@ export class Task<
         >
 {
     private constructor(
+        public readonly status: TaskStatus,
+        public readonly customStatus: TaskStatus extends "CUSTOM" ? string : undefined,
         public readonly description: string,
         public readonly priority: number,
         public readonly recurrenceRule: string,
@@ -56,6 +62,8 @@ export class Task<
         T extends { startDate: DateTime<infer IsValid> } ? IsValid : false
     > {
         return new Task(
+            part.status && TASK_STATUSES.includes(part.status) ? part.status : "OPEN",
+            part.customStatus,
             isString(part.description) ? part.description : "",
             isNumber(part.priority) ? part.priority : 3,
             isString(part.recurrenceRule) ? part.recurrenceRule : "",
@@ -80,6 +88,8 @@ export class Task<
         [K, V] extends ["startDate", DateTime<infer WithIsValid>] ? WithIsValid : StartDateIsValid
     > {
         const {
+            status,
+            customStatus,
             description,
             priority,
             recurrenceRule,
@@ -91,6 +101,8 @@ export class Task<
             startDate,
         } = { ...this.toFields(), [key]: value } as TaskFields;
         return new Task(
+            status,
+            customStatus,
             description,
             priority,
             recurrenceRule,
@@ -112,6 +124,8 @@ export class Task<
         StartDateIsValid
     > {
         return {
+            status: this.status,
+            customStatus: this.customStatus,
             description: this.description,
             priority: this.priority,
             recurrenceRule: this.recurrenceRule,
@@ -133,6 +147,8 @@ export interface TaskFields<
     ScheduledDateIsValid extends boolean = boolean,
     StartDateIsValid extends boolean = boolean,
 > {
+    status: TaskStatus;
+    customStatus: TaskStatus extends "CUSTOM" ? string : undefined;
     description: string;
     priority: number;
     recurrenceRule: string;
