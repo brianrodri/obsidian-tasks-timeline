@@ -1,7 +1,7 @@
 import { HTMLAttributes, PropsWithChildren } from "preact/compat";
 import { useCallback } from "preact/hooks";
 
-import { usePluginContext } from "../context/plugin-context";
+import { usePluginContext } from "@/context/plugin-context";
 
 export interface VaultLinkProps extends HTMLAttributes<HTMLAnchorElement> {
     href: string;

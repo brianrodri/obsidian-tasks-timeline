@@ -2,8 +2,8 @@ import { Dictionary, groupBy, memoize, partition, sortedIndex } from "lodash";
 import { DateTime } from "luxon";
 import { useMemo } from "preact/hooks";
 
-import { usePluginContext } from "../context/plugin-context";
-import { Task } from "../lib/obsidian-dataview/types";
+import { usePluginContext } from "@/context/plugin-context";
+import { Task } from "@/lib/obsidian-dataview/api";
 
 export interface ScheduledTasksValue {
     unscheduled: Task[];

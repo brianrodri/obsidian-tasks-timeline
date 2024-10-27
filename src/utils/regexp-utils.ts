@@ -1,6 +1,6 @@
 import { isRegExp, isString } from "lodash";
 
-import { pairwise } from "./iter-utils";
+import { pairwise } from "@/utils/iter-utils";
 
 export function splitAtRegExp(text: string, regExp: RegExp) {
     if (!isString(text)) throw new Error(`want string, got: ${text}`);

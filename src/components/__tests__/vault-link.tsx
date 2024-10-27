@@ -2,13 +2,13 @@ import { act, render } from "@testing-library/preact";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { Obsidian } from "../../lib/obsidian/api";
-import { MockPluginContext } from "../../utils/test-utils";
+import { Obsidian } from "@/lib/obsidian/api";
+import { MockPluginContext } from "@/utils/test-utils";
 import { VaultLink } from "../vault-link";
 
-vi.mock("../../lib/obsidian/api");
-vi.mock("../../lib/obsidian-dataview/api");
-vi.mock("../../lib/obsidian-tasks/api");
+vi.mock("@/lib/obsidian/api");
+vi.mock("@/lib/obsidian-dataview/api");
+vi.mock("@/lib/obsidian-tasks/api");
 
 describe("VaultLink", () => {
     const href = "www.abc.com";

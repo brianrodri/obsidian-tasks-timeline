@@ -1,6 +1,7 @@
 import preact from "@preact/preset-vite";
 import { defineConfig } from "vite";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+import path from "path";
 
 export default defineConfig(({ mode }) => ({
     plugins: [
@@ -24,6 +25,9 @@ export default defineConfig(({ mode }) => ({
             external: ["obsidian"],
         },
         sourcemap: mode === "development" ? "inline" : false,
+    },
+    resolve: {
+        alias: { "@": path.resolve(__dirname, "./src") },
     },
     test: {
         environment: "jsdom",

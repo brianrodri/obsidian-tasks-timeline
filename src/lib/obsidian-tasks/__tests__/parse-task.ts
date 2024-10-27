@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { describe, expect, it } from "vitest";
 
-import { TaskFields } from "../../../models/tasks/task-fields";
+import { TaskFields } from "@/data/task";
 import { parseTask } from "../parse-task";
 
 const TEST_CASES: [sourceText: string, parsedResult: Partial<TaskFields>][] = [

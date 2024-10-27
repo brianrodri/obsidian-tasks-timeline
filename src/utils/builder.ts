@@ -1,7 +1,7 @@
 /* v8 ignore next */
 import { assign, cloneDeep } from "lodash";
 
-import { DeepReadonly } from "./type-utils";
+import { DeepReadonly } from "@/utils/type-utils";
 
 export class Builder<T extends object> extends Object {
     private readonly defaults: DeepReadonly<T>;

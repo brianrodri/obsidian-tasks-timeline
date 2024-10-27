@@ -1,9 +1,8 @@
 import { chunk, escapeRegExp, uniq } from "lodash";
 import { DateTime } from "luxon";
 
-import { Task } from "../../models/tasks/task";
-import { TaskFields } from "../../models/tasks/task-fields";
-import { splitAtRegExp } from "../../utils/regexp-utils";
+import { Task, TaskFields } from "@/data/task";
+import { splitAtRegExp } from "@/utils/regexp-utils";
 
 export function parseTask(text: string): Task {
     const symbolRegExp = RegExp(uniq(TASK_FIELD_SYMBOLS.values().toArray().flat()).map(escapeRegExp).join("|"), "g");

@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { VNode } from "preact";
-import { useCallback, useMemo } from "preact/hooks";
+import { useCallback } from "preact/hooks";
 
 import {
     CancelledIcon,
@@ -15,11 +15,12 @@ import {
     StartedIcon,
     TagsIcon,
     TaskIcon,
-} from "../../../assets/icons";
-import { VaultLink } from "../../../components/vault-link";
-import { usePluginContext } from "../../../context/plugin-context";
-import { extractTaskMetadata } from "../../../data/lib/obsidian-tasks/task-resolver";
-import { Link, Task } from "../../../lib/obsidian-dataview/types";
+} from "@/assets/icons";
+import { VaultLink } from "@/components/vault-link";
+import { usePluginContext } from "@/context/plugin-context";
+import { Link, Task } from "@/lib/obsidian-dataview/api";
+
+//import { extractTaskMetadata } from "@/data/lib/obsidian-tasks/task-resolver";
 
 export interface TaskEntryProps {
     task: Task;
@@ -37,7 +38,7 @@ export const TaskEntry = ({ task: { checked, completed, path, position, section,
         dueDate,
         scheduledDate,
         startDate,
-    } = useMemo(() => extractTaskMetadata(text, tags), [text, tags]);
+    } = { text } as Partial<Task>;
 
     const { obsidian, tasksApi } = usePluginContext();
 

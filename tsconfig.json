@@ -5,9 +5,10 @@
         "strict": true,
 
         // Modules
-        "baseUrl": "./src",
+        "baseUrl": ".",
         "module": "ESNext",
         "moduleResolution": "Node",
+        "paths": { "@/*": ["./src/*"] },
 
         // Emit
         "noEmit": true,

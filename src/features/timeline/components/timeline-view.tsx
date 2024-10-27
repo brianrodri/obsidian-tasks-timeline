@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 
-import { useScheduledTasks } from "../../../hooks/use-scheduled-tasks";
+import { useScheduledTasks } from "@/hooks/use-scheduled-tasks";
 import { TaskEntry } from "./task-line";
 
 export function TimelineView() {
