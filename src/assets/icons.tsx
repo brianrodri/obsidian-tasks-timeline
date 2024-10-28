@@ -5,7 +5,7 @@ export {
     CalendarIcon as DueIcon,
     FileTextIcon as FileIcon,
     CircleAlertIcon as OverdueIcon,
-    TriangleAlertIcon as PriorityIcon,
+    CircleAlertIcon as PriorityIcon,
     RepeatIcon,
     HourglassIcon as ScheduledIcon,
     PlaneTakeoffIcon as StartedIcon,
