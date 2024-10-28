@@ -34,7 +34,6 @@ export class Dataview {
         const pages = [...this.dv.pages(pageQuery, originFile).array()];
         return pages.flatMap((page) => {
             const sTasks = page.file.tasks.array();
-            console.log({ sTasks });
             return sTasks.map((sTask: STask) => {
                 const status: TaskStatus =
                     sTask.completed ? "DONE"
