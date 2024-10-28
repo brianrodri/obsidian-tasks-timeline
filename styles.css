@@ -239,9 +239,6 @@
     padding: 0;
     border-radius: 3px !important;
 }
-.taskido .task .info .file {
-    color: var(--task-color);
-}
 .taskido .task .info .tag {
     color: var(--tag-color) !important;
     background: none !important;
