@@ -26,9 +26,7 @@ export default defineConfig(({ mode }) => ({
         },
         sourcemap: mode === "development" ? "inline" : false,
     },
-    resolve: {
-        alias: { "@": path.resolve(__dirname, "./src") },
-    },
+    resolve: { alias: { "@": path.resolve(__dirname, "/src") } },
     test: {
         environment: "jsdom",
         include: ["src/**/__tests__/*.{ts,tsx}"],

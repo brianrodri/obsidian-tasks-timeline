@@ -5,7 +5,8 @@ import { DataviewApi } from "obsidian-dataview/lib/api/plugin-api";
 import { STask } from "obsidian-dataview/lib/data-model/serialized/markdown";
 export type { Link } from "obsidian-dataview/lib/data-model/value";
 
-import { Task } from "@/data/task";
+import { Task, TaskLocation, TaskStatus } from "@/data/task";
+import { parseEmojiTaskFields } from "@/lib/obsidian-tasks/parse-task";
 
 export class Dataview {
     private readonly plugin: Plugin;
@@ -30,26 +31,31 @@ export class Dataview {
     }
 
     public getTasks(pageQuery: string, originFile?: string): Task[] {
-        return this.dv
-            .pages(pageQuery, originFile)
-            .flatMap(
-                (page) =>
-                    page.file.tasks.array().map((sTask: STask) =>
-                        Task.fromFields({
-                            status:
-                                sTask.completed ? "DONE"
-                                : sTask.checked ? "DROPPED"
-                                : "OPEN",
-                            description: sTask.text,
-                            createdDate: sTask.created,
-                            doneDate: sTask.completion,
-                            dueDate: sTask.due,
-                            scheduledDate: sTask.scheduled,
-                            startDate: sTask.start,
-                        }),
-                    ) as Task[],
-            )
-            .array();
+        const pages = [...this.dv.pages(pageQuery, originFile).array()];
+        return pages.flatMap((page) => {
+            const sTasks = page.file.tasks.array();
+            console.log({ sTasks });
+            return sTasks.map((sTask: STask) => {
+                const status: TaskStatus =
+                    sTask.completed ? "DONE"
+                    : sTask.checked ? "DROPPED"
+                    : "OPEN";
+                const location: TaskLocation = {
+                    filePath: sTask.path,
+                    fileName: sTask.section.fileName(),
+                    fileSection: sTask.section.subpath,
+                    fileLine: sTask.line,
+                    fileStartByte: sTask.position.start.offset,
+                    fileStopByte: sTask.position.end.offset,
+                    obsidianHref: sTask.section.obsidianLink(),
+                };
+                const tags: readonly string[] = sTask.tags;
+                let parsedTask = parseEmojiTaskFields(sTask.text);
+                const scheduledDate = parsedTask.scheduledDate.isValid ? parsedTask.scheduledDate : page.file.day;
+
+                return Task.fromFields({ ...parsedTask, status, scheduledDate, tags, location });
+            });
+        });
     }
 }
 

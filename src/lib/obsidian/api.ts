@@ -1,4 +1,4 @@
-import { IconName, ItemView, Keymap, Plugin, Pos, UserEvent, WorkspaceLeaf } from "obsidian";
+import { IconName, ItemView, Keymap, Plugin, UserEvent, WorkspaceLeaf } from "obsidian";
 import { ComponentChild, ContainerNode, render } from "preact";
 
 export { WorkspaceLeaf } from "obsidian";
@@ -22,15 +22,16 @@ export class Obsidian {
 
     public async processFilePosition(
         filePath: string,
-        filePosition: Pos,
+        startByte: number,
+        stopByte: number,
         process: (payload: string) => string,
     ): Promise<void> {
         const file = this.plugin.app.vault.getFileByPath(filePath);
         if (file) {
             await this.plugin.app.vault.process(file, (fileContent: string) => {
-                const head = fileContent.slice(0, filePosition.start.offset);
-                const processed = process(fileContent.slice(filePosition.start.offset, filePosition.end.offset));
-                const tail = fileContent.slice(filePosition.end.offset);
+                const head = fileContent.slice(0, startByte);
+                const processed = process(fileContent.slice(startByte, stopByte));
+                const tail = fileContent.slice(stopByte);
                 return `${head}${processed}${tail}`;
             });
         }

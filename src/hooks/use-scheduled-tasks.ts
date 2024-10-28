@@ -6,6 +6,7 @@ import { usePluginContext } from "@/context/plugin-context";
 import { Task } from "@/data/task";
 
 export interface ScheduledTasksValue {
+    revision: number;
     unscheduled: Task[];
     getScheduledOn: (date: DateTime<true>) => Task[];
 }

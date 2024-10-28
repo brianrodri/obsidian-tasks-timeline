@@ -18,6 +18,17 @@ describe("VaultLink", () => {
 
     afterEach(vi.restoreAllMocks);
 
+    it("does nothing when passed undefined props", async () => {
+        const result = render(<VaultLink>abc</VaultLink>, { wrapper });
+
+        await act(() => userEvent.click(result.getByText("abc")));
+        await act(() => userEvent.hover(result.getByText("abc")));
+
+        expect(obsidian.openVaultLink).not.toHaveBeenCalled();
+        expect(obsidian.openVaultHover).not.toHaveBeenCalled();
+        expect(result.unmount).not.toThrow();
+    });
+
     it("opens link when clicked", async () => {
         const result = render(
             <VaultLink href={href} sourcePath={sourcePath}>

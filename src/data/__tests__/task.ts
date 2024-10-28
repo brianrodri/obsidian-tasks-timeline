@@ -21,10 +21,10 @@ describe("Task", () => {
         });
 
         it("can be converted to and from fields", () => {
-            const fields = Task.EMPTY.toFields();
+            const fields = Task.EMPTY;
             const copy = Task.fromFields(fields);
             expect(copy).toEqual(Task.EMPTY);
-            expect(copy.toFields()).toEqual(fields);
+            expect(copy).toEqual(fields);
         });
     });
 

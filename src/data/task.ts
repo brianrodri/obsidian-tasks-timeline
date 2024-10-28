@@ -7,11 +7,11 @@
  * NOTE: I hate how bloated this class is from the type stuff, but it's very nice being able to guarantee you have a
  * {@link DateTime<true>} from the IDE.
  *
- * TODO: Try to generalize this logic in type-utils so that this file shrinks by ~45%.
+ * TODO: Try to generalize this logic in type-utils so that this file shrinks by ~50%.
  */
 
 /* v8 ignore next 1 */
-import { isNumber, isString } from "lodash";
+import { isArray, isNumber, isString } from "lodash";
 import { DateTime } from "luxon";
 
 export const TASK_STATUSES = ["OPEN", "DONE", "DROPPED", "CUSTOM"] as const;
@@ -47,12 +47,14 @@ export class Task<
         public readonly dueDate: DateTime<DueDateIsValid>,
         public readonly scheduledDate: DateTime<ScheduledDateIsValid>,
         public readonly startDate: DateTime<StartDateIsValid>,
+        public readonly tags: readonly string[],
+        public readonly location: TaskLocation,
     ) {}
 
     public static readonly EMPTY = Task.fromFields({});
 
     public static fromFields<T extends Partial<TaskFields>>(
-        part = {} as T,
+        part: T,
     ): Task<
         T extends { cancelledDate: DateTime<infer IsValid> } ? IsValid : false,
         T extends { createdDate: DateTime<infer IsValid> } ? IsValid : false,
@@ -61,6 +63,16 @@ export class Task<
         T extends { scheduledDate: DateTime<infer IsValid> } ? IsValid : false,
         T extends { startDate: DateTime<infer IsValid> } ? IsValid : false
     > {
+        const {
+            fileStartByte = 0,
+            fileStopByte = 0,
+            fileLine = undefined,
+            filePath = undefined,
+            fileSection = undefined,
+            fileName = undefined,
+            obsidianHref = undefined,
+        } = part.location ?? {};
+
         return new Task(
             part.status && TASK_STATUSES.includes(part.status) ? part.status : "OPEN",
             part.customStatus,
@@ -73,6 +85,8 @@ export class Task<
             DateTime.isDateTime(part.dueDate) ? part.dueDate : DateTime.invalid("unspecified"),
             DateTime.isDateTime(part.scheduledDate) ? part.scheduledDate : DateTime.invalid("unspecified"),
             DateTime.isDateTime(part.startDate) ? part.startDate : DateTime.invalid("unspecified"),
+            isArray(part.tags) && part.tags.every(isString) ? part.tags : [],
+            { fileStartByte, fileStopByte, fileLine, filePath, fileSection, fileName, obsidianHref },
         );
     }
 
@@ -99,6 +113,8 @@ export class Task<
             dueDate,
             scheduledDate,
             startDate,
+            tags,
+            location,
         } = { ...this, [key]: value } as TaskFields;
         return new Task(
             status,
@@ -112,6 +128,8 @@ export class Task<
             dueDate,
             scheduledDate,
             startDate,
+            tags,
+            location,
         );
     }
 }
@@ -135,4 +153,16 @@ export interface TaskFields<
     dueDate: DateTime<DueDateIsValid>;
     scheduledDate: DateTime<ScheduledDateIsValid>;
     startDate: DateTime<StartDateIsValid>;
+    tags: readonly string[];
+    location: TaskLocation;
+}
+
+export interface TaskLocation {
+    filePath?: string;
+    fileName?: string;
+    fileSection?: string;
+    fileLine?: number;
+    fileStartByte: number;
+    fileStopByte: number;
+    obsidianHref?: string;
 }

@@ -5,9 +5,9 @@
  * input iterable has fewer than two values.
  */
 export function* pairwise<T>(iterable: Iterable<T>) {
-    const iterator = Iterator.from(iterable);
-    let [curr] = iterator.take(1);
-    for (const next of iterator) {
+    const [head, ...tail] = iterable;
+    let curr = head;
+    for (const next of tail) {
         yield [curr, next];
         curr = next;
     }

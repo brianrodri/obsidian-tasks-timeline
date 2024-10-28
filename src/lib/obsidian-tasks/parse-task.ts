@@ -1,4 +1,4 @@
-import { chunk } from "lodash";
+import { chunk, escapeRegExp } from "lodash";
 import { DateTime } from "luxon";
 
 import { Task, TaskFields } from "@/data/task";
@@ -6,7 +6,7 @@ import { splitAtRegExp } from "@/utils/regexp-utils";
 import { KeysWithValueOf } from "@/utils/type-utils";
 
 export function parseEmojiTaskFields(text: string): Task {
-    const anySymbolsPattern = new RegExp(Object.keys(TASK_FIELD_KEY_BY_SYMBOL).join("|"), "g");
+    const anySymbolsPattern = new RegExp(Object.keys(TASK_FIELD_KEY_BY_SYMBOL).map(escapeRegExp).join("|"), "g");
     const [description, ...symbolValuePairs] = splitAtRegExp(text, anySymbolsPattern);
 
     const rawEntries = chunk(symbolValuePairs, 2).map(([symbol, value]) => {
