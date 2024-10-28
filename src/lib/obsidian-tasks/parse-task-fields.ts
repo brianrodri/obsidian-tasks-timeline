@@ -1,11 +1,11 @@
 import { chunk, escapeRegExp } from "lodash";
 import { DateTime } from "luxon";
 
-import { Task, TaskFields } from "@/data/task";
+import { TaskFields } from "@/data/task";
 import { splitAtRegExp } from "@/utils/regexp-utils";
 import { KeysWithValueOf } from "@/utils/type-utils";
 
-export function parseEmojiTaskFields(text: string): Task {
+export function parseEmojiTaskFields(text: string): Partial<TaskFields> {
     const anySymbolsPattern = new RegExp(Object.keys(TASK_FIELD_KEY_BY_SYMBOL).map(escapeRegExp).join("|"), "g");
     const [description, ...symbolValuePairs] = splitAtRegExp(text, anySymbolsPattern);
 
@@ -20,26 +20,24 @@ export function parseEmojiTaskFields(text: string): Task {
         }
     });
 
-    return Task.fromFields(
-        Object.fromEntries([
-            ["description", description.trim()],
-            ...rawEntries.map(([key, rawValue]) => {
-                switch (key) {
-                    case "recurrenceRule":
-                        return [key, rawValue];
-                    case "priority":
-                        return [key, PRIORITY_VALUE_BY_SYMBOL[rawValue]];
-                    case "cancelledDate":
-                    case "createdDate":
-                    case "doneDate":
-                    case "dueDate":
-                    case "scheduledDate":
-                    case "startDate":
-                        return [key, DateTime.fromISO(rawValue)];
-                }
-            }),
-        ]),
-    );
+    return Object.fromEntries([
+        ["description", description.trim()],
+        ...rawEntries.map(([key, rawValue]) => {
+            switch (key) {
+                case "recurrenceRule":
+                    return [key, rawValue];
+                case "priority":
+                    return [key, PRIORITY_VALUE_BY_SYMBOL[rawValue]];
+                case "cancelledDate":
+                case "createdDate":
+                case "doneDate":
+                case "dueDate":
+                case "scheduledDate":
+                case "startDate":
+                    return [key, DateTime.fromISO(rawValue)];
+            }
+        }),
+    ]);
 }
 
 const TASK_FIELD_KEY_BY_SYMBOL = {

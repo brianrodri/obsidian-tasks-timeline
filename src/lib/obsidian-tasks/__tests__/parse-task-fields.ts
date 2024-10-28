@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { describe, expect, it } from "vitest";
 
-import { parseEmojiTaskFields } from "../parse-task";
+import { parseEmojiTaskFields } from "../parse-task-fields";
 
 describe("parseText", () => {
     it.each([
@@ -9,7 +9,6 @@ describe("parseText", () => {
         [{ priority: 0 }, "🔺"],
         [{ priority: 1 }, "⏫"],
         [{ priority: 2 }, "🔼"],
-        [{ priority: 3 }, ""],
         [{ priority: 4 }, "🔽"],
         [{ priority: 5 }, "⏬"],
         [{ recurrenceRule: "every day" }, "🔁 every day"],

@@ -1,12 +1,12 @@
 import { Signal, signal } from "@preact/signals";
+import { uniq } from "lodash";
+import { DateTime } from "luxon";
 import type { Plugin } from "obsidian";
-import { getAPI, isPluginEnabled } from "obsidian-dataview";
-import { DataviewApi } from "obsidian-dataview/lib/api/plugin-api";
-import { STask } from "obsidian-dataview/lib/data-model/serialized/markdown";
-export type { Link } from "obsidian-dataview/lib/data-model/value";
+import { DataviewApi, getAPI, isPluginEnabled } from "obsidian-dataview";
+import { SMarkdownPage, STask } from "obsidian-dataview/lib/data-model/serialized/markdown";
 
 import { Task, TaskLocation, TaskStatus } from "@/data/task";
-import { parseEmojiTaskFields } from "@/lib/obsidian-tasks/parse-task";
+import { parseEmojiTaskFields } from "@/lib/obsidian-tasks/parse-task-fields";
 
 export class Dataview {
     private readonly plugin: Plugin;
@@ -31,14 +31,25 @@ export class Dataview {
     }
 
     public getTasks(pageQuery: string, originFile?: string): Task[] {
-        const pages = [...this.dv.pages(pageQuery, originFile).array()];
-        return pages.flatMap((page) => {
-            const sTasks = page.file.tasks.array();
-            return sTasks.map((sTask: STask) => {
+        const pages = this.dv.pages(pageQuery, originFile).array();
+
+        return pages.flatMap((page: SMarkdownPage) =>
+            // @ts-expect-error DataviewApi is wrong about the type of file.tasks.
+            page.file.tasks.array().map((sTask: STask) => {
+                const emojiFields = parseEmojiTaskFields(sTask.text);
+
+                const scheduledDate: DateTime<boolean> =
+                    emojiFields.scheduledDate?.isValid ? emojiFields.scheduledDate
+                    : sTask.scheduled?.isValid ? sTask.scheduled
+                    : page.file.day;
+
                 const status: TaskStatus =
                     sTask.completed ? "DONE"
                     : sTask.checked ? "DROPPED"
                     : "OPEN";
+
+                const tags: string[] = uniq(sTask.tags);
+
                 const location: TaskLocation = {
                     filePath: sTask.path,
                     fileName: sTask.section.fileName(),
@@ -48,13 +59,10 @@ export class Dataview {
                     fileStopByte: sTask.position.end.offset,
                     obsidianHref: sTask.section.obsidianLink(),
                 };
-                const tags: readonly string[] = sTask.tags;
-                let parsedTask = parseEmojiTaskFields(sTask.text);
-                const scheduledDate = parsedTask.scheduledDate.isValid ? parsedTask.scheduledDate : page.file.day;
 
-                return Task.fromFields({ ...parsedTask, status, scheduledDate, tags, location });
-            });
-        });
+                return Task.fromFields({ ...emojiFields, status, scheduledDate, tags, location });
+            }),
+        );
     }
 }
 
