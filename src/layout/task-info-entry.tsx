@@ -2,14 +2,14 @@ import { VNode } from "preact";
 import { HTMLAttributes, PropsWithChildren } from "preact/compat";
 
 export interface TaskInfoEntryProps extends HTMLAttributes<HTMLDivElement> {
-    infoIcon?: VNode;
+    symbol?: VNode;
 }
 
-export function TaskInfoEntry({ infoIcon, children, ...rest }: PropsWithChildren<TaskInfoEntryProps>) {
-    if (!children) return <></>;
+export function TaskInfoEntry({ symbol, children, ...rest }: PropsWithChildren<TaskInfoEntryProps>) {
+    if (!children) return null;
     return (
         <div {...rest}>
-            <div class="icon">{infoIcon}</div>
+            <div class="icon">{symbol}</div>
             <div class="label">{children}</div>
         </div>
     );
