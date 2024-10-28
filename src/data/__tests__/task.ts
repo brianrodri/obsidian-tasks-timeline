@@ -1,57 +1,33 @@
 import { DateTime } from "luxon";
-import { describe, expect, expectTypeOf, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { Task } from "../task";
 
+const EMPTY = Task.create({});
+const VALID_DATE = DateTime.now();
+const INVALID_DATE = DateTime.invalid("uh-oh");
+const UNTESTED_DATE = DateTime.fromISO("2024-10-26");
+
 describe("Task", () => {
-    describe(".fromFields", () => {
-        it("carries strong type-information from valid input", () => {
-            const { cancelledDate } = Task.fromFields({ cancelledDate: DateTime.now() });
-            expectTypeOf(cancelledDate).toEqualTypeOf<DateTime<true>>();
-        });
-
-        it("carries strong type-information from invalid input", () => {
-            const { createdDate } = Task.fromFields({ createdDate: DateTime.invalid("uh-oh") });
-            expectTypeOf(createdDate).toEqualTypeOf<DateTime<false>>();
-        });
-
-        it("carries weak type-information from unknown input", () => {
-            const { doneDate } = Task.fromFields({ doneDate: DateTime.fromISO("2024-10-26") });
-            expectTypeOf(doneDate).toEqualTypeOf<DateTime<boolean>>();
-        });
-
-        it("can be converted to and from fields", () => {
-            const fields = Task.EMPTY;
-            const copy = Task.fromFields(fields);
-            expect(copy).toEqual(Task.EMPTY);
-            expect(copy).toEqual(fields);
-        });
+    it("uses valid date", () => {
+        const { cancelledDate } = Task.create({ cancelledDate: VALID_DATE });
+        expect(cancelledDate).toEqual(VALID_DATE);
     });
 
-    describe(".with", () => {
-        it("carries strong type-information from valid input", () => {
-            const { dueDate } = Task.EMPTY.with("dueDate", DateTime.now());
-            expectTypeOf(dueDate).toEqualTypeOf<DateTime<true>>();
-        });
+    it("uses invalid date", () => {
+        const { createdDate } = Task.create({ createdDate: INVALID_DATE });
+        expect(createdDate).toEqual(INVALID_DATE);
+    });
 
-        it("carries strong type-information from invalid input", () => {
-            const { scheduledDate } = Task.EMPTY.with("scheduledDate", DateTime.invalid("uh-oh"));
-            expectTypeOf(scheduledDate).toEqualTypeOf<DateTime<false>>();
-        });
+    it("uses untested date", () => {
+        const { doneDate } = Task.create({ doneDate: UNTESTED_DATE });
+        expect(doneDate).toEqual(UNTESTED_DATE);
+    });
 
-        it("carries weak type-information from unknown input", () => {
-            const { startDate } = Task.EMPTY.with("startDate", DateTime.fromISO("2024-10-26"));
-            expectTypeOf(startDate).toEqualTypeOf<DateTime<boolean>>();
-        });
-
-        it("carries old type-information when chained", () => {
-            const fromOneValidDate = Task.fromFields({ cancelledDate: DateTime.now() });
-            const withTwoValidDates = fromOneValidDate.with("createdDate", DateTime.now());
-
-            expectTypeOf(fromOneValidDate.cancelledDate).toEqualTypeOf<DateTime<true>>();
-            expectTypeOf(fromOneValidDate.createdDate).toEqualTypeOf<DateTime<false>>();
-            expectTypeOf(withTwoValidDates.cancelledDate).toEqualTypeOf<DateTime<true>>();
-            expectTypeOf(withTwoValidDates.createdDate).toEqualTypeOf<DateTime<true>>();
-        });
+    it("can be converted to and from itself", () => {
+        const fields = EMPTY;
+        const copy = Task.create(fields);
+        expect(copy).toEqual(EMPTY);
+        expect(copy).toEqual(fields);
     });
 });

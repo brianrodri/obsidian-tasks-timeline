@@ -15,9 +15,9 @@ const JAN_1ST = DateTime.fromISO("2024-01-01") as DateTime<true>;
 const JAN_2ND = DateTime.fromISO("2024-01-02") as DateTime<true>;
 const JAN_3RD = DateTime.fromISO("2024-01-03") as DateTime<true>;
 
+vi.mock("@/lib/obsidian/api");
 vi.mock("@/lib/obsidian-dataview/api");
 vi.mock("@/lib/obsidian-tasks/api");
-vi.mock("@/lib/obsidian/api");
 
 describe("useScheduledTasks", () => {
     const obsidian = vi.mocked(new Obsidian(), true);
@@ -57,9 +57,9 @@ describe("useScheduledTasks", () => {
 
     it("groups scheduled tasks with the same date", () => {
         const [open, done, cancelled] = mockPageWithTasks([
-            Task.fromFields({ scheduledDate: JAN_2ND, status: "OPEN" }),
-            Task.fromFields({ scheduledDate: JAN_2ND, status: "DONE" }),
-            Task.fromFields({ scheduledDate: JAN_2ND, status: "DROPPED" }),
+            Task.create({ scheduledDate: JAN_2ND, status: "OPEN" }),
+            Task.create({ scheduledDate: JAN_2ND, status: "DONE" }),
+            Task.create({ scheduledDate: JAN_2ND, status: "DROPPED" }),
         ]);
 
         const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, { wrapper }).result.current;
@@ -72,8 +72,8 @@ describe("useScheduledTasks", () => {
 
     it("splits tasks with different scheduled dates", () => {
         const [done1st, done2nd] = mockPageWithTasks([
-            Task.fromFields({ scheduledDate: JAN_1ST, status: "DONE" }),
-            Task.fromFields({ scheduledDate: JAN_2ND, status: "DONE" }),
+            Task.create({ scheduledDate: JAN_1ST, status: "DONE" }),
+            Task.create({ scheduledDate: JAN_2ND, status: "DONE" }),
         ]);
 
         const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, { wrapper }).result.current;
@@ -86,10 +86,10 @@ describe("useScheduledTasks", () => {
 
     it("forwards unchecked tasks with past scheduled dates", () => {
         const [open1st, done1st, open2nd, done2nd] = mockPageWithTasks([
-            Task.fromFields({ scheduledDate: JAN_1ST, status: "OPEN" }),
-            Task.fromFields({ scheduledDate: JAN_1ST, status: "DONE" }),
-            Task.fromFields({ scheduledDate: JAN_2ND, status: "OPEN" }),
-            Task.fromFields({ scheduledDate: JAN_2ND, status: "DONE" }),
+            Task.create({ scheduledDate: JAN_1ST, status: "OPEN" }),
+            Task.create({ scheduledDate: JAN_1ST, status: "DONE" }),
+            Task.create({ scheduledDate: JAN_2ND, status: "OPEN" }),
+            Task.create({ scheduledDate: JAN_2ND, status: "DONE" }),
         ]);
 
         const { unscheduled, getScheduledOn } = renderHook(useScheduledTasks, { wrapper }).result.current;

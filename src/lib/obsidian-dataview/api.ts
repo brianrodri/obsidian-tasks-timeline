@@ -60,7 +60,7 @@ export class Dataview {
                     obsidianHref: sTask.section.obsidianLink(),
                 };
 
-                return Task.fromFields({ ...emojiFields, status, scheduledDate, tags, location });
+                return Task.create({ ...emojiFields, status, scheduledDate, tags, location });
             }),
         );
     }
