@@ -20,7 +20,7 @@ export class Obsidian {
         await this.plugin.saveData(settings);
     }
 
-    public async processFilePosition(
+    public async processFileRange(
         filePath: string,
         startByte: number,
         stopByte: number,
