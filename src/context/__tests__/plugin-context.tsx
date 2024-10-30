@@ -13,11 +13,11 @@ describe("useTimelineContext", () => {
         expect(() => renderHook(usePluginContext)).toThrowError("context must be used from within a provider");
     });
 
-    const { wrapper, obsidian, dataview, tasksApi, leaf, settings } = new MockPluginContext();
+    const { wrapper, obsidian, dataview, tasksApi, leaf, settings, setSettings } = new MockPluginContext();
 
     it("returns provided values", () => {
         const { result } = renderHook(usePluginContext, { wrapper });
 
-        expect(result.current).toEqual({ settings, obsidian, dataview, tasksApi, leaf });
+        expect(result.current).toEqual({ settings, obsidian, dataview, tasksApi, leaf, setSettings });
     });
 });

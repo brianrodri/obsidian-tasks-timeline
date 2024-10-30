@@ -1,10 +1,11 @@
 import { vi } from "vitest";
 
-import { PluginContextProvider, PluginContextValue } from "@/context/plugin-context";
-import { DEFAULT_SETTINGS } from "@/data/settings";
+import { PluginContext, PluginContextValue } from "@/context/plugin-context";
+import { DEFAULT_SETTINGS, PluginSettings } from "@/data/settings";
 import { Dataview } from "@/lib/obsidian-dataview/__mocks__/api";
 import { TasksApi } from "@/lib/obsidian-tasks/__mocks__/api";
 import { Obsidian, WorkspaceLeaf } from "@/lib/obsidian/__mocks__/api";
+import { Signal } from "@preact/signals";
 
 // TODO: Change this into a vitest-compatible mock
 export class MockPluginContext {
@@ -13,20 +14,20 @@ export class MockPluginContext {
         public readonly dataview = vi.mocked(new Dataview()),
         public readonly leaf = vi.mocked(new WorkspaceLeaf()),
         public readonly tasksApi = vi.mocked(new TasksApi()),
-        public readonly settings = vi.mocked(DEFAULT_SETTINGS),
+        public readonly settings = { value: vi.mocked(DEFAULT_SETTINGS) } as Signal<PluginSettings>,
+        public readonly setSettings = vi.fn(),
     ) {}
 
-    public toValue(): PluginContextValue {
-        return {
+    public readonly wrapper = ({ children }: { children: Element }) => {
+        const value = {
             dataview: this.dataview,
             obsidian: this.obsidian,
             leaf: this.leaf,
             tasksApi: this.tasksApi,
             settings: this.settings,
+            setSettings: this.setSettings,
         } as unknown as PluginContextValue;
-    }
 
-    public readonly wrapper = ({ children }: { children: Element }) => (
-        <PluginContextProvider {...this.toValue()}>{children}</PluginContextProvider>
-    );
+        return <PluginContext.Provider value={value}>{children}</PluginContext.Provider>;
+    };
 }
