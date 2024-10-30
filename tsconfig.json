@@ -24,6 +24,9 @@
         "jsx": "react-jsx",
         "jsxImportSource": "preact",
         "skipLibCheck": true, // Only concerned w/ type checking the package code.
-        "target": "ESNext"
-    }
+        "target": "ESNext",
+        "lib": ["ESNext", "DOM"]
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
 }

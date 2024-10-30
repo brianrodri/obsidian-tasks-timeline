@@ -12,6 +12,7 @@ import {
 } from "@/assets/icons";
 import { VaultLink } from "@/components/vault-link";
 import { Task } from "@/data/task";
+
 import { TaskCheckbox } from "./task-checkbox";
 import { TaskInfoEntry } from "./task-info-entry";
 
@@ -56,23 +57,23 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
                     <TaskInfoEntry key="repeat" symbol={<RepeatIcon />} className="repeat">
                         {task.recurrenceRule}
                     </TaskInfoEntry>
-                    <TaskInfoEntry key="created" symbol={<CreatedIcon />} className="relative">
-                        {task.createdDate.toRelativeCalendar()}
-                    </TaskInfoEntry>
-                    <TaskInfoEntry key="due" symbol={<DueIcon />} className="relative">
-                        {task.dueDate.toRelativeCalendar()}
-                    </TaskInfoEntry>
-                    <TaskInfoEntry key="scheduled" symbol={<ScheduledIcon />} className="relative">
-                        {task.scheduledDate.toRelativeCalendar()}
-                    </TaskInfoEntry>
-                    <TaskInfoEntry key="start" symbol={<StartedIcon />} className="relative">
-                        {task.startDate.toRelativeCalendar()}
-                    </TaskInfoEntry>
                     <TaskInfoEntry key="done" symbol={<CompletedIcon />} className="relative">
                         {task.doneDate.toRelativeCalendar()}
                     </TaskInfoEntry>
                     <TaskInfoEntry key="cancelled" symbol={<CancelledIcon />} className="relative">
                         {task.cancelledDate.toRelativeCalendar()}
+                    </TaskInfoEntry>
+                    <TaskInfoEntry key="scheduled" symbol={<ScheduledIcon />} className="relative">
+                        {task.scheduledDate.toRelativeCalendar()}
+                    </TaskInfoEntry>
+                    <TaskInfoEntry key="due" symbol={<DueIcon />} className="relative">
+                        {task.dueDate.toRelativeCalendar()}
+                    </TaskInfoEntry>
+                    <TaskInfoEntry key="start" symbol={<StartedIcon />} className="relative">
+                        {task.startDate.toRelativeCalendar()}
+                    </TaskInfoEntry>
+                    <TaskInfoEntry key="created" symbol={<CreatedIcon />} className="relative">
+                        {task.createdDate.toRelativeCalendar()}
                     </TaskInfoEntry>
                 </div>
             </div>

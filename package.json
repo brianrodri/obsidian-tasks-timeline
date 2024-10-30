@@ -23,6 +23,8 @@
     "type": "module",
     "dependencies": {
         "@preact/signals": "latest",
+        "@types/core-js": "^2.5.8",
+        "core-js": "^3.38.1",
         "lodash": "latest",
         "lucide-preact": "latest",
         "luxon": "latest",

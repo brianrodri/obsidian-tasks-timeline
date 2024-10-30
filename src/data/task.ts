@@ -23,6 +23,45 @@ export class Task implements TaskFields {
         public readonly location: TaskLocation,
     ) {}
 
+    public getKey(revision?: number): string {
+        const locationKey = `${this.location.filePath}:${this.location.fileLine}`;
+        return isNumber(revision) ? `${locationKey}@${revision}` : locationKey;
+    }
+
+    public get happensDate(): DateTime {
+        const { doneDate, cancelledDate, startDate, scheduledDate, dueDate, createdDate } = this;
+
+        if (doneDate.isValid) {
+            return doneDate;
+        }
+        if (cancelledDate.isValid) {
+            return cancelledDate;
+        }
+        if (scheduledDate.isValid && startDate.isValid && dueDate.isValid) {
+            return DateTime.min(DateTime.max(scheduledDate, startDate), dueDate);
+        }
+        if (scheduledDate.isValid && dueDate.isValid) {
+            return DateTime.min(scheduledDate, dueDate);
+        }
+        if (startDate.isValid && dueDate.isValid) {
+            return DateTime.min(startDate, dueDate);
+        }
+        if (scheduledDate.isValid) {
+            return scheduledDate;
+        }
+        if (startDate.isValid) {
+            return startDate;
+        }
+        if (dueDate.isValid) {
+            return dueDate;
+        }
+        if (createdDate.isValid) {
+            return createdDate;
+        }
+
+        return DateTime.invalid("task has no valid dates");
+    }
+
     public static create(part: Partial<TaskFields>): Task {
         const {
             fileStartByte = 0,
@@ -36,7 +75,7 @@ export class Task implements TaskFields {
 
         return new Task(
             part.status && TASK_STATUSES.includes(part.status) ? part.status : "OPEN",
-            part.customStatus,
+            part.status === "CUSTOM" && isString(part.customStatus) ? part.customStatus : undefined,
             isString(part.description) ? part.description : "",
             isNumber(part.priority) ? part.priority : 3,
             isString(part.recurrenceRule) ? part.recurrenceRule : "",

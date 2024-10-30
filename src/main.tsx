@@ -1,11 +1,14 @@
+import "core-js/features/iterator";
+
 import { Notice, Plugin } from "obsidian";
 
 import { PluginContextProvider } from "@/context/plugin-context";
+import { VaultTaskStateProvider } from "@/context/vault-task-state";
 import { DEFAULT_SETTINGS } from "@/data/settings";
-import { TimelineView } from "@/layout/timeline-view";
 import { Dataview, ensureDataviewReady } from "@/lib/obsidian-dataview/api";
 import { TasksApi } from "@/lib/obsidian-tasks/api";
 import { NoticeMessage, Obsidian, ObsidianView, WorkspaceLeaf } from "@/lib/obsidian/api";
+import { TodayView } from "./layout/today-view";
 
 const VIEW_TYPE = "obsidian-tasks-timeline" as const;
 const VIEW_HEADER = "Tasks timeline" as const;
@@ -43,7 +46,9 @@ export default class TasksTimelinePlugin extends Plugin {
                 dataview={new Dataview(this)}
                 tasksApi={new TasksApi(this)}
             >
-                <TimelineView />
+                <VaultTaskStateProvider>
+                    <TodayView />
+                </VaultTaskStateProvider>
             </PluginContextProvider>
         );
         return new ObsidianView(leaf, VIEW_TYPE, VIEW_HEADER, VIEW_ICON, timelineView);
