@@ -3,7 +3,7 @@ import "core-js/features/iterator";
 import { Notice, Plugin } from "obsidian";
 
 import { PluginContextProvider } from "@/context/plugin-context";
-import { VaultTaskStateProvider } from "@/context/vault-task-state";
+import { TasksStateProvider } from "@/context/tasks-state";
 import { DEFAULT_SETTINGS } from "@/data/settings";
 import { Dataview, ensureDataviewReady } from "@/lib/obsidian-dataview/api";
 import { TasksApi } from "@/lib/obsidian-tasks/api";
@@ -46,9 +46,9 @@ export default class TasksTimelinePlugin extends Plugin {
                 dataview={new Dataview(this)}
                 tasksApi={new TasksApi(this)}
             >
-                <VaultTaskStateProvider>
+                <TasksStateProvider>
                     <TodayView />
-                </VaultTaskStateProvider>
+                </TasksStateProvider>
             </PluginContextProvider>
         );
         return new ObsidianView(leaf, VIEW_TYPE, VIEW_HEADER, VIEW_ICON, timelineView);

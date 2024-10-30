@@ -29,6 +29,14 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
         : task.dueDate.diffNow().as("days") < 0 ? "task overdue"
         : "task";
 
+    const fileLabel =
+        fileSection ?
+            <>
+                {fileName}
+                <span class="header">{` > ${fileSection}`}</span>
+            </>
+        :   fileName;
+
     return (
         <div class={rootElClass}>
             <div class="timeline">
@@ -40,12 +48,7 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
                 <div class="line info">
                     <TaskInfoEntry key="location" symbol={<FileIcon />} className="file">
                         <VaultLink className="internal-link" href={obsidianHref} sourcePath={filePath}>
-                            {fileSection ?
-                                <>
-                                    {fileName}
-                                    <span class="header">{` > ${fileSection}`}</span>
-                                </>
-                            :   fileName}
+                            {fileLabel}
                         </VaultLink>
                     </TaskInfoEntry>
                     <TaskInfoEntry key="tags" symbol={<TagsIcon />} className="tag">

@@ -1,7 +1,7 @@
 import { DateTime, Interval } from "luxon";
 import { useMemo } from "preact/compat";
 
-import { useVaultTaskState } from "@/context/vault-task-state";
+import { useTasksState } from "@/context/tasks-state";
 
 import { Task } from "@/data/task";
 import { TaskEntry } from "./task-entry";
@@ -12,7 +12,7 @@ export interface TodayViewProps {
 }
 
 export function TodayView({ showFuture = false }: TodayViewProps) {
-    const { getHappeningBefore, getDatesAfter, undated } = useVaultTaskState();
+    const { getHappeningBefore, getDatesAfter, undated } = useTasksState();
     // Use a number so that React can properly identify updates.
     const today = DateTime.now();
     const todayStartEpoch = today.startOf("day").toMillis();
@@ -51,7 +51,7 @@ interface TimelineEntryProps {
 }
 
 function TimelineEntry({ date, label }: TimelineEntryProps) {
-    const { getHappeningOn, revision } = useVaultTaskState();
+    const { getHappeningOn, revision } = useTasksState();
 
     date = isString(date) ? (DateTime.fromISO(date) as DateTime<true>) : date;
     const start = date.startOf("day");

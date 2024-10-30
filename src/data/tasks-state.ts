@@ -3,7 +3,7 @@ import { DateTime, Interval } from "luxon";
 
 import { Task } from "./task";
 
-export class VaultTaskState {
+export class TasksState {
     public readonly undated: readonly Task[];
 
     private readonly tasksByDateKey: ReadonlyMap<string, readonly Task[]>;
@@ -18,23 +18,23 @@ export class VaultTaskState {
         this.undated = unscheduled;
         this.tasksByDateKey = Map.groupBy(
             sortBy(scheduled, (task) => task.happensDate),
-            (task) => VaultTaskState.getDateKey(task.happensDate),
+            (task) => TasksState.getDateKey(task.happensDate),
         );
         this.sortedDateKeys = [...this.tasksByDateKey.keys()];
 
-        this.getDatesAfter = memoize(this.getDatesAfter.bind(this), VaultTaskState.getDateKey);
-        this.getHappeningBefore = memoize(this.getHappeningBefore.bind(this), VaultTaskState.getDateKey);
-        this.getHappeningOn = memoize(this.getHappeningOn.bind(this), VaultTaskState.getIntervalKey);
+        this.getDatesAfter = memoize(this.getDatesAfter.bind(this), TasksState.getDateKey);
+        this.getHappeningBefore = memoize(this.getHappeningBefore.bind(this), TasksState.getDateKey);
+        this.getHappeningOn = memoize(this.getHappeningOn.bind(this), TasksState.getIntervalKey);
     }
 
     public getDatesAfter(date: DateTime<true>) {
-        const upperBound = sortedLastIndex(this.sortedDateKeys, VaultTaskState.getDateKey(date));
+        const numDatesSameOrBefore = sortedLastIndex(this.sortedDateKeys, TasksState.getDateKey(date));
 
-        return this.sortedDateKeys.slice(upperBound);
+        return this.sortedDateKeys.slice(numDatesSameOrBefore);
     }
 
     public getHappeningBefore(date: DateTime<true>): ReadonlyArray<Task> {
-        const numDatesBefore = sortedIndex(this.sortedDateKeys, VaultTaskState.getDateKey(date));
+        const numDatesBefore = sortedIndex(this.sortedDateKeys, TasksState.getDateKey(date));
 
         return this.tasksByDateKey
             .values()
@@ -44,8 +44,8 @@ export class VaultTaskState {
     }
 
     public getHappeningOn(interval: Interval<true>): ReadonlyArray<Task> {
-        const numDatesBeforeStart = sortedIndex(this.sortedDateKeys, VaultTaskState.getDateKey(interval.start));
-        const numDatesBeforeEnd = sortedIndex(this.sortedDateKeys, VaultTaskState.getDateKey(interval.end));
+        const numDatesBeforeStart = sortedIndex(this.sortedDateKeys, TasksState.getDateKey(interval.start));
+        const numDatesBeforeEnd = sortedIndex(this.sortedDateKeys, TasksState.getDateKey(interval.end));
 
         return this.tasksByDateKey
             .values()
@@ -60,6 +60,6 @@ export class VaultTaskState {
     }
 
     private static getIntervalKey({ start, end }: Interval<true>): string {
-        return `${VaultTaskState.getDateKey(start)}/${VaultTaskState.getDateKey(end)}`;
+        return `${TasksState.getDateKey(start)}/${TasksState.getDateKey(end)}`;
     }
 }
