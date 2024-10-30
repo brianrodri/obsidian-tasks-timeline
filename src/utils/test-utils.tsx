@@ -6,6 +6,7 @@ import { Dataview } from "@/lib/obsidian-dataview/__mocks__/api";
 import { TasksApi } from "@/lib/obsidian-tasks/__mocks__/api";
 import { Obsidian, WorkspaceLeaf } from "@/lib/obsidian/__mocks__/api";
 
+// TODO: Change this into a vitest-compatible mock
 export class MockPluginContext {
     public constructor(
         public readonly obsidian = vi.mocked(new Obsidian()),
