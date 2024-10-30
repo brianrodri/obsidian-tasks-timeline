@@ -9,17 +9,18 @@ import { Dataview, ensureDataviewReady } from "@/lib/obsidian-dataview/api";
 import { TasksApi } from "@/lib/obsidian-tasks/api";
 import { NoticeMessage, Obsidian, ObsidianView, WorkspaceLeaf } from "@/lib/obsidian/api";
 import { TodayView } from "./layout/today-view";
+import { signal } from "@preact/signals";
 
 const VIEW_TYPE = "obsidian-tasks-timeline" as const;
 const VIEW_HEADER = "Tasks timeline" as const;
 const VIEW_ICON = "list-todo" as const;
 
 export default class TasksTimelinePlugin extends Plugin {
-    private settings = DEFAULT_SETTINGS;
+    private settings = signal(DEFAULT_SETTINGS);
     private readonly obsidian = new Obsidian(this);
 
     public override async onload(): Promise<void> {
-        this.settings = await this.obsidian.loadData(DEFAULT_SETTINGS);
+        this.settings.value = await this.obsidian.loadData(DEFAULT_SETTINGS);
         this.registerView(VIEW_TYPE, (leaf) => this.createView(leaf));
         this.addRibbonIcon(VIEW_ICON, `Open ${VIEW_HEADER.toLowerCase()}`, () => this.obsidian.revealView(VIEW_TYPE));
 

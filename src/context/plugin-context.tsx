@@ -1,6 +1,7 @@
+import { Signal } from "@preact/signals";
 import { PropsWithChildren, createContext, useContext } from "preact/compat";
 
-import { PluginSettings as Settings } from "@/data/settings";
+import { PluginSettings } from "@/data/settings";
 import { Dataview } from "@/lib/obsidian-dataview/api";
 import { TasksApi } from "@/lib/obsidian-tasks/api";
 import { Obsidian, WorkspaceLeaf } from "@/lib/obsidian/api";
@@ -9,7 +10,7 @@ const PluginContext = createContext<PluginContextValue | null>(null);
 
 export interface PluginContextValue {
     leaf: WorkspaceLeaf;
-    settings: Settings;
+    settings: Signal<PluginSettings>;
     obsidian: Obsidian;
     dataview: Dataview;
     tasksApi: TasksApi;

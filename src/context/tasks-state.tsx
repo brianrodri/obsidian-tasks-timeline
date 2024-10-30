@@ -14,7 +14,7 @@ export function useTasksState(): TasksState {
 export function TasksStateProvider({ children }: PropsWithChildren) {
     const { dataview, settings } = usePluginContext();
     const revision = dataview.revision.value;
-    const pageQuery = settings.pageQuery;
+    const pageQuery = settings.value.pageQuery;
 
     const state = useMemo(
         () => new TasksState(dataview.getTasks(pageQuery), revision),
