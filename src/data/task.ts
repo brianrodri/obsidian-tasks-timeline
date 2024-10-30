@@ -40,6 +40,9 @@ export class Task implements TaskFields {
         if (scheduledDate.isValid && startDate.isValid && dueDate.isValid) {
             return DateTime.min(DateTime.max(scheduledDate, startDate), dueDate);
         }
+        if (scheduledDate.isValid && startDate.isValid) {
+            return DateTime.max(scheduledDate, startDate);
+        }
         if (scheduledDate.isValid && dueDate.isValid) {
             return DateTime.min(scheduledDate, dueDate);
         }
