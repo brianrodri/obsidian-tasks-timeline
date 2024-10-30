@@ -7,7 +7,7 @@ export interface PluginSettings {
 }
 
 export const DEFAULT_SETTINGS: Readonly<PluginSettings> = {
-    pageQuery: "",
+    pageQuery: "-#index",
     checked: true,
     forward: true,
     dailyNoteFolder: "01 - Fleeting/01 - Daily",

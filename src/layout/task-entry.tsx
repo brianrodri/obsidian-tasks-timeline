@@ -1,19 +1,9 @@
-import {
-    CancelledIcon,
-    CompletedIcon,
-    CreatedIcon,
-    DueIcon,
-    FileIcon,
-    PriorityIcon,
-    RepeatIcon,
-    ScheduledIcon,
-    StartedIcon,
-    TagsIcon,
-} from "@/assets/icons";
+import { FileIcon, PriorityIcon, RepeatIcon, TagsIcon } from "@/assets/icons";
 import { VaultLink } from "@/components/vault-link";
 import { Task } from "@/data/task";
 
 import { TaskCheckbox } from "./task-checkbox";
+import { TaskDateInput } from "./task-date-input";
 import { TaskInfoEntry } from "./task-info-entry";
 
 export interface TaskEntryProps {
@@ -60,24 +50,12 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
                     <TaskInfoEntry key="repeat" symbol={<RepeatIcon />} className="repeat">
                         {task.recurrenceRule}
                     </TaskInfoEntry>
-                    <TaskInfoEntry key="done" symbol={<CompletedIcon />} className="relative">
-                        {task.doneDate.toRelativeCalendar()}
-                    </TaskInfoEntry>
-                    <TaskInfoEntry key="cancelled" symbol={<CancelledIcon />} className="relative">
-                        {task.cancelledDate.toRelativeCalendar()}
-                    </TaskInfoEntry>
-                    <TaskInfoEntry key="scheduled" symbol={<ScheduledIcon />} className="relative">
-                        {task.scheduledDate.toRelativeCalendar()}
-                    </TaskInfoEntry>
-                    <TaskInfoEntry key="due" symbol={<DueIcon />} className="relative">
-                        {task.dueDate.toRelativeCalendar()}
-                    </TaskInfoEntry>
-                    <TaskInfoEntry key="start" symbol={<StartedIcon />} className="relative">
-                        {task.startDate.toRelativeCalendar()}
-                    </TaskInfoEntry>
-                    <TaskInfoEntry key="created" symbol={<CreatedIcon />} className="relative">
-                        {task.createdDate.toRelativeCalendar()}
-                    </TaskInfoEntry>
+                    <TaskDateInput field="doneDate" task={task} />
+                    <TaskDateInput field="cancelledDate" task={task} />
+                    <TaskDateInput field="scheduledDate" task={task} />
+                    <TaskDateInput field="dueDate" task={task} />
+                    <TaskDateInput field="startDate" task={task} />
+                    <TaskDateInput field="createdDate" task={task} />
                 </div>
             </div>
         </div>

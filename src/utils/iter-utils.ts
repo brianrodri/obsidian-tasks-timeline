@@ -8,7 +8,7 @@ export function* pairwise<T>(iterable: Iterable<T>) {
     const [head, ...tail] = iterable;
     let curr = head;
     for (const next of tail) {
-        yield [curr, next];
+        yield [curr, next] as const;
         curr = next;
     }
 }

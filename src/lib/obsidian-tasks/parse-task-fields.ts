@@ -1,13 +1,13 @@
-import { chunk, escapeRegExp } from "lodash";
+import { chunk, escapeRegExp, invert } from "lodash";
 import { DateTime } from "luxon";
 
 import { TaskFields } from "@/data/task";
+import { pairwise } from "@/utils/iter-utils";
 import { splitAtRegExp } from "@/utils/regexp-utils";
 import { KeysWithValueOf } from "@/utils/type-utils";
 
 export function parseEmojiTaskFields(text: string): Partial<TaskFields> {
-    const anySymbolsPattern = new RegExp(Object.keys(TASK_FIELD_KEY_BY_SYMBOL).map(escapeRegExp).join("|"), "g");
-    const [description, ...symbolValuePairs] = splitAtRegExp(text, anySymbolsPattern);
+    const [description, ...symbolValuePairs] = splitAtRegExp(text, TASK_FIELD_SYMBOL_PATTERN);
 
     const rawEntries = chunk(symbolValuePairs, 2).map(([symbol, value]) => {
         const key = TASK_FIELD_KEY_BY_SYMBOL[symbol as keyof TaskFieldKeyBySymbol];
@@ -40,7 +40,30 @@ export function parseEmojiTaskFields(text: string): Partial<TaskFields> {
     ]);
 }
 
-const TASK_FIELD_KEY_BY_SYMBOL = {
+export function updateEmojiTaskField<K extends KeysWithValueOf<TaskFields, DateTime>>(
+    text: string,
+    key: K,
+    process: (old: DateTime) => DateTime,
+): string {
+    const matches = [...text.matchAll(TASK_FIELD_SYMBOL_PATTERN), /$/.exec(text) as RegExpExecArray];
+
+    for (const [match, nextMatch] of pairwise(matches)) {
+        // Process if found
+        const symbol = match[0] as keyof TaskFieldKeyBySymbol;
+        if (TASK_FIELD_KEY_BY_SYMBOL[symbol] === key) {
+            const value = DateTime.fromISO(text.slice(match.index + symbol.length, nextMatch.index).trim());
+
+            return `${text.slice(0, match.index)}${symbol} ${process(value).toISODate()} ${text.slice(nextMatch.index)}`;
+        }
+    }
+
+    // Append if missing
+    const symbol = SYMBOL_BY_TASK_FIELD_KEY[key];
+    const trailingWhitespaceStart = /\s*$/.exec(text)?.index ?? text.length;
+    return `${text.slice(0, trailingWhitespaceStart)} ${symbol} ${DateTime.now().toISODate()}${text.slice(trailingWhitespaceStart)}`;
+}
+
+export const TASK_FIELD_KEY_BY_SYMBOL = {
     "➕": "createdDate",
     "⌛": "scheduledDate",
     "⏳": "scheduledDate",
@@ -55,6 +78,10 @@ const TASK_FIELD_KEY_BY_SYMBOL = {
     "🔽": "priority",
     "⏬": "priority",
 } as const satisfies Record<string, keyof TaskFields>;
+
+export const SYMBOL_BY_TASK_FIELD_KEY = invert(TASK_FIELD_KEY_BY_SYMBOL);
+
+const TASK_FIELD_SYMBOL_PATTERN = new RegExp(Object.keys(TASK_FIELD_KEY_BY_SYMBOL).map(escapeRegExp).join("|"), "g");
 
 type TaskFieldKeyBySymbol = typeof TASK_FIELD_KEY_BY_SYMBOL;
 

@@ -44,7 +44,7 @@ export class Dataview {
                     : page.file.day;
 
                 const status: TaskStatus =
-                    sTask.completed ? "DONE"
+                    sTask.fullyCompleted ? "DONE"
                     : sTask.checked ? "DROPPED"
                     : "OPEN";
 
