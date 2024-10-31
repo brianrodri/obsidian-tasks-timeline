@@ -1,47 +1,42 @@
-import { isString, upperFirst } from "lodash";
-import { DateTime, Interval } from "luxon";
+import { useCallback, useMemo } from "preact/hooks";
 
-import { useTasksState } from "@/context/tasks-state";
+import { Task } from "@/data/task";
 import { TaskEntry } from "./task-entry";
 
-export interface TimelineEntryProps {
-    date: DateTime<true> | string;
-    label?: string;
+interface TaskTimelineProps {
+    label: string;
+    tasks: readonly Task[];
     showDone?: boolean;
     showDropped?: boolean;
+    showCustom?: boolean;
 }
 
-export function TimelineEntry({ date, label, showDone = false, showDropped = false }: TimelineEntryProps) {
-    const { getHappeningOn, revision } = useTasksState();
-
-    date = isString(date) ? (DateTime.fromISO(date) as DateTime<true>) : date;
-    const start = date.startOf("day");
-    const end = start.plus({ days: 1 });
-    const interval = Interval.fromDateTimes(start, end) as Interval<true>;
-
-    const entries = getHappeningOn(interval)
-        .filter(
-            (task) =>
-                task.status === "OPEN" ||
-                (showDone && task.status === "DONE") ||
-                (showDropped && task.status === "DROPPED"),
-        )
-        .map((task) => <TaskEntry task={task} key={task.getKey(revision)} />);
-
-    if (entries.length === 0) return null;
-    return (
-        <>
-            <div class="dateLine">
-                <div class="date">{label ?? getDefaultDateLabel(start)}</div>
-            </div>
-            <div class="content">{entries}</div>
-        </>
+export function TaskTimeline({
+    label,
+    tasks,
+    showDone = false,
+    showDropped = false,
+    showCustom = false,
+}: TaskTimelineProps) {
+    const taskFilter = useCallback(
+        (task: Task) =>
+            (task.status !== "DONE" || showDone) &&
+            (task.status !== "DROPPED" || showDropped) &&
+            (task.status !== "CUSTOM" || showCustom),
+        [showDone, showDropped, showCustom],
     );
-}
 
-export function getDefaultDateLabel(date: DateTime<true>): string {
-    if (Math.abs(date.diffNow().as("days")) < 1) {
-        return upperFirst(date.toRelativeCalendar({ unit: "days" }));
-    }
-    return upperFirst(date.toISODate());
+    const entries = useMemo(
+        () => tasks.filter(taskFilter).map((task) => <TaskEntry task={task} key={task.getKey()} />),
+        [tasks, taskFilter],
+    );
+
+    return entries.length > 0 ?
+            <>
+                <div class="dateLine">
+                    <div class="date">{label}</div>
+                </div>
+                <div class="content">{entries}</div>
+            </>
+        :   null;
 }

@@ -1,5 +1,5 @@
 import { memoize, partition, sortBy, sortedIndex, sortedLastIndex } from "lodash";
-import { DateTime, Interval } from "luxon";
+import { DateTime } from "luxon";
 
 import { Task } from "./task";
 
@@ -22,15 +22,27 @@ export class TasksState {
         );
         this.sortedDateKeys = [...this.tasksByDateKey.keys()];
 
-        this.getDatesAfter = memoize(this.getDatesAfter.bind(this), TasksState.getDateKey);
         this.getHappeningBefore = memoize(this.getHappeningBefore.bind(this), TasksState.getDateKey);
-        this.getHappeningOn = memoize(this.getHappeningOn.bind(this), TasksState.getIntervalKey);
+        this.getHappeningOn = memoize(this.getHappeningOn.bind(this), TasksState.getDateKey);
+        this.getHappeningAfter = memoize(this.getHappeningAfter.bind(this), TasksState.getDateKey);
     }
 
-    public getDatesAfter(date: DateTime<true>) {
-        const numDatesSameOrBefore = sortedLastIndex(this.sortedDateKeys, TasksState.getDateKey(date));
+    public getHappeningOn(date: DateTime): ReadonlyArray<Task> {
+        if (!date.isValid) {
+            throw new Error(`${date.invalidReason}: ${date.invalidExplanation}`);
+        }
 
-        return this.sortedDateKeys.slice(numDatesSameOrBefore);
+        const start = date.startOf("day");
+        const end = start.plus({ day: 1 });
+        const numDatesBeforeStart = sortedIndex(this.sortedDateKeys, TasksState.getDateKey(start));
+        const numDatesBeforeEnd = sortedIndex(this.sortedDateKeys, TasksState.getDateKey(end));
+
+        return this.tasksByDateKey
+            .values()
+            .drop(numDatesBeforeStart)
+            .take(numDatesBeforeEnd - numDatesBeforeStart)
+            .flatMap((tasks) => tasks.values())
+            .toArray();
     }
 
     public getHappeningBefore(date: DateTime<true>): ReadonlyArray<Task> {
@@ -43,23 +55,17 @@ export class TasksState {
             .toArray();
     }
 
-    public getHappeningOn(interval: Interval<true>): ReadonlyArray<Task> {
-        const numDatesBeforeStart = sortedIndex(this.sortedDateKeys, TasksState.getDateKey(interval.start));
-        const numDatesBeforeEnd = sortedIndex(this.sortedDateKeys, TasksState.getDateKey(interval.end));
+    public getHappeningAfter(date: DateTime<true>): ReadonlyArray<Task> {
+        const numDatesSameOrBefore = sortedLastIndex(this.sortedDateKeys, TasksState.getDateKey(date));
 
         return this.tasksByDateKey
             .values()
-            .drop(numDatesBeforeStart)
-            .take(numDatesBeforeEnd - numDatesBeforeStart)
+            .drop(numDatesSameOrBefore)
             .flatMap((tasks) => tasks.values())
             .toArray();
     }
 
-    private static getDateKey(date: DateTime<true>): string {
+    public static getDateKey(date: DateTime<true>): string {
         return date.toISODate();
-    }
-
-    private static getIntervalKey({ start, end }: Interval<true>): string {
-        return `${TasksState.getDateKey(start)}/${TasksState.getDateKey(end)}`;
     }
 }

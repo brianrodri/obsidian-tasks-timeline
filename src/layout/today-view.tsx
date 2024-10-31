@@ -1,40 +1,31 @@
 import { DateTime } from "luxon";
 
 import { useTasksState } from "@/context/tasks-state";
-import { Task } from "@/data/task";
 
-import { TaskEntry } from "./task-entry";
-import { TimelineEntry } from "./timeline-entry";
+import { TaskTimeline } from "./timeline-entry";
 
 export interface TodayViewProps {
     showFuture?: boolean;
 }
 
 export function TodayView({ showFuture = true }: TodayViewProps) {
-    const { getHappeningBefore, getDatesAfter, undated } = useTasksState();
-
+    const { getHappeningBefore, getHappeningOn, getHappeningAfter, undated } = useTasksState();
     const today = DateTime.now().startOf("day");
-    const futureDates = showFuture ? getDatesAfter(today) : [];
-    const futureIntervals = futureDates.map((date) => <TimelineEntry key={date} date={date} />);
-    const unscheduled = [...getHappeningBefore(today), ...undated].filter((task) => task.status === "OPEN");
-    const unscheduledEntries = (
-        <>
-            <div class="dateLine">
-                <div class="date">To Schedule</div>
-            </div>
-            <div class="content">{unscheduled.map(toTaskEntry)}</div>
-        </>
-    );
+
+    const todoToday = getHappeningOn(today);
+    const todoLater = Map.groupBy(showFuture ? getHappeningAfter(today) : [], (task) => task.happensDate.toISODate());
+    const unplanned = [...getHappeningBefore(today).toReversed(), ...undated].filter((task) => task.status === "OPEN");
 
     return (
         <div class="taskido" id="taskido">
             <div class="details">
-                <TimelineEntry label="Today" date={today} showDone={true} showDropped={true} />
-                {unscheduled.length > 0 ? unscheduledEntries : null}
-                {futureIntervals}
+                <TaskTimeline key="today" label={today.toRelativeCalendar()} tasks={todoToday} />
+                <TaskTimeline key="unplanned" label={"To schedule"} tasks={unplanned} />
+                {todoLater
+                    .entries()
+                    .map(([isoDate, tasks]) => <TaskTimeline key={isoDate} label={isoDate as string} tasks={tasks} />)
+                    .toArray()}
             </div>
         </div>
     );
 }
-
-const toTaskEntry = (task: Task) => <TaskEntry task={task} key={task.getKey()} />;

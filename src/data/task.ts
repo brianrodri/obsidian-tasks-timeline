@@ -28,6 +28,34 @@ export class Task implements TaskFields {
         return isNumber(revision) ? `${locationKey}@${revision}` : locationKey;
     }
 
+    public static create(part: Partial<TaskFields>): Task {
+        const {
+            fileStartByte = 0,
+            fileStopByte = 0,
+            fileLine = undefined,
+            filePath = undefined,
+            fileSection = undefined,
+            fileName = undefined,
+            obsidianHref = undefined,
+        } = part.location ?? {};
+
+        return new Task(
+            part.status && TASK_STATUSES.includes(part.status) ? part.status : "OPEN",
+            part.status === "CUSTOM" && isString(part.customStatus) ? part.customStatus : undefined,
+            isString(part.description) ? part.description : "",
+            isNumber(part.priority) ? part.priority : 3,
+            isString(part.recurrenceRule) ? part.recurrenceRule : "",
+            DateTime.isDateTime(part.cancelledDate) ? part.cancelledDate : DateTime.invalid("unspecified"),
+            DateTime.isDateTime(part.createdDate) ? part.createdDate : DateTime.invalid("unspecified"),
+            DateTime.isDateTime(part.doneDate) ? part.doneDate : DateTime.invalid("unspecified"),
+            DateTime.isDateTime(part.dueDate) ? part.dueDate : DateTime.invalid("unspecified"),
+            DateTime.isDateTime(part.scheduledDate) ? part.scheduledDate : DateTime.invalid("unspecified"),
+            DateTime.isDateTime(part.startDate) ? part.startDate : DateTime.invalid("unspecified"),
+            isArray(part.tags) && part.tags.every(isString) ? part.tags : [],
+            { fileStartByte, fileStopByte, fileLine, filePath, fileSection, fileName, obsidianHref },
+        );
+    }
+
     public get happensDate(): DateTime {
         const { doneDate, cancelledDate, startDate, scheduledDate, dueDate, createdDate } = this;
 
@@ -63,34 +91,6 @@ export class Task implements TaskFields {
         }
 
         return DateTime.invalid("task has no valid dates");
-    }
-
-    public static create(part: Partial<TaskFields>): Task {
-        const {
-            fileStartByte = 0,
-            fileStopByte = 0,
-            fileLine = undefined,
-            filePath = undefined,
-            fileSection = undefined,
-            fileName = undefined,
-            obsidianHref = undefined,
-        } = part.location ?? {};
-
-        return new Task(
-            part.status && TASK_STATUSES.includes(part.status) ? part.status : "OPEN",
-            part.status === "CUSTOM" && isString(part.customStatus) ? part.customStatus : undefined,
-            isString(part.description) ? part.description : "",
-            isNumber(part.priority) ? part.priority : 3,
-            isString(part.recurrenceRule) ? part.recurrenceRule : "",
-            DateTime.isDateTime(part.cancelledDate) ? part.cancelledDate : DateTime.invalid("unspecified"),
-            DateTime.isDateTime(part.createdDate) ? part.createdDate : DateTime.invalid("unspecified"),
-            DateTime.isDateTime(part.doneDate) ? part.doneDate : DateTime.invalid("unspecified"),
-            DateTime.isDateTime(part.dueDate) ? part.dueDate : DateTime.invalid("unspecified"),
-            DateTime.isDateTime(part.scheduledDate) ? part.scheduledDate : DateTime.invalid("unspecified"),
-            DateTime.isDateTime(part.startDate) ? part.startDate : DateTime.invalid("unspecified"),
-            isArray(part.tags) && part.tags.every(isString) ? part.tags : [],
-            { fileStartByte, fileStopByte, fileLine, filePath, fileSection, fileName, obsidianHref },
-        );
     }
 }
 

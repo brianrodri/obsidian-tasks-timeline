@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { describe, expect, it } from "vitest";
 
-import { parseEmojiTaskFields } from "../parse-task-fields";
+import { readEmojiTaskFields } from "../parse-task-fields";
 
 describe("parseText", () => {
     it.each([
@@ -20,12 +20,12 @@ describe("parseText", () => {
         [{ doneDate: DateTime.fromISO("2024-10-30") }, "✅ 2024-10-30"],
         [{ cancelledDate: DateTime.fromISO("2024-10-31") }, "❌ 2024-10-31"],
     ])("parses %j from input=%j", (expectedPart, inputText) => {
-        expect(parseEmojiTaskFields(inputText)).toEqual(expect.objectContaining(expectedPart));
+        expect(readEmojiTaskFields(inputText)).toEqual(expect.objectContaining(expectedPart));
     });
 
     it("parses sequential fields", () => {
         expect(
-            parseEmojiTaskFields(`
+            readEmojiTaskFields(`
                 TODO ⏫ 🔁 every day ➕ 2024-10-25 ⏳ 2024-10-26 🛫 2024-10-27 📅 2024-10-28 ✅ 2024-10-29 ❌ 2024-10-30
             `),
         ).toEqual(

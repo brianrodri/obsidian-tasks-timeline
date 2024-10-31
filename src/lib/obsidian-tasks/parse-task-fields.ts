@@ -1,94 +1,84 @@
-import { chunk, escapeRegExp, invert } from "lodash";
+import { join } from "lodash";
 import { DateTime } from "luxon";
 
 import { TaskFields } from "@/data/task";
 import { pairwise } from "@/utils/iter-utils";
-import { splitAtRegExp } from "@/utils/regexp-utils";
-import { KeysWithValueOf } from "@/utils/type-utils";
 
-export function parseEmojiTaskFields(text: string): Partial<TaskFields> {
-    const [description, ...symbolValuePairs] = splitAtRegExp(text, TASK_FIELD_SYMBOL_PATTERN);
+const FIELD_KEY_BY_EMOJI = new Map([
+    ["➕", "createdDate"],
+    ["⌛", "scheduledDate"],
+    ["⏳", "scheduledDate"],
+    ["🛫", "startDate"],
+    ["📅", "dueDate"],
+    ["✅", "doneDate"],
+    ["❌", "cancelledDate"],
+    ["🔁", "recurrenceRule"],
+    ["🔺", "priority"],
+    ["⏫", "priority"],
+    ["🔼", "priority"],
+    ["🔽", "priority"],
+    ["⏬", "priority"],
+] as const);
 
-    const rawEntries = chunk(symbolValuePairs, 2).map(([symbol, value]) => {
-        const key = TASK_FIELD_KEY_BY_SYMBOL[symbol as keyof TaskFieldKeyBySymbol];
-        switch (key) {
-            case "priority":
-                // TODO: Why can't TypeScript figure this out on its own?
-                return ["priority", symbol as KeysWithValueOf<TaskFieldKeyBySymbol, "priority">] as const;
-            default:
-                return [key, value.trim()] as const;
-        }
-    });
+const PRIORITY_BY_EMOJI = new Map([
+    ["🔺", 0],
+    ["⏫", 1],
+    ["🔼", 2],
+    ["🔽", 4],
+    ["⏬", 5],
+] as const);
 
-    return Object.fromEntries([
-        ["description", description.trim()],
-        ...rawEntries.map(([key, rawValue]) => {
-            switch (key) {
-                case "recurrenceRule":
-                    return [key, rawValue];
+const EMOJIS_BY_FIELD_KEY = Map.groupBy(FIELD_KEY_BY_EMOJI.keys(), (key) => FIELD_KEY_BY_EMOJI.get(key) as FieldKey);
+
+type Emoji = typeof FIELD_KEY_BY_EMOJI extends ReadonlyMap<infer K, string> ? K : never;
+type FieldKey = typeof FIELD_KEY_BY_EMOJI extends ReadonlyMap<string, infer V> ? V : never;
+type PriorityEmoji = typeof PRIORITY_BY_EMOJI extends ReadonlyMap<infer K, number> ? K : never;
+
+export function readEmojiTaskFields(text: string): Partial<TaskFields> {
+    const matches = [
+        ...text.matchAll(new RegExp(join(FIELD_KEY_BY_EMOJI.keys().toArray(), "|"), "g")),
+        /$/.exec(text) as RegExpExecArray,
+    ];
+
+    const result: Partial<TaskFields> = { description: text.slice(0, matches[0].index).trim() };
+
+    for (const [start, stop] of pairwise(matches)) {
+        const emoji = start[0] as Emoji;
+        const fieldKey = FIELD_KEY_BY_EMOJI.get(emoji) as FieldKey;
+        if (fieldKey) {
+            switch (fieldKey) {
                 case "priority":
-                    return [key, PRIORITY_VALUE_BY_SYMBOL[rawValue]];
-                case "cancelledDate":
+                    result[fieldKey] = PRIORITY_BY_EMOJI.get(emoji as PriorityEmoji);
+                    break;
                 case "createdDate":
+                case "cancelledDate":
                 case "doneDate":
                 case "dueDate":
-                case "scheduledDate":
                 case "startDate":
-                    return [key, DateTime.fromISO(rawValue)];
+                case "scheduledDate":
+                    result[fieldKey] = DateTime.fromISO(text.slice(start.index + emoji.length, stop.index).trim());
+                    break;
+                default:
+                    result[fieldKey] = text.slice(start.index + emoji.length, stop.index).trim();
+                    break;
             }
-        }),
-    ]);
-}
-
-export function updateEmojiTaskField<K extends KeysWithValueOf<TaskFields, DateTime>>(
-    text: string,
-    key: K,
-    process: (old: DateTime) => DateTime,
-): string {
-    const matches = [...text.matchAll(TASK_FIELD_SYMBOL_PATTERN), /$/.exec(text) as RegExpExecArray];
-
-    for (const [match, nextMatch] of pairwise(matches)) {
-        // Process if found
-        const symbol = match[0] as keyof TaskFieldKeyBySymbol;
-        if (TASK_FIELD_KEY_BY_SYMBOL[symbol] === key) {
-            const value = DateTime.fromISO(text.slice(match.index + symbol.length, nextMatch.index).trim());
-
-            return `${text.slice(0, match.index)}${symbol} ${process(value).toISODate()} ${text.slice(nextMatch.index)}`;
         }
     }
 
-    // Append if missing
-    const symbol = SYMBOL_BY_TASK_FIELD_KEY[key];
-    const trailingWhitespaceStart = /\s*$/.exec(text)?.index ?? text.length;
-    return `${text.slice(0, trailingWhitespaceStart)} ${symbol} ${DateTime.now().toISODate()}${text.slice(trailingWhitespaceStart)}`;
+    return result;
 }
 
-export const TASK_FIELD_KEY_BY_SYMBOL = {
-    "➕": "createdDate",
-    "⌛": "scheduledDate",
-    "⏳": "scheduledDate",
-    "🛫": "startDate",
-    "📅": "dueDate",
-    "✅": "doneDate",
-    "❌": "cancelledDate",
-    "🔁": "recurrenceRule",
-    "🔺": "priority",
-    "⏫": "priority",
-    "🔼": "priority",
-    "🔽": "priority",
-    "⏬": "priority",
-} as const satisfies Record<string, keyof TaskFields>;
+export function writeEmojiTaskField(text: string, fieldKey: FieldKey, value: string): string {
+    const emojis = EMOJIS_BY_FIELD_KEY.get(fieldKey);
+    if (!emojis) {
+        return text;
+    }
 
-export const SYMBOL_BY_TASK_FIELD_KEY = invert(TASK_FIELD_KEY_BY_SYMBOL);
+    const [start, stop] = [...text.matchAll(new RegExp(join(emojis, "|"), "g")), /$/.exec(text) as RegExpExecArray];
+    if (start && stop) {
+        return `${text.slice(0, start.index + start[0].length)} ${value} ${text.slice(stop.index)}`;
+    }
 
-const TASK_FIELD_SYMBOL_PATTERN = new RegExp(Object.keys(TASK_FIELD_KEY_BY_SYMBOL).map(escapeRegExp).join("|"), "g");
-
-type TaskFieldKeyBySymbol = typeof TASK_FIELD_KEY_BY_SYMBOL;
-
-const PRIORITY_VALUE_BY_SYMBOL = {
-    "🔺": 0,
-    "⏫": 1,
-    "🔼": 2,
-    "🔽": 4,
-    "⏬": 5,
-} as const satisfies Record<KeysWithValueOf<TaskFieldKeyBySymbol, "priority">, number>;
+    const trailingWhitespaceStart = /\s*$/.exec(text)?.index ?? text.length;
+    return `${text.slice(0, trailingWhitespaceStart)} ${emojis[0]} ${value}${text.slice(trailingWhitespaceStart)}`;
+}

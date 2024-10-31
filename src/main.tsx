@@ -23,15 +23,16 @@ export default class TasksTimelinePlugin extends Plugin {
         this.settings.value = await this.obsidian.loadData(DEFAULT_SETTINGS);
         this.registerView(VIEW_TYPE, (leaf) => this.createView(leaf));
         this.addRibbonIcon(VIEW_ICON, `Open ${VIEW_HEADER.toLowerCase()}`, () => this.obsidian.revealView(VIEW_TYPE));
-
-        this.app.workspace.onLayoutReady(async () => {
-            try {
-                await ensureDataviewReady(this);
-                await this.obsidian.attachView(VIEW_TYPE);
-            } catch (error: unknown) {
-                new Notice(new NoticeMessage(`Failed to load ${VIEW_TYPE}`, `${error}`));
-            }
-        });
+        this.obsidian.detachView(VIEW_TYPE).finally(() =>
+            this.app.workspace.onLayoutReady(async () => {
+                try {
+                    await ensureDataviewReady(this);
+                    await this.obsidian.attachView(VIEW_TYPE);
+                } catch (error: unknown) {
+                    new Notice(new NoticeMessage(`Failed to load ${VIEW_TYPE}`, `${error}`));
+                }
+            }),
+        );
     }
 
     public override async onunload(): Promise<void> {

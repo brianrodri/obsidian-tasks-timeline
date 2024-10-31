@@ -6,7 +6,7 @@ import { DataviewApi, getAPI, isPluginEnabled } from "obsidian-dataview";
 import { SMarkdownPage, STask } from "obsidian-dataview/lib/data-model/serialized/markdown";
 
 import { Task, TaskLocation, TaskStatus } from "@/data/task";
-import { parseEmojiTaskFields } from "@/lib/obsidian-tasks/parse-task-fields";
+import { readEmojiTaskFields } from "@/lib/obsidian-tasks/parse-task-fields";
 
 export class Dataview {
     private readonly plugin: Plugin;
@@ -36,11 +36,11 @@ export class Dataview {
         return pages.flatMap((page: SMarkdownPage) =>
             // @ts-expect-error DataviewApi is wrong about the type of file.tasks.
             page.file.tasks.array().map((sTask: STask) => {
-                const emojiFields = parseEmojiTaskFields(sTask.text);
+                const emojiFields = readEmojiTaskFields(sTask.text);
 
                 const scheduledDate: DateTime<boolean> =
-                    emojiFields.scheduledDate?.isValid ? emojiFields.scheduledDate
-                    : sTask.scheduled?.isValid ? sTask.scheduled
+                    sTask.scheduled?.isValid ? sTask.scheduled
+                    : emojiFields.scheduledDate?.isValid ? emojiFields.scheduledDate
                     : page.file.day;
 
                 const status: TaskStatus =
