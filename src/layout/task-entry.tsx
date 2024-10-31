@@ -22,12 +22,13 @@ export interface TaskEntryProps {
 }
 
 export const TaskEntry = ({ task }: TaskEntryProps) => {
+    const overdue = task.dueDate.isValid && task.dueDate.diffNow().as("days") < -1;
     const { filePath, fileName, fileSection, obsidianHref } = task.location;
 
     const rootElClass =
         task.status === "DONE" ? "task done"
         : task.status === "DROPPED" ? "task cancelled"
-        : task.dueDate.isValid && task.dueDate.diffNow().as("days") < -1 ? "task overdue"
+        : overdue ? "task overdue"
         : "task";
 
     const fileLabel =
@@ -41,7 +42,7 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
     return (
         <div class={rootElClass}>
             <div class="timeline">
-                <TaskCheckbox status={task.status} location={task.location} />
+                <TaskCheckbox overdue={overdue} status={task.status} location={task.location} />
                 <div class="stripe" />
             </div>
             <div class="lines">
