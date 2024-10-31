@@ -2,7 +2,7 @@ export {
     CircleSlash2Icon as CancelledIcon,
     CircleCheckBigIcon as CompletedIcon,
     CirclePlusIcon as CreatedIcon,
-    CalendarIcon as DueIcon,
+    GoalIcon as DueIcon,
     FileTextIcon as FileIcon,
     CircleAlertIcon as OverdueIcon,
     CircleAlertIcon as PriorityIcon,

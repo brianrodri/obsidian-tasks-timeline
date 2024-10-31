@@ -1,4 +1,15 @@
-import { FileIcon, PriorityIcon, RepeatIcon, TagsIcon } from "@/assets/icons";
+import {
+    CancelledIcon,
+    CompletedIcon,
+    CreatedIcon,
+    DueIcon,
+    FileIcon,
+    PriorityIcon,
+    RepeatIcon,
+    ScheduledIcon,
+    StartedIcon,
+    TagsIcon,
+} from "@/assets/icons";
 import { VaultLink } from "@/components/vault-link";
 import { Task } from "@/data/task";
 
@@ -16,7 +27,7 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
     const rootElClass =
         task.status === "DONE" ? "task done"
         : task.status === "DROPPED" ? "task cancelled"
-        : task.dueDate.diffNow().as("days") < 0 ? "task overdue"
+        : task.dueDate.isValid && task.dueDate.diffNow().as("days") < -1 ? "task overdue"
         : "task";
 
     const fileLabel =
@@ -36,26 +47,26 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
             <div class="lines">
                 <div class="content">{task.description}</div>
                 <div class="line info">
-                    <TaskInfoEntry key="location" symbol={<FileIcon />} className="file">
+                    <TaskInfoEntry symbol={<FileIcon />} className="file">
                         <VaultLink className="internal-link" href={obsidianHref} sourcePath={filePath}>
                             {fileLabel}
                         </VaultLink>
                     </TaskInfoEntry>
-                    <TaskInfoEntry key="tags" symbol={<TagsIcon />} className="tag">
+                    <TaskInfoEntry symbol={<TagsIcon />} className="tag">
                         {task.tags.join(", ")}
                     </TaskInfoEntry>
-                    <TaskInfoEntry key="priority" symbol={<PriorityIcon />} className="priority">
+                    <TaskInfoEntry symbol={<PriorityIcon />} className="priority">
                         {task.priority}
                     </TaskInfoEntry>
-                    <TaskInfoEntry key="repeat" symbol={<RepeatIcon />} className="repeat">
+                    <TaskInfoEntry symbol={<RepeatIcon />} className="repeat">
                         {task.recurrenceRule}
                     </TaskInfoEntry>
-                    <TaskDateInput field="doneDate" task={task} />
-                    <TaskDateInput field="cancelledDate" task={task} />
-                    <TaskDateInput field="scheduledDate" task={task} />
-                    <TaskDateInput field="dueDate" task={task} />
-                    <TaskDateInput field="startDate" task={task} />
-                    <TaskDateInput field="createdDate" task={task} />
+                    <TaskDateInput field="dueDate" symbol={<DueIcon />} task={task} />
+                    <TaskDateInput field="doneDate" symbol={<CompletedIcon />} task={task} />
+                    <TaskDateInput field="cancelledDate" symbol={<CancelledIcon />} task={task} />
+                    <TaskDateInput field="scheduledDate" symbol={<ScheduledIcon />} task={task} />
+                    <TaskDateInput field="startDate" symbol={<StartedIcon />} task={task} />
+                    <TaskDateInput field="createdDate" symbol={<CreatedIcon />} task={task} />
                 </div>
             </div>
         </div>

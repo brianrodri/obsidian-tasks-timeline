@@ -1,3 +1,4 @@
+import { isEmpty } from "lodash";
 import { VNode } from "preact";
 import { HTMLAttributes, PropsWithChildren } from "preact/compat";
 
@@ -6,10 +7,11 @@ export interface TaskInfoEntryProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export function TaskInfoEntry({ symbol, children, ...rest }: PropsWithChildren<TaskInfoEntryProps>) {
-    if (!children) return null;
+    if (isEmpty(children)) return null;
     return (
         <div {...rest}>
             <div class="icon">{symbol}</div>
+
             <div class="label">{children}</div>
         </div>
     );

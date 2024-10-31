@@ -257,8 +257,41 @@
 .taskido .info .label {
     margin-left: 2px;
 }
-.taskido .info .date-input {
-    text-decoration: underline dotted;
+.taskido .info label.dateInput {
+    display: inline-flex;
+    position: relative;
+    overflow: clip;
+    margin-right: 3px;
+    border-radius: 10px;
+    color: var(--interactive-accent);
+    border: var(--input-border-width) solid var(--interactive-accent);
+}
+.taskido .info label.dateInput:hover {
+    color: var(--text-normal);
+    border: var(--input-border-width) solid var(--text-normal);
+}
+.taskido .info label.dateInput > .icon {
+    padding: 2px;
+    border-radius: 10px;
+    width: 13px;
+    height: 13px;
+}
+.taskido .info label.dateInput > input[type="date"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300%;
+    height: 300%;
+    opacity: 0;
+    cursor: pointer;
+}
+.taskido .info label.dateInput > input[type="date"]::-webkit-calendar-picker-indicator {
+    position: absolute;
+    top: -150%;
+    left: -150%;
+    width: 300%;
+    height: 300%;
+    cursor: pointer;
 }
 .taskido .info svg {
     height: 12px;
