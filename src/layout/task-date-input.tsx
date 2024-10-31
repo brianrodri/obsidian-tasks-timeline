@@ -2,7 +2,7 @@ import { useSignal } from "@preact/signals";
 import { lowerCase } from "lodash";
 import { DateTime } from "luxon";
 import { VNode } from "preact";
-import { useCallback } from "preact/hooks";
+import { useEventCallback } from "usehooks-ts";
 
 import { usePluginContext } from "@/context/plugin-context";
 import { Task } from "@/data/task";
@@ -25,20 +25,15 @@ export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
     } = task;
     const waiting = useSignal(false);
 
-    const setDate = useCallback(
-        (newDate: DateTime) => {
-            if (filePath === undefined || !newDate.isValid || waiting.value) return;
-            waiting.value = true;
-            obsidian
-                .processFileRange(filePath, fileStartByte, fileStopByte, (text) =>
-                    updateEmojiTaskField(text, field, () => newDate),
-                )
-                .catch((error) => console.error(error))
-                .finally(() => (waiting.value = false));
-        },
-
-        [field, filePath, fileStartByte, fileStopByte, obsidian, waiting],
-    );
+    const setDate = useEventCallback((newDate: DateTime) => {
+        if (filePath === undefined || !newDate.isValid || waiting.value) return;
+        waiting.value = true;
+        const process = (text: string) => updateEmojiTaskField(text, field, () => newDate);
+        obsidian
+            .processFileRange(filePath, fileStartByte, fileStopByte, process)
+            .catch((error) => console.error(error))
+            .finally(() => (waiting.value = false));
+    });
 
     if (date.isValid || field === "scheduledDate") {
         return (

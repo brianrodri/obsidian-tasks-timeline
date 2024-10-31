@@ -26,7 +26,13 @@ export default defineConfig(({ mode }) => ({
         },
         sourcemap: mode === "development" ? "inline" : false,
     },
-    resolve: { alias: { "@": path.resolve(__dirname, "/src") } },
+    resolve: {
+        alias: {
+            "@": path.resolve(__dirname, "/src"),
+            react: "preact/compat",
+            "react-dom": "preact/compat",
+        },
+    },
     test: {
         environment: "jsdom",
         include: ["src/**/__tests__/*.{ts,tsx}"],
