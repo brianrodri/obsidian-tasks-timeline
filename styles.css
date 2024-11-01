@@ -1,6 +1,24 @@
 .taskido {
     cursor: default;
     user-select: none;
+    height: 100%;
+}
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+.taskido .spinner {
+    color: var(--text-muted);
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+.taskido .spinner svg {
+    animation: spin 3s linear infinite;
 }
 .taskido a {
     text-decoration: none !important;

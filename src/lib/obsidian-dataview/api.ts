@@ -30,6 +30,22 @@ export class Dataview {
         );
     }
 
+    /** IMPORTANT: Must be called within `onLayoutReady` callback, otherwise the plugin will freeze! */
+    static async ensureDataviewReady(plugin: Plugin): Promise<Dataview> {
+        return new Promise<Dataview>((resolve, reject) => {
+            if (!isPluginEnabled(plugin.app)) {
+                reject(new Error("obsidian-dataview must be installed and enabled"));
+            } else if (getAPI(plugin.app)?.index.initialized) {
+                resolve(new Dataview(plugin));
+            } else {
+                plugin.registerEvent(
+                    // @ts-expect-error - obsidian doesn't define types for third-party events.
+                    plugin.app.metadataCache.on("dataview:index-ready", () => resolve(new Dataview(plugin))),
+                );
+            }
+        });
+    }
+
     public getTasks(pageQuery: string, originFile?: string): Task[] {
         const pages = this.dv.pages(pageQuery, originFile).array();
 
@@ -64,18 +80,4 @@ export class Dataview {
             }),
         );
     }
-}
-
-/** IMPORTANT: Must be called within `onLayoutReady` callback, otherwise the plugin will freeze! */
-export async function ensureDataviewReady(plugin: Plugin): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-        if (!isPluginEnabled(plugin.app)) {
-            reject(new Error("obsidian-dataview must be installed and enabled"));
-        } else if (getAPI(plugin.app)?.index.initialized) {
-            resolve();
-        } else {
-            // @ts-expect-error - obsidian doesn't define types for third-party events.
-            plugin.registerEvent(plugin.app.metadataCache.on("dataview:index-ready", resolve));
-        }
-    });
 }
