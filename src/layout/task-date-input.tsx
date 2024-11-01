@@ -5,13 +5,13 @@ import { TargetedEvent, useState } from "preact/compat";
 import { useEventCallback } from "usehooks-ts";
 
 import { usePluginContext } from "@/context/plugin-context";
-import { Task } from "@/data/task";
+import { Task, TaskFields } from "@/data/task";
 import { writeEmojiTaskField } from "@/lib/obsidian-tasks/parse-task-fields";
-import { KeysWithValueOf } from "@/utils/type-utils";
+import { PickByValue } from "utility-types";
 
 export type TaskDateInputProps = {
     symbol?: VNode;
-    field: KeysWithValueOf<Omit<Task, "happensDate">, DateTime>;
+    field: keyof PickByValue<TaskFields, DateTime>;
     task: Task;
 };
 
