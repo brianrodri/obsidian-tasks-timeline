@@ -1,5 +1,5 @@
 /* v8 ignore next 1 */
-import { isArray, isNumber, isSet, isString } from "lodash";
+import { isNumber, isSet, isString } from "lodash";
 import { DateTime } from "luxon";
 
 export const TASK_STATUSES = ["OPEN", "DONE", "DROPPED", "CUSTOM"] as const;
@@ -7,6 +7,8 @@ export const TASK_STATUSES = ["OPEN", "DONE", "DROPPED", "CUSTOM"] as const;
 export type TaskStatus = typeof TASK_STATUSES extends ReadonlyArray<infer T> ? T : never;
 
 export class Task implements TaskFields {
+    public readonly key: string;
+
     private constructor(
         public readonly status: TaskStatus,
         public readonly customStatus: TaskStatus extends "CUSTOM" ? string : undefined,
@@ -19,15 +21,12 @@ export class Task implements TaskFields {
         public readonly dueDate: DateTime,
         public readonly scheduledDate: DateTime,
         public readonly startDate: DateTime,
-        public readonly tags: readonly string[],
+        public readonly tags: ReadonlySet<string>,
         public readonly location: TaskLocation,
         public readonly id: string,
         public readonly dependsOn: ReadonlySet<string>,
-    ) {}
-
-    public getKey(revision?: number): string {
-        const locationKey = `${this.location.filePath}:${this.location.fileLine}`;
-        return isNumber(revision) ? `${locationKey}@${revision}` : locationKey;
+    ) {
+        this.key = JSON.stringify(this);
     }
 
     public static create(part: Partial<TaskFields>): Task {
@@ -53,7 +52,7 @@ export class Task implements TaskFields {
             DateTime.isDateTime(part.dueDate) ? part.dueDate : DateTime.invalid("unspecified"),
             DateTime.isDateTime(part.scheduledDate) ? part.scheduledDate : DateTime.invalid("unspecified"),
             DateTime.isDateTime(part.startDate) ? part.startDate : DateTime.invalid("unspecified"),
-            isArray(part.tags) && part.tags.every(isString) ? part.tags : [],
+            isSet(part.tags) && part.tags.values().every(isString) ? part.tags : new Set(),
             { fileStartByte, fileStopByte, fileLine, filePath, fileSection, fileName, obsidianHref },
             isString(part.id) ? part.id : "",
             isSet(part.dependsOn) && part.dependsOn.values().every(isString) ? part.dependsOn : new Set(),
@@ -110,7 +109,7 @@ export interface TaskFields {
     dueDate: DateTime;
     scheduledDate: DateTime;
     startDate: DateTime;
-    tags: readonly string[];
+    tags: ReadonlySet<string>;
     location: TaskLocation;
     id: string;
     dependsOn: ReadonlySet<string>;

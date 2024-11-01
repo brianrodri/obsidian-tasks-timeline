@@ -27,7 +27,7 @@ export function TaskTimeline({
     );
 
     const entries = useMemo(
-        () => tasks.filter(taskFilter).map((task) => <TaskEntry task={task} key={task.getKey()} />),
+        () => tasks.filter(taskFilter).map((task) => <TaskEntry task={task} key={task.key} />),
         [tasks, taskFilter],
     );
 

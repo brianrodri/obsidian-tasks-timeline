@@ -57,7 +57,7 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
                         </VaultLink>
                     </TaskInfoEntry>
                     <TaskInfoEntry symbol={<TagsIcon />} className="tag">
-                        {task.tags.join(", ")}
+                        {task.tags.values().toArray().join(", ")}
                     </TaskInfoEntry>
                     <TaskInfoEntry symbol={<PriorityIcon />} className="priority">
                         {task.priority}

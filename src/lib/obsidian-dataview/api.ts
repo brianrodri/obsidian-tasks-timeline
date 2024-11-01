@@ -1,5 +1,4 @@
 import { Signal, signal } from "@preact/signals";
-import { uniq } from "lodash";
 import { DateTime } from "luxon";
 import type { Plugin } from "obsidian";
 import { DataviewApi, getAPI, isPluginEnabled } from "obsidian-dataview";
@@ -64,7 +63,7 @@ export class Dataview {
                     : sTask.checked ? "DROPPED"
                     : "OPEN";
 
-                const tags: string[] = uniq(sTask.tags);
+                const tags: Set<string> = new Set(sTask.tags);
 
                 const location: TaskLocation = {
                     filePath: sTask.path,
