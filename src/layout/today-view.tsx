@@ -9,12 +9,16 @@ export interface TodayViewProps {
 }
 
 export function TodayView({ showFuture = true }: TodayViewProps) {
-    const { getHappeningBefore, getHappeningOn, getHappeningAfter, undated } = useTasksState();
+    const { getHappeningBefore, getHappeningOn, getHappeningAfter, isDependencyFree, undated } = useTasksState();
     const today = DateTime.now().startOf("day");
 
-    const todoToday = getHappeningOn(today);
-    const todoLater = Map.groupBy(showFuture ? getHappeningAfter(today) : [], (task) => task.happensDate.toISODate());
-    const unplanned = [...getHappeningBefore(today).toReversed(), ...undated].filter((task) => task.status === "OPEN");
+    const todoToday = getHappeningOn(today).filter(isDependencyFree);
+    const todoLater = Map.groupBy(showFuture ? getHappeningAfter(today).filter(isDependencyFree) : [], (task) =>
+        task.happensDate.toISODate(),
+    );
+    const unplanned = [...getHappeningBefore(today).toReversed(), ...undated].filter(
+        (task) => isDependencyFree(task) && task.status === "OPEN",
+    );
 
     return (
         <div class="taskido" id="taskido">

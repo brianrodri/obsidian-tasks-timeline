@@ -8,6 +8,7 @@ export class TasksState {
 
     private readonly tasksByDateKey: ReadonlyMap<string, readonly Task[]>;
     private readonly sortedDateKeys: readonly string[];
+    private readonly openTaskIds: ReadonlySet<string>;
 
     public constructor(
         public readonly tasks: readonly Task[] = [],
@@ -21,7 +22,9 @@ export class TasksState {
             (task) => TasksState.getDateKey(task.happensDate),
         );
         this.sortedDateKeys = [...this.tasksByDateKey.keys()];
+        this.openTaskIds = new Set(tasks.filter((task) => task.id && task.status === "OPEN").map((task) => task.id));
 
+        this.isDependencyFree = memoize(this.isDependencyFree.bind(this));
         this.getHappeningBefore = memoize(this.getHappeningBefore.bind(this), TasksState.getDateKey);
         this.getHappeningOn = memoize(this.getHappeningOn.bind(this), TasksState.getDateKey);
         this.getHappeningAfter = memoize(this.getHappeningAfter.bind(this), TasksState.getDateKey);
@@ -63,6 +66,10 @@ export class TasksState {
             .drop(numDatesSameOrBefore)
             .flatMap((tasks) => tasks.values())
             .toArray();
+    }
+
+    public isDependencyFree(task: Task): boolean {
+        return this.openTaskIds.isDisjointFrom(task.dependsOn);
     }
 
     public static getDateKey(date: DateTime<true>): string {

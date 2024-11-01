@@ -19,6 +19,8 @@ const FIELD_KEY_BY_EMOJI = {
     "🔼": "priority",
     "🔽": "priority",
     "⏬": "priority",
+    "⛔": "dependsOn",
+    "🆔": "id",
 } as const satisfies Record<string, keyof TaskFields>;
 
 const PRIORITY_BY_EMOJI = {
@@ -49,6 +51,7 @@ export function readEmojiTaskFields(text: string): Partial<TaskFields> {
     for (const [start, stop] of pairwise(matches)) {
         const emoji = start[0] as Emoji;
         const fieldKey = FIELD_KEY_BY_EMOJI[emoji] as FieldKey;
+        const fieldValue = text.slice(start.index + emoji.length, stop.index).trim();
         if (fieldKey) {
             switch (fieldKey) {
                 case "priority":
@@ -60,10 +63,13 @@ export function readEmojiTaskFields(text: string): Partial<TaskFields> {
                 case "dueDate":
                 case "startDate":
                 case "scheduledDate":
-                    result[fieldKey] = DateTime.fromISO(text.slice(start.index + emoji.length, stop.index).trim());
+                    result[fieldKey] = DateTime.fromISO(fieldValue);
+                    break;
+                case "dependsOn":
+                    result[fieldKey] = new Set(fieldValue.split(",").map((id) => id.trim()));
                     break;
                 default:
-                    result[fieldKey] = text.slice(start.index + emoji.length, stop.index).trim();
+                    result[fieldKey] = fieldValue;
                     break;
             }
         }

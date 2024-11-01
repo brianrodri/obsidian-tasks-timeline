@@ -1,5 +1,5 @@
 /* v8 ignore next 1 */
-import { isArray, isNumber, isString } from "lodash";
+import { isArray, isNumber, isSet, isString } from "lodash";
 import { DateTime } from "luxon";
 
 export const TASK_STATUSES = ["OPEN", "DONE", "DROPPED", "CUSTOM"] as const;
@@ -21,6 +21,8 @@ export class Task implements TaskFields {
         public readonly startDate: DateTime,
         public readonly tags: readonly string[],
         public readonly location: TaskLocation,
+        public readonly id: string,
+        public readonly dependsOn: ReadonlySet<string>,
     ) {}
 
     public getKey(revision?: number): string {
@@ -53,6 +55,8 @@ export class Task implements TaskFields {
             DateTime.isDateTime(part.startDate) ? part.startDate : DateTime.invalid("unspecified"),
             isArray(part.tags) && part.tags.every(isString) ? part.tags : [],
             { fileStartByte, fileStopByte, fileLine, filePath, fileSection, fileName, obsidianHref },
+            isString(part.id) ? part.id : "",
+            isSet(part.dependsOn) && part.dependsOn.values().every(isString) ? part.dependsOn : new Set(),
         );
     }
 
@@ -108,6 +112,8 @@ export interface TaskFields {
     startDate: DateTime;
     tags: readonly string[];
     location: TaskLocation;
+    id: string;
+    dependsOn: ReadonlySet<string>;
 }
 
 export interface TaskLocation {

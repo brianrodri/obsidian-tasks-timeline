@@ -1,4 +1,5 @@
 import "core-js/features/iterator";
+import "core-js/features/set";
 
 import { signal } from "@preact/signals";
 import { Notice, Plugin } from "obsidian";
