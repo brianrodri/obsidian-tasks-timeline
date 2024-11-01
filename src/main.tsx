@@ -42,6 +42,7 @@ export default class TasksTimelinePlugin extends Plugin {
     private createView(leaf: WorkspaceLeaf): ObsidianView {
         const timelineView = (
             <PluginContextProvider
+                plugin={this}
                 leaf={leaf}
                 settingsSignal={this.settings}
                 obsidian={this.obsidian}

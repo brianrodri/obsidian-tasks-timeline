@@ -6,10 +6,12 @@ import { LoadingView } from "@/layout/loading-view";
 import { Dataview } from "@/lib/obsidian-dataview/api";
 import { TasksApi } from "@/lib/obsidian-tasks/api";
 import { Obsidian, WorkspaceLeaf } from "@/lib/obsidian/api";
+import { Plugin } from "obsidian";
 
 export const PluginContext = createContext<PluginContextValue | null>(null);
 
 export interface PluginContextValue {
+    plugin: Plugin;
     leaf: WorkspaceLeaf;
     obsidian: Obsidian;
     dataview: Dataview;
@@ -27,6 +29,7 @@ export function usePluginContext(): PluginContextValue {
 }
 
 interface PluginContextProviderProps {
+    plugin: Plugin;
     leaf: WorkspaceLeaf;
     settingsSignal: Signal<PluginSettings>;
     obsidian: Obsidian;

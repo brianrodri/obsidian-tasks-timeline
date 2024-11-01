@@ -3,6 +3,9 @@
     user-select: none;
     height: 100%;
 }
+.taskido .obsidian-markdown p {
+    margin: inherit;
+}
 @keyframes spin {
     0% {
         transform: rotate(0deg);

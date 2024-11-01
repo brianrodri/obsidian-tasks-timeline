@@ -16,6 +16,7 @@ import { Task } from "@/data/task";
 import { TaskCheckbox } from "./task-checkbox";
 import { TaskDateInput } from "./task-date-input";
 import { TaskInfoEntry } from "./task-info-entry";
+import { Markdown } from "@/lib/obsidian/markdown";
 
 export interface TaskEntryProps {
     task: Task;
@@ -46,7 +47,9 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
                 <div class="stripe" />
             </div>
             <div class="lines">
-                <div class="content">{task.description}</div>
+                <div class="content">
+                    <Markdown md={task.description} sourcePath={filePath} />
+                </div>
                 <div class="line info">
                     <TaskInfoEntry symbol={<FileIcon />} className="file">
                         <VaultLink className="internal-link" href={obsidianHref} sourcePath={filePath}>
