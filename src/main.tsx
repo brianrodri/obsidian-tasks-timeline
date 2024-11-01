@@ -17,9 +17,9 @@ const VIEW_HEADER = "Tasks timeline" as const;
 const VIEW_ICON = "list-todo" as const;
 
 export default class TasksTimelinePlugin extends Plugin {
-    private settings = signal(DEFAULT_SETTINGS);
+    private settingsSignal = signal(DEFAULT_SETTINGS);
     private readonly obsidian = new Obsidian(this);
-    private readonly dataview = signal<Dataview>();
+    private readonly dataviewSignal = signal<Dataview>();
 
     public override async onload(): Promise<void> {
         this.registerView(VIEW_TYPE, (leaf) => this.createView(leaf));
@@ -27,8 +27,8 @@ export default class TasksTimelinePlugin extends Plugin {
 
         this.app.workspace.onLayoutReady(async () => {
             try {
-                this.settings.value = await this.obsidian.loadData(DEFAULT_SETTINGS);
-                this.dataview.value = await Dataview.ensureDataviewReady(this);
+                this.settingsSignal.value = await this.obsidian.loadData(DEFAULT_SETTINGS);
+                this.dataviewSignal.value = await Dataview.ensureDataviewReady(this);
                 await this.obsidian.attachView(VIEW_TYPE);
             } catch (error: unknown) {
                 new Notice(new NoticeMessage(`Failed to load ${VIEW_TYPE}`, `${error}`));
@@ -45,9 +45,10 @@ export default class TasksTimelinePlugin extends Plugin {
             <PluginContextProvider
                 plugin={this}
                 leaf={leaf}
-                settingsSignal={this.settings}
+                settingsSignal={this.settingsSignal}
+                setSettings={(part) => (this.settingsSignal.value = { ...this.settingsSignal.value, ...part })}
                 obsidian={this.obsidian}
-                dataviewSignal={this.dataview}
+                dataviewSignal={this.dataviewSignal}
                 tasksApi={new TasksApi(this)}
             >
                 <TasksStateProvider>

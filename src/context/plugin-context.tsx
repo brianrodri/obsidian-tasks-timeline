@@ -1,12 +1,12 @@
 import { Signal } from "@preact/signals";
-import { PropsWithChildren, createContext, useCallback, useContext } from "preact/compat";
+import { Plugin } from "obsidian";
+import { PropsWithChildren, createContext, useContext } from "preact/compat";
 
 import { PluginSettings } from "@/data/settings";
 import { LoadingView } from "@/layout/loading-view";
 import { Dataview } from "@/lib/obsidian-dataview/api";
 import { TasksApi } from "@/lib/obsidian-tasks/api";
 import { Obsidian, WorkspaceLeaf } from "@/lib/obsidian/api";
-import { Plugin } from "obsidian";
 
 export const PluginContext = createContext<PluginContextValue | null>(null);
 
@@ -31,28 +31,26 @@ export function usePluginContext(): PluginContextValue {
 interface PluginContextProviderProps {
     plugin: Plugin;
     leaf: WorkspaceLeaf;
-    settingsSignal: Signal<PluginSettings>;
     obsidian: Obsidian;
-    dataviewSignal: Signal<Dataview | undefined>;
     tasksApi: TasksApi;
+    dataviewSignal: Signal<Dataview | undefined>;
+    settingsSignal: Signal<PluginSettings>;
+    setSettings: (part: Partial<PluginSettings>) => PluginSettings;
 }
 
 export function PluginContextProvider({
     children,
-    settingsSignal,
     dataviewSignal,
+    settingsSignal,
     ...rest
 }: PropsWithChildren<PluginContextProviderProps>) {
-    const setSettings = useCallback(
-        (part: Partial<PluginSettings>) => (settingsSignal.value = { ...settingsSignal.value, ...part }),
-        [settingsSignal],
-    );
-
     const dataview = dataviewSignal.value;
+    const settings = settingsSignal.value;
+
     if (!dataview) {
         return <LoadingView />;
     }
 
-    const value = { dataview, settings: settingsSignal.value, setSettings, ...rest };
+    const value = { dataview, settings, ...rest };
     return <PluginContext.Provider value={value}>{children}</PluginContext.Provider>;
 }
