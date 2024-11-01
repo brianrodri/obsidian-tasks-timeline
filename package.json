@@ -5,14 +5,13 @@
     "main": "dist/main.js",
     "scripts": {
         "test": "vitest run",
-        "watch": "vitest run --watch",
+        "watch": "vitest --watch",
         "coverage": "vitest run --coverage",
+        "watch-coverage": "vitest --watch --coverage",
         "hotreload": "vite build --mode development --outDir ./test-vault/.obsidian/plugins/obsidian-tasks-timeline/ --watch",
-        "dev": "vite serve",
         "build": "tsc && vite build",
         "docs": "typedoc src/main.tsx --plugin typedoc-plugin-coverage --out docs/ --excludeExternals --excludePrivate --excludeProtected",
         "lint": "eslint .",
-        "version": "node version-bump.mjs && git add public/",
         "prepare": "node .husky/install.js",
         "commitlint": "commitlint --edit",
         "clean": "rm -rf node_modules/ dist/ coverage/ docs/"
