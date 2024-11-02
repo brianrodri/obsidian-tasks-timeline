@@ -1,8 +1,9 @@
 import { Signal } from "@preact/signals";
 import { Plugin } from "obsidian";
-import { PropsWithChildren, createContext, useContext } from "preact/compat";
+import { PropsWithChildren, createContext, useContext, useMemo } from "preact/compat";
 
 import { PluginSettings } from "@/data/settings";
+import { TasksState } from "@/data/tasks-state";
 import { LoadingView } from "@/layout/loading-view";
 import { Dataview } from "@/lib/obsidian-dataview/api";
 import { TasksApi } from "@/lib/obsidian-tasks/api";
@@ -17,6 +18,7 @@ export interface PluginContextValue {
     dataview: Dataview;
     tasksApi: TasksApi;
     settings: PluginSettings;
+    tasks: TasksState;
     setSettings: (part: Partial<PluginSettings>) => PluginSettings;
 }
 
@@ -47,10 +49,18 @@ export function PluginContextProvider({
     const dataview = dataviewSignal.value;
     const settings = settingsSignal.value;
 
+    const tasks = useMemo(
+        () =>
+            dataview ?
+                new TasksState(dataview.getTasks(settings.pageQuery), dataview.revision.value)
+            :   new TasksState(),
+        [dataview, settings.pageQuery],
+    );
+
     if (!dataview) {
         return <LoadingView />;
     }
 
-    const value = { dataview, settings, ...rest };
+    const value = { dataview, settings, tasks, ...rest };
     return <PluginContext.Provider value={value}>{children}</PluginContext.Provider>;
 }

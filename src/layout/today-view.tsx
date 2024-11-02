@@ -1,7 +1,6 @@
 import { DateTime } from "luxon";
 
-import { useTasksState } from "@/context/tasks-state";
-
+import { usePluginContext } from "@/context/plugin-context";
 import { TaskTimeline } from "./timeline-entry";
 
 export interface TodayViewProps {
@@ -9,7 +8,8 @@ export interface TodayViewProps {
 }
 
 export function TodayView({ showFuture = true }: TodayViewProps) {
-    const { getHappeningBefore, getHappeningOn, getHappeningAfter, isDependencyFree, undated } = useTasksState();
+    const { getHappeningBefore, getHappeningOn, getHappeningAfter, isDependencyFree, undated } =
+        usePluginContext().tasks;
     const today = DateTime.now().startOf("day");
 
     const todoToday = getHappeningOn(today).filter(isDependencyFree);

@@ -5,7 +5,6 @@ import { signal } from "@preact/signals";
 import { Notice, Plugin } from "obsidian";
 
 import { PluginContextProvider } from "@/context/plugin-context";
-import { TasksStateProvider } from "@/context/tasks-state";
 import { DEFAULT_SETTINGS } from "@/data/settings";
 import { TodayView } from "@/layout/today-view";
 import { Dataview } from "@/lib/obsidian-dataview/api";
@@ -51,9 +50,7 @@ export default class TasksTimelinePlugin extends Plugin {
                 dataviewSignal={this.dataviewSignal}
                 tasksApi={new TasksApi(this)}
             >
-                <TasksStateProvider>
-                    <TodayView />
-                </TasksStateProvider>
+                <TodayView />
             </PluginContextProvider>
         );
         return new ObsidianView(leaf, VIEW_TYPE, VIEW_HEADER, VIEW_ICON, timelineView);
