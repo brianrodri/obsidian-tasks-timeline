@@ -3,11 +3,10 @@ import { DateTime } from "luxon";
 
 import { Task } from "./task";
 
-export class TasksState {
+export class TaskLookup {
     public readonly undated: readonly Task[];
 
     private readonly tasksByDateKey: ReadonlyMap<string, readonly Task[]>;
-    private readonly sortedDateKeys: readonly string[];
     private readonly openTaskIds: ReadonlySet<string>;
 
     public constructor(
@@ -19,15 +18,14 @@ export class TasksState {
         this.undated = unscheduled;
         this.tasksByDateKey = Map.groupBy(
             sortBy(scheduled, (task) => task.happensDate),
-            (task) => TasksState.getDateKey(task.happensDate),
+            (task) => TaskLookup.getDateKey(task.happensDate),
         );
-        this.sortedDateKeys = [...this.tasksByDateKey.keys()];
         this.openTaskIds = new Set(tasks.filter((task) => task.id && task.status === "OPEN").map((task) => task.id));
 
         this.isDependencyFree = memoize(this.isDependencyFree.bind(this));
-        this.getHappeningBefore = memoize(this.getHappeningBefore.bind(this), TasksState.getDateKey);
-        this.getHappeningOn = memoize(this.getHappeningOn.bind(this), TasksState.getDateKey);
-        this.getHappeningAfter = memoize(this.getHappeningAfter.bind(this), TasksState.getDateKey);
+        this.getHappeningBefore = memoize(this.getHappeningBefore.bind(this), TaskLookup.getDateKey);
+        this.getHappeningOn = memoize(this.getHappeningOn.bind(this), TaskLookup.getDateKey);
+        this.getHappeningAfter = memoize(this.getHappeningAfter.bind(this), TaskLookup.getDateKey);
     }
 
     public getHappeningOn(date: DateTime): ReadonlyArray<Task> {
@@ -37,8 +35,8 @@ export class TasksState {
 
         const start = date.startOf("day");
         const end = start.plus({ day: 1 });
-        const numDatesBeforeStart = sortedIndex(this.sortedDateKeys, TasksState.getDateKey(start));
-        const numDatesBeforeEnd = sortedIndex(this.sortedDateKeys, TasksState.getDateKey(end));
+        const numDatesBeforeStart = sortedIndex(this.tasksByDateKey.keys().toArray(), TaskLookup.getDateKey(start));
+        const numDatesBeforeEnd = sortedIndex(this.tasksByDateKey.keys().toArray(), TaskLookup.getDateKey(end));
 
         return this.tasksByDateKey
             .values()
@@ -49,7 +47,7 @@ export class TasksState {
     }
 
     public getHappeningBefore(date: DateTime<true>): ReadonlyArray<Task> {
-        const numDatesBefore = sortedIndex(this.sortedDateKeys, TasksState.getDateKey(date));
+        const numDatesBefore = sortedIndex(this.tasksByDateKey.keys().toArray(), TaskLookup.getDateKey(date));
 
         return this.tasksByDateKey
             .values()
@@ -59,7 +57,7 @@ export class TasksState {
     }
 
     public getHappeningAfter(date: DateTime<true>): ReadonlyArray<Task> {
-        const numDatesSameOrBefore = sortedLastIndex(this.sortedDateKeys, TasksState.getDateKey(date));
+        const numDatesSameOrBefore = sortedLastIndex(this.tasksByDateKey.keys().toArray(), TaskLookup.getDateKey(date));
 
         return this.tasksByDateKey
             .values()
