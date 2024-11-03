@@ -1,6 +1,6 @@
-import { Signal } from "@preact/signals";
+import { Signal, useComputed } from "@preact/signals";
 import { Plugin } from "obsidian";
-import { PropsWithChildren, createContext, useContext, useMemo } from "preact/compat";
+import { PropsWithChildren, createContext, useContext } from "preact/compat";
 
 import { PluginSettings } from "@/data/settings";
 import { TaskLookup } from "@/data/task-lookup";
@@ -18,7 +18,7 @@ export interface PluginContextValue {
     dataview: Dataview;
     tasksApi: TasksApi;
     settings: PluginSettings;
-    taskLookup: TaskLookup;
+    taskLookup: Signal<TaskLookup>;
     setSettings: (part: Partial<PluginSettings>) => PluginSettings;
 }
 
@@ -46,21 +46,18 @@ export function PluginContextProvider({
     settingsSignal,
     ...rest
 }: PropsWithChildren<PluginContextProviderProps>) {
-    const dataview = dataviewSignal.value;
-    const settings = settingsSignal.value;
-
-    const taskLookup = useMemo(
+    const taskLookup = useComputed(
         () =>
-            dataview ?
-                new TaskLookup(dataview.getTasks(settings.pageQuery), dataview.revision.value)
-            :   new TaskLookup(),
-        [dataview, settings.pageQuery],
+            new TaskLookup(
+                dataviewSignal.value?.getTasks(settingsSignal.value.pageQuery) ?? [],
+                dataviewSignal.value?.revision.value ?? 0,
+            ),
     );
 
-    if (!dataview) {
+    if (!dataviewSignal.value) {
         return <LoadingView />;
     }
 
-    const value = { dataview, settings, taskLookup, ...rest };
+    const value = { dataview: dataviewSignal.value, settings: settingsSignal.value, taskLookup, ...rest };
     return <PluginContext.Provider value={value}>{children}</PluginContext.Provider>;
 }

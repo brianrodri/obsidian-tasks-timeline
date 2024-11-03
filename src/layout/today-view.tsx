@@ -9,7 +9,7 @@ export interface TodayViewProps {
 
 export function TodayView({ showFuture = true }: TodayViewProps) {
     const { taskLookup } = usePluginContext();
-    const { getHappeningBefore, getHappeningOn, getHappeningAfter, isDependencyFree, undated } = taskLookup;
+    const { getHappeningBefore, getHappeningOn, getHappeningAfter, isDependencyFree, undated } = taskLookup.value;
     const today = DateTime.now().startOf("day");
 
     const todoToday = getHappeningOn(today).filter(isDependencyFree);
