@@ -3,7 +3,6 @@ import { DateTime } from "luxon";
 import { PickByValue, ValuesType } from "utility-types";
 
 import { TaskFields } from "@/data/task";
-import { pairwise } from "@/utils/iter-utils";
 
 const FIELD_KEY_BY_EMOJI = {
     "➕": "createdDate",
@@ -48,7 +47,8 @@ export function readEmojiTaskFields(text: string): Partial<TaskFields> {
 
     const result: Partial<TaskFields> = { description: text.slice(0, matches[0].index).trim() };
 
-    for (const [start, stop] of pairwise(matches)) {
+    for (let i = 0; i < matches.length - 1; ++i) {
+        const [start, stop] = matches.slice(i, i + 2);
         const emoji = start[0] as Emoji;
         const fieldKey = FIELD_KEY_BY_EMOJI[emoji] as FieldKey;
         const fieldValue = text.slice(start.index + emoji.length, stop.index).trim();
