@@ -3,11 +3,11 @@ import { DateTime } from "luxon";
 import { VNode } from "preact";
 import { TargetedEvent, useState } from "preact/compat";
 import { useEventCallback } from "usehooks-ts";
+import { PickByValue } from "utility-types";
 
 import { usePluginContext } from "@/context/plugin-context";
 import { Task, TaskFields } from "@/data/task";
 import { writeEmojiTaskField } from "@/lib/obsidian-tasks/parse-task-fields";
-import { PickByValue } from "utility-types";
 
 export type TaskDateInputProps = {
     symbol?: VNode;

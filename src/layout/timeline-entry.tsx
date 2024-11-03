@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "preact/hooks";
 
 import { Task } from "@/data/task";
-import { TaskEntry } from "./task-entry";
+import { TaskEntry } from "@/layout/task-entry";
 
 interface TaskTimelineProps {
     label: string;

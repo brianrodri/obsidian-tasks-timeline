@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 
 import { usePluginContext } from "@/context/plugin-context";
-import { TaskTimeline } from "./timeline-entry";
+import { TaskTimeline } from "@/layout/timeline-entry";
 
 export interface TodayViewProps {
     showFuture?: boolean;

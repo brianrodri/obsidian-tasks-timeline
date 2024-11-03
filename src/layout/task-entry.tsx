@@ -13,9 +13,9 @@ import {
 import { VaultLink } from "@/components/vault-link";
 import { Task } from "@/data/task";
 
-import { TaskCheckbox } from "./task-checkbox";
-import { TaskDateInput } from "./task-date-input";
-import { TaskInfoEntry } from "./task-info-entry";
+import { TaskCheckbox } from "@/layout/task-checkbox";
+import { TaskDateInput } from "@/layout/task-date-input";
+import { TaskInfoEntry } from "@/layout/task-info-entry";
 import { Markdown } from "@/lib/obsidian/markdown";
 
 export interface TaskEntryProps {
