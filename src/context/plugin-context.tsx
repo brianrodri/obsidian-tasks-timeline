@@ -46,18 +46,20 @@ export function PluginContextProvider({
     settingsSignal,
     ...rest
 }: PropsWithChildren<PluginContextProviderProps>) {
-    const taskLookup = useComputed(
-        () =>
+    const taskLookup = useComputed(() =>
+        dataviewSignal.value ?
             new TaskLookup(
-                dataviewSignal.value?.getTasks(settingsSignal.value.pageQuery) ?? [],
-                dataviewSignal.value?.revision.value ?? 0,
-            ),
+                dataviewSignal.value.getTasks(settingsSignal.value.pageQuery),
+                dataviewSignal.value.revision.value,
+            )
+        :   new TaskLookup(),
     );
 
-    if (!dataviewSignal.value) {
-        return <LoadingView />;
-    }
-
-    const value = { dataview: dataviewSignal.value, settings: settingsSignal.value, taskLookup, ...rest };
-    return <PluginContext.Provider value={value}>{children}</PluginContext.Provider>;
+    return dataviewSignal.value ?
+            <PluginContext.Provider
+                value={{ dataview: dataviewSignal.value, settings: settingsSignal.value, taskLookup, ...rest }}
+            >
+                {children}
+            </PluginContext.Provider>
+        :   <LoadingView />;
 }

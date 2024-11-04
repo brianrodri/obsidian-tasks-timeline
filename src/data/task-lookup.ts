@@ -1,76 +1,86 @@
 import { memoize, partition, sortBy, sortedIndex, sortedLastIndex } from "lodash";
-import { DateTime } from "luxon";
+import { DateTime, Interval } from "luxon";
 
-import { Task } from "./task";
+import { Task } from "@/data/task";
 
 export class TaskLookup {
-    public readonly undated: readonly Task[];
-
-    private readonly tasksByDateKey: ReadonlyMap<string, readonly Task[]>;
+    public readonly revision: number;
+    public readonly undatedTasks: readonly Task[];
+    private readonly tasksBySortedDateKey: ReadonlyMap<string, readonly Task[]>;
+    private readonly sortedDateKeys: readonly string[];
     private readonly openTaskIds: ReadonlySet<string>;
 
-    public constructor(
-        public readonly tasks: readonly Task[] = [],
-        public readonly revision: number = 0,
-    ) {
-        const [scheduled, unscheduled] = partition(tasks, (task) => task.happensDate.isValid);
+    public constructor(tasks: Task[] = [], revision: number = 0) {
+        this.revision = revision;
 
-        this.undated = unscheduled;
-        this.tasksByDateKey = Map.groupBy(
-            sortBy(scheduled, (task) => task.happensDate),
-            (task) => TaskLookup.getDateKey(task.happensDate),
-        );
         this.openTaskIds = new Set(tasks.filter((task) => task.id && task.status === "OPEN").map((task) => task.id));
 
-        this.isDependencyFree = memoize(this.isDependencyFree.bind(this));
-        this.getHappeningBefore = memoize(this.getHappeningBefore.bind(this), TaskLookup.getDateKey);
-        this.getHappeningOn = memoize(this.getHappeningOn.bind(this), TaskLookup.getDateKey);
-        this.getHappeningAfter = memoize(this.getHappeningAfter.bind(this), TaskLookup.getDateKey);
+        const [withKeys, withoutKeys] = partition(tasks, TaskLookup.getTaskDateKey);
+        this.tasksBySortedDateKey = Map.groupBy(sortBy(withKeys, TaskLookup.getTaskDateKey), TaskLookup.getTaskDateKey);
+        this.sortedDateKeys = this.tasksBySortedDateKey.keys().toArray();
+        this.undatedTasks = withoutKeys;
+
+        this.isTaskActionable = memoize(this.isTaskActionable.bind(this));
+        this.getTasksHappeningBefore = memoize(this.getTasksHappeningBefore.bind(this), TaskLookup.getDateKey);
+        this.getTasksHappeningOn = memoize(this.getTasksHappeningOn.bind(this), TaskLookup.getDateKey);
+        this.getTasksHappeningAfter = memoize(this.getTasksHappeningAfter.bind(this), TaskLookup.getDateKey);
     }
 
-    public getHappeningOn(date: DateTime): ReadonlyArray<Task> {
-        if (!date.isValid) {
-            throw new Error(`${date.invalidReason}: ${date.invalidExplanation}`);
-        }
+    public getTasksHappeningOn(date: DateTime): readonly Task[] {
+        if (!date.isValid) return [];
 
-        const start = date.startOf("day");
-        const end = start.plus({ day: 1 });
-        const numDatesBeforeStart = sortedIndex(this.tasksByDateKey.keys().toArray(), TaskLookup.getDateKey(start));
-        const numDatesBeforeEnd = sortedIndex(this.tasksByDateKey.keys().toArray(), TaskLookup.getDateKey(end));
+        const interval = Interval.after(date.startOf("day"), { days: 1 });
+        const start = sortedIndex(this.sortedDateKeys, TaskLookup.getDateKey(interval.start));
+        const end = sortedIndex(this.sortedDateKeys, TaskLookup.getDateKey(interval.end));
 
-        return this.tasksByDateKey
+        return this.tasksBySortedDateKey
             .values()
-            .drop(numDatesBeforeStart)
-            .take(numDatesBeforeEnd - numDatesBeforeStart)
+            .drop(start)
+            .take(end - start)
             .flatMap((tasks) => tasks.values())
             .toArray();
     }
 
-    public getHappeningBefore(date: DateTime<true>): ReadonlyArray<Task> {
-        const numDatesBefore = sortedIndex(this.tasksByDateKey.keys().toArray(), TaskLookup.getDateKey(date));
+    public getTasksHappeningBefore(date: DateTime): readonly Task[] {
+        if (!date.isValid) return [];
 
-        return this.tasksByDateKey
+        const end = sortedIndex(this.sortedDateKeys, TaskLookup.getDateKey(date));
+
+        return this.tasksBySortedDateKey
             .values()
-            .take(numDatesBefore)
+            .take(end)
             .flatMap((tasks) => tasks.values())
             .toArray();
     }
 
-    public getHappeningAfter(date: DateTime<true>): ReadonlyArray<Task> {
-        const numDatesSameOrBefore = sortedLastIndex(this.tasksByDateKey.keys().toArray(), TaskLookup.getDateKey(date));
+    public getTasksHappeningAfter(date: DateTime): readonly Task[] {
+        if (!date.isValid) return [];
 
-        return this.tasksByDateKey
+        const start = sortedLastIndex(this.sortedDateKeys, TaskLookup.getDateKey(date));
+
+        return this.tasksBySortedDateKey
             .values()
-            .drop(numDatesSameOrBefore)
+            .drop(start)
             .flatMap((tasks) => tasks.values())
             .toArray();
     }
 
-    public isDependencyFree(task: Task): boolean {
-        return this.openTaskIds.isDisjointFrom(task.dependsOn);
+    /**
+     * Returns whether the given {@link Task} is "actionable".
+     *
+     * A task is actionable if all its dependencies are resolved.
+     *
+     * @see {@link https://publish.obsidian.md/tasks/Getting+Started/Task+Dependencies}
+     */
+    public isTaskActionable(task: Task): boolean {
+        return task.dependsOn.isDisjointFrom(this.openTaskIds);
     }
 
-    public static getDateKey(date: DateTime<true>): string {
-        return date.toISODate();
+    static getTaskDateKey(task?: Task | null): string {
+        return task ? TaskLookup.getDateKey(task.happensDate) : "";
+    }
+
+    public static getDateKey(date?: DateTime | null): string {
+        return date?.toISODate() ?? "";
     }
 }
