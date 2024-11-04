@@ -2,6 +2,7 @@
     cursor: default;
     user-select: none;
     height: 100%;
+    padding-bottom: 1em;
 }
 .taskido .obsidian-markdown p {
     margin: inherit;
@@ -250,6 +251,8 @@
 .taskido .task .info .repeat,
 .taskido .task .info .priority,
 .taskido .task .info .relative,
+.taskido .task .info .id,
+.taskido .task .info .depends-on,
 .taskido .task .info .file {
     display: flex;
     flex-direction: row;
@@ -265,11 +268,6 @@
     line-height: 1 !important;
     padding: 0;
     border-radius: 3px !important;
-}
-.taskido .task .info .tag {
-    color: var(--tag-color) !important;
-    background: none !important;
-    cursor: pointer;
 }
 .taskido .info .icon {
     text-align: center;

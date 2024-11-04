@@ -17,6 +17,7 @@ import { TaskCheckbox } from "@/layout/task-checkbox";
 import { TaskDateInput } from "@/layout/task-date-input";
 import { TaskInfoEntry } from "@/layout/task-info-entry";
 import { Markdown } from "@/lib/obsidian/markdown";
+import { NetworkIcon, SignatureIcon } from "lucide-preact";
 
 export interface TaskEntryProps {
     task: Task;
@@ -56,6 +57,9 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
                             {fileLabel}
                         </VaultLink>
                     </TaskInfoEntry>
+                    <TaskInfoEntry symbol={<SignatureIcon />} className="id">
+                        {task.id}
+                    </TaskInfoEntry>
                     <TaskInfoEntry symbol={<TagsIcon />} className="tag">
                         {task.tags.values().toArray().join(", ")}
                     </TaskInfoEntry>
@@ -64,6 +68,9 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
                     </TaskInfoEntry>
                     <TaskInfoEntry symbol={<RepeatIcon />} className="repeat">
                         {task.recurrenceRule}
+                    </TaskInfoEntry>
+                    <TaskInfoEntry symbol={<NetworkIcon />} className="depends-on">
+                        {task.dependsOn.values().toArray().join(", ")}
                     </TaskInfoEntry>
                     <TaskDateInput field="dueDate" symbol={<DueIcon />} task={task} />
                     <TaskDateInput field="doneDate" symbol={<CompletedIcon />} task={task} />
