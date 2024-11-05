@@ -2,18 +2,21 @@ import { useCallback, useMemo } from "preact/hooks";
 
 import { Task } from "@/data/task";
 import { TaskEntry } from "@/layout/task-entry";
+import { DateTime } from "luxon";
 
 interface TaskTimelineProps {
-    label: string;
+    date?: DateTime<true>;
     tasks: readonly Task[];
+    label?: string;
     showDone?: boolean;
     showDropped?: boolean;
     showCustom?: boolean;
 }
 
 export function TaskTimeline({
-    label,
+    date,
     tasks,
+    label = date && Math.abs(date.diffNow().as("days")) < 1 ? date.toRelativeCalendar() : date?.toISODate(),
     showDone = false,
     showDropped = false,
     showCustom = false,
@@ -35,6 +38,7 @@ export function TaskTimeline({
             <>
                 <div class="dateLine">
                     <div class="date">{label}</div>
+                    <div class="weekday">{date?.weekdayShort}</div>
                 </div>
                 <div class="content">{entries}</div>
             </>

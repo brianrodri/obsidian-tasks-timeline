@@ -29,11 +29,17 @@ export function TodayView({ showFuture = true }: TodayViewProps) {
     return (
         <div class="taskido" id="taskido">
             <div class="details">
-                <TaskTimeline key="today" label={today.toRelativeCalendar()} tasks={todoToday} />
+                <TaskTimeline key="today" date={today} tasks={todoToday} />
                 <TaskTimeline key="unplanned" label={"To schedule"} tasks={unplanned} />
                 {todoLater
                     .entries()
-                    .map(([isoDate, tasks]) => <TaskTimeline key={isoDate} label={isoDate as string} tasks={tasks} />)
+                    .map(([isoDate, tasks]) => (
+                        <TaskTimeline
+                            key={isoDate}
+                            date={isoDate ? (DateTime.fromISO(isoDate) as DateTime<true>) : undefined}
+                            tasks={tasks}
+                        />
+                    ))
                     .toArray()}
             </div>
         </div>
