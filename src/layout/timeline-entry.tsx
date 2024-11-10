@@ -5,8 +5,8 @@ import { TaskEntry } from "@/layout/task-entry";
 import { DateTime } from "luxon";
 
 interface TaskTimelineProps {
-    date?: DateTime<true>;
     tasks: readonly Task[];
+    date?: DateTime<true>;
     label?: string;
     showDone?: boolean;
     showDropped?: boolean;
@@ -14,9 +14,9 @@ interface TaskTimelineProps {
 }
 
 export function TaskTimeline({
-    date,
     tasks,
-    label = date && Math.abs(date.diffNow().as("days")) < 1 ? date.toRelativeCalendar() : date?.toISODate(),
+    date,
+    label,
     showDone = false,
     showDropped = false,
     showCustom = false,
@@ -36,10 +36,12 @@ export function TaskTimeline({
 
     return entries.length > 0 ?
             <>
-                <div class="dateLine">
-                    <div class="date">{label}</div>
-                    <div class="weekday">{date?.weekdayShort}</div>
-                </div>
+                {date?.isValid ?
+                    <div class="dateLine">
+                        <div class="relative">{date.toRelativeCalendar()}</div>
+                        <div class="date">{`${date.toISODate()} ${date.weekdayShort}`}</div>
+                    </div>
+                :   <div class="dateLine">{label}</div>}
                 <div class="content">{entries}</div>
             </>
         :   null;
