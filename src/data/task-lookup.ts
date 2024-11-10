@@ -73,7 +73,7 @@ export class TaskLookup {
      * @see {@link https://publish.obsidian.md/tasks/Getting+Started/Task+Dependencies}
      */
     public isTaskActionable(task: Task): boolean {
-        return task.dependsOn.isDisjointFrom(this.openTaskIds);
+        return task.status === "OPEN" && task.dependsOn.isDisjointFrom(this.openTaskIds);
     }
 
     static getTaskDateKey(task?: Task | null): string {
