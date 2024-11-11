@@ -9,7 +9,7 @@ import {
     ScheduledIcon,
     StartedIcon,
     TagsIcon,
-} from "@/assets/icons";
+} from "@/components/icons";
 import { VaultLink } from "@/components/vault-link";
 import { Task } from "@/data/task";
 

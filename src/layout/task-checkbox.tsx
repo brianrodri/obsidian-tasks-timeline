@@ -2,7 +2,7 @@ import { useSignal } from "@preact/signals";
 import { VNode } from "preact";
 import { useEventCallback } from "usehooks-ts";
 
-import { CancelledIcon, CompletedIcon, OverdueIcon, TaskIcon } from "@/assets/icons";
+import { CancelledIcon, CompletedIcon, OverdueIcon, TaskIcon } from "@/components/icons";
 import { usePluginContext } from "@/context/plugin-context";
 import { TaskLocation, TaskStatus } from "@/data/task";
 
