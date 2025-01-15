@@ -70,5 +70,8 @@
         "vite": "latest",
         "vite-plugin-static-copy": "latest",
         "vitest": "latest"
+    },
+    "overrides": {
+        "obsidian-calendar-ui": "brianrodri/obsidian-calendar-ui"
     }
 }
