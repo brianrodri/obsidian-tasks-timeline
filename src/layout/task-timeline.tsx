@@ -8,6 +8,7 @@ interface TaskTimelineProps {
     tasks: readonly Task[];
     date?: DateTime<true>;
     label?: string;
+    relativeCalendar?: string | null;
     showDone?: boolean;
     showDropped?: boolean;
     showCustom?: boolean;
@@ -17,6 +18,7 @@ export function TaskTimeline({
     tasks,
     date,
     label,
+    relativeCalendar,
     showDone = false,
     showDropped = false,
     showCustom = false,
@@ -38,7 +40,7 @@ export function TaskTimeline({
             <>
                 {date?.isValid ?
                     <div class="dateLine">
-                        <div class="relative">{date.toRelativeCalendar()}</div>
+                        <div class="relative">{relativeCalendar}</div>
                         <div class="date">{`${date.toISODate()} ${date.weekdayShort}`}</div>
                     </div>
                 :   <div class="dateLine">{label}</div>}

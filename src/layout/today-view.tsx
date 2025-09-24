@@ -16,23 +16,26 @@ export function TodayView({ showFuture = true }: TodayViewProps) {
     const today = DateTime.now().startOf("day");
     const plannedToday = getTasksHappeningOn(today);
     const unplanned = [...getTasksHappeningBefore(today).toReversed(), ...undatedTasks];
-    const plannedLater = Map.groupBy(showFuture ? getTasksHappeningAfter(today) : [], (task) => task.happensDate.toISODate());
+    const plannedLater = Map.groupBy(showFuture ? getTasksHappeningAfter(today) : [], (task) => task.happensDate);
+    const laterDatesGrouped = Map.groupBy(plannedLater.keys().toArray().toSorted(), (isoDate) => isoDate.toRelativeCalendar());
 
     return (
         <div class="taskido" id="taskido">
             <div class="details">
                 <TaskTimeline key="today" date={today} tasks={plannedToday.filter(isTaskActionable)} />
                 <TaskTimeline key="unplanned" label={"To schedule"} tasks={unplanned.filter(isTaskActionable)} />
-                {plannedLater
-                    .entries()
-                    .map(([isoDate, tasks]) => (
-                        <TaskTimeline
-                            key={isoDate}
-                            date={DateTime.fromISO(isoDate as string) as DateTime<true>}
-                            tasks={tasks.filter(isTaskActionable)}
-                        />
-                    ))
-                    .toArray()}
+                {
+                    laterDatesGrouped.entries().flatMap(([relativeCalendar, groupedDates]) => (
+                        groupedDates.map((date, dateIndex) => (
+                            <TaskTimeline
+                                relativeCalendar={dateIndex === 0 ? relativeCalendar : null}
+                                key={date.toISODate()}
+                                date={date as DateTime<true>}
+                                tasks={plannedLater.get(date)?.filter(isTaskActionable) ?? []}
+                            />
+                        ))
+                    )).toArray()
+                }
             </div>
         </div>
     );
