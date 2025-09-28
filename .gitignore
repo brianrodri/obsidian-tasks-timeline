@@ -2,6 +2,7 @@ coverage/
 dist/
 docs/
 node_modules/
+.DS_Store
 
 # Exclude (most of) the testing vault
 test-vault/.obsidian/*
