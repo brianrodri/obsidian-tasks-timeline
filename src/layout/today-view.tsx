@@ -3,6 +3,10 @@ import { DateTime } from "luxon";
 
 import { usePluginContext } from "@/context/plugin-context";
 import { TaskTimeline } from "@/layout/task-timeline";
+import { Task } from "@/data/task";
+import { sortedLastIndexBy } from "lodash";
+import { useMemo } from "preact/hooks";
+import { memo } from "preact/compat";
 
 export interface TodayViewProps {
     showFuture?: boolean;
@@ -14,29 +18,57 @@ export function TodayView({ showFuture = true }: TodayViewProps) {
         taskLookup.value;
 
     const today = DateTime.now().startOf("day");
-    const plannedToday = getTasksHappeningOn(today);
-    const unplanned = [...getTasksHappeningBefore(today).toReversed(), ...undatedTasks];
-    const plannedLater = Map.groupBy(showFuture ? getTasksHappeningAfter(today) : [], (task) => task.happensDate);
-    const laterDatesGrouped = Map.groupBy(plannedLater.keys().toArray().toSorted(), (isoDate) => isoDate.toRelativeCalendar());
+
+    const plannedToday = useMemo(
+        () => getTasksHappeningOn(today).filter(isTaskActionable),
+        [getTasksHappeningOn, isTaskActionable, today],
+    );
+
+    const unplanned = useMemo(
+        () => [...getTasksHappeningBefore(today).filter(isTaskActionable).toReversed(), ...undatedTasks],
+        [today, undatedTasks, getTasksHappeningBefore, isTaskActionable],
+    );
+
+    const plannedLater = useMemo(
+        () => showFuture ? getTasksHappeningAfter(today).filter(isTaskActionable) : [],
+        [showFuture, today, getTasksHappeningAfter, isTaskActionable],
+    );
 
     return (
         <div class="taskido" id="taskido">
             <div class="details">
-                <TaskTimeline key="today" date={today} tasks={plannedToday.filter(isTaskActionable)} />
-                <TaskTimeline key="unplanned" label={"To schedule"} tasks={unplanned.filter(isTaskActionable)} />
-                {
-                    laterDatesGrouped.entries().flatMap(([relativeCalendar, groupedDates]) => (
-                        groupedDates.map((date, dateIndex) => (
-                            <TaskTimeline
-                                relativeCalendar={dateIndex === 0 ? relativeCalendar : null}
-                                key={date.toISODate()}
-                                date={date as DateTime<true>}
-                                tasks={plannedLater.get(date)?.filter(isTaskActionable) ?? []}
-                            />
-                        ))
-                    )).toArray()
-                }
+                <TaskTimeline key="today" date={today} tasks={plannedToday} />
+                <TaskTimeline key="unplanned" label={"To Schedule"} tasks={unplanned} />
+                <GroupedTaskTimelines tasks={plannedLater} />
             </div>
         </div>
     );
 }
+
+interface GroupedTaskTimelinesProps {
+    tasks: readonly Task[];
+}
+
+const GroupedTaskTimelines = memo(({ tasks }: GroupedTaskTimelinesProps) => {
+    const timelines = [];
+
+    for (let indexStartIncl = 0, prevRelativeDate = null; indexStartIncl < tasks.length;) {
+        const firstTask = tasks[indexStartIncl];
+        const indexStopExcl = sortedLastIndexBy(tasks, firstTask, (task) => task.happensDate.toISODate());
+        const relativeDate = firstTask.happensDate.toRelativeCalendar();
+
+        timelines.push(
+            <TaskTimeline
+                key={firstTask.happensDate.toISODate()}
+                tasks={tasks.slice(indexStartIncl, indexStopExcl)}
+                date={firstTask.happensDate}
+                relativeCalendar={relativeDate !== prevRelativeDate ? relativeDate : null}
+            />
+        );
+
+        indexStartIncl = indexStopExcl;
+        prevRelativeDate = relativeDate;
+    };
+
+    return timelines;
+})
