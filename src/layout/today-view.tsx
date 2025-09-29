@@ -25,7 +25,7 @@ export function TodayView({ showFuture = true }: TodayViewProps) {
     );
 
     const unplanned = useMemo(
-        () => [...getTasksHappeningBefore(today).filter(isTaskActionable).toReversed(), ...undatedTasks],
+        () => [...getTasksHappeningBefore(today).toReversed(), ...undatedTasks].filter(isTaskActionable),
         [today, undatedTasks, getTasksHappeningBefore, isTaskActionable],
     );
 
