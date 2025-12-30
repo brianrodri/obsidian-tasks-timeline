@@ -3,7 +3,6 @@ import typescriptPluginParser from "@typescript-eslint/parser";
 import preactConfig from "eslint-config-preact";
 import prettierConfig from "eslint-config-prettier";
 import prettierPlugin from "eslint-plugin-prettier";
-import reactHooksPlugin from "eslint-plugin-react-hooks";
 import globals from "globals";
 
 /** @type { import("eslint").Linter.Config[] } */
@@ -23,12 +22,10 @@ export default [
         files: ["src/**/*.{ts,tsx}"],
         plugins: {
             "@typescript-eslint": typescriptPlugin,
-            "react-hooks": reactHooksPlugin,
         },
         rules: {
             ...typescriptPlugin.configs.recommended.rules,
             ...typescriptPlugin.configs.strict.rules,
-            ...reactHooksPlugin.configs.recommended.rules,
         },
         languageOptions: {
             globals: { ...globals.browser },
