@@ -10,7 +10,7 @@ import globals from "globals";
 export default [
     { ignores: ["coverage/", "docs/", "dist/", "node_modules/", "test-vault/"] },
 
-    ...preactConfig.flat,
+    ...preactConfig,
 
     {
         files: ["*.config.js", ".husky/install.js"],
