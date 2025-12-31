@@ -6,7 +6,7 @@ import { App, Component, MarkdownRenderer } from "@/lib/obsidian/types";
 
 import { ObsidianMarkdown, ObsidianMarkdownProps } from "../markdown";
 
-vi.mock(import("@/lib/obsidian/types"));
+vi.mock("@/lib/obsidian/types");
 afterEach(() => vi.restoreAllMocks());
 
 describe("ObsidianMarkdown", () => {
