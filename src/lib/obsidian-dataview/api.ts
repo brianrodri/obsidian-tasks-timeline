@@ -1,10 +1,10 @@
 import { Signal, signal } from "@preact/signals";
 import { DateTime } from "luxon";
-import type { Plugin } from "obsidian";
 import { DataviewApi, getAPI, isPluginEnabled } from "obsidian-dataview";
 import { SMarkdownPage, STask } from "obsidian-dataview/lib/data-model/serialized/markdown";
 
 import { Task, TaskLocation, TaskStatus } from "@/data/task";
+import type { Plugin } from "@/lib/obsidian/types";
 import { readEmojiTaskFields } from "@/lib/obsidian-tasks/parse-task-fields";
 
 export class Dataview {

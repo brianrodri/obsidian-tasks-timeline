@@ -1,13 +1,13 @@
 import { Signal, useComputed } from "@preact/signals";
-import { Plugin } from "obsidian";
 import { PropsWithChildren, createContext, useContext } from "preact/compat";
 
 import { PluginSettings } from "@/data/settings";
 import { TaskLookup } from "@/data/task-lookup";
 import { LoadingView } from "@/layout/loading-view";
+import { Obsidian } from "@/lib/obsidian/adapters";
+import { Plugin, WorkspaceLeaf } from "@/lib/obsidian/types";
 import { Dataview } from "@/lib/obsidian-dataview/api";
 import { TasksApi } from "@/lib/obsidian-tasks/api";
-import { Obsidian, WorkspaceLeaf } from "@/lib/obsidian/api";
 
 export const PluginContext = createContext<PluginContextValue | null>(null);
 

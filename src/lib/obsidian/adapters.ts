@@ -1,7 +1,5 @@
-import { IconName, ItemView, Keymap, Plugin, UserEvent, WorkspaceLeaf } from "obsidian";
+import { ItemView, Keymap, type IconName, type Plugin, type UserEvent, type WorkspaceLeaf } from "@/lib/obsidian/types";
 import { ComponentChild, ContainerNode, render } from "preact";
-
-export { WorkspaceLeaf } from "obsidian";
 
 export class Obsidian {
     public readonly plugin: Plugin;
@@ -110,13 +108,5 @@ export class ObsidianView extends ItemView {
 
     protected override async onClose(): Promise<void> {
         render(null, this.container);
-    }
-}
-
-export class NoticeMessage extends DocumentFragment {
-    public constructor(header: string, content: string) {
-        super();
-        this.createEl("h4", { text: header });
-        this.createEl("p", { text: content });
     }
 }
