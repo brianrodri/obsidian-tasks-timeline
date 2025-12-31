@@ -23,7 +23,7 @@ export const ObsidianMarkdown: FunctionalComponent<ObsidianMarkdownProps> = ({
 
     useEffect(() => {
         const el = elRef.current;
-        if (el) {
+        if (el && markdown && sourcePath) {
             const runAsync = async () => await renderObsidianMarkdown(app, markdown, el, sourcePath, component);
             runAsync().catch(console.error);
             return () => renderObsidianMarkdown.cancel();
@@ -40,9 +40,9 @@ export interface ObsidianMarkdownProps {
     /** A parent component to manage the lifecycle of the rendered child components. */
     component: Component;
     /** The Markdown source code. */
-    markdown: string;
+    markdown?: string;
     /** The normalized path of this Markdown file, used to resolve relative internal links. */
-    sourcePath: string;
+    sourcePath?: string;
     /** The tag used to contain the rendered Markdown source code. */
     tagName?: keyof JSX.IntrinsicElements;
     /** Custom debounce time for renders. */
