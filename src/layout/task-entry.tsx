@@ -11,6 +11,7 @@ import {
     TagsIcon,
 } from "@/components/icons";
 import { VaultLink } from "@/components/vault-link";
+import { usePluginContext } from "@/context/plugin-context";
 import { Task } from "@/data/task";
 
 import { TaskCheckbox } from "@/layout/task-checkbox";
@@ -26,6 +27,7 @@ export interface TaskEntryProps {
 export const TaskEntry = ({ task }: TaskEntryProps) => {
     const overdue = task.dueDate.isValid && task.dueDate.diffNow().as("days") < -1;
     const { filePath, fileName, fileSection, obsidianHref } = task.location;
+    const { plugin } = usePluginContext();
 
     const rootElClass =
         task.status === "DONE" ? "task done"
@@ -49,7 +51,12 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
             </div>
             <div class="lines">
                 <div class="content">
-                    <ObsidianMarkdown md={task.description} sourcePath={filePath} />
+                    <ObsidianMarkdown
+                        app={plugin.app}
+                        component={plugin}
+                        markdown={task.description}
+                        sourcePath={filePath}
+                    />
                 </div>
                 <div class="line info">
                     <TaskInfoEntry symbol={<FileIcon />} className="file">
