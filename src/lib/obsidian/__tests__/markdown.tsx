@@ -40,17 +40,17 @@ describe("ObsidianMarkdown", () => {
     });
 
     it("should rerender when 'props.markdown' stops changing for a while", async () => {
-        const props = { ...requiredProps, delay: 500 };
+        let props = { ...requiredProps, delay: 500 };
 
-        props.markdown = "Apple";
+        props = { ...props, markdown: "Apple" };
         const { container, rerender } = render(<ObsidianMarkdown {...props} />);
         await vi.runAllTimersAsync();
 
-        props.markdown = "Banana";
+        props = { ...props, markdown: "Banana" };
         rerender(<ObsidianMarkdown {...props} />);
         await vi.advanceTimersByTimeAsync(300);
 
-        props.markdown = "Banana";
+        props = { ...props, markdown: "Banana" };
         rerender(<ObsidianMarkdown {...props} />);
         await vi.advanceTimersByTimeAsync(300);
 
@@ -74,17 +74,17 @@ describe("ObsidianMarkdown", () => {
     });
 
     it("should not rerender when 'props.markdown' keeps changing", async () => {
-        const props = { ...requiredProps, delay: 500 };
+        let props = { ...requiredProps, delay: 500 };
 
-        props.markdown = "Apple";
+        props = { ...props, markdown: "Apple" };
         const { container, rerender } = render(<ObsidianMarkdown {...props} />);
         await vi.runAllTimersAsync();
 
-        props.markdown = "Banana";
+        props = { ...props, markdown: "Banana" };
         rerender(<ObsidianMarkdown {...props} />);
         await vi.advanceTimersByTimeAsync(300);
 
-        props.markdown = "Cherry";
+        props = { ...props, markdown: "Cherry" };
         rerender(<ObsidianMarkdown {...props} />);
         await vi.advanceTimersByTimeAsync(300);
 
