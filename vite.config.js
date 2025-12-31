@@ -41,6 +41,7 @@ export default defineConfig(({ mode }) => ({
             include: ["src/"],
             exclude: ["src/main.tsx", "**/__mocks__/*", "**/__tests__/*"],
         },
+        clearMocks: true,
         // NOTE(vitest-dev/vitest#4029): obsidian package has no "main" entrypoint so we need to mock the entire lib.
         alias: { obsidian: path.resolve(__dirname, "src/lib/obsidian/__mocks__/types.ts") },
     },

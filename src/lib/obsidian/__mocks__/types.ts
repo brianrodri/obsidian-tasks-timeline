@@ -1,3 +1,4 @@
+/** IMPORTANT: This mock will be used to replace the ENTIRE "obsidian" package across ALL tests; write with care! */
 import { vi } from "vitest";
 
 export type { IconName, PaneType, UserEvent, WorkspaceLeaf } from "obsidian";

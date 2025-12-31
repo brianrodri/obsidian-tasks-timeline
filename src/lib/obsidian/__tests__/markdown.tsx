@@ -1,14 +1,10 @@
 import { render } from "@testing-library/preact";
 import { DurationLike } from "luxon";
 import { OmitByValue } from "utility-types";
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { App, Component, MarkdownRenderer } from "@/lib/obsidian/types";
-
 import { ObsidianMarkdown, ObsidianMarkdownProps } from "../markdown";
-
-vi.mock("@/lib/obsidian/types");
-afterEach(() => vi.mocked(MarkdownRenderer.render).mockClear());
 
 describe("ObsidianMarkdown", () => {
     const requiredProps: OmitByValue<ObsidianMarkdownProps, undefined> = {
