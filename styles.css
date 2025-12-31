@@ -4,8 +4,8 @@
     height: 100%;
     padding-bottom: 1em;
 }
-.taskido .obsidian-markdown p {
-    margin: inherit;
+.taskido p {
+    margin: 0;
 }
 @keyframes spin {
     0% {
