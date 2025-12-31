@@ -39,7 +39,9 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
         fileSection ?
             <>
                 {fileName}
-                <span class="header">{` > ${fileSection}`}</span>
+                {fileName !== fileSection ?
+                    <span class="header">{` > ${fileSection}`}</span>
+                :   null}
             </>
         :   fileName;
 
