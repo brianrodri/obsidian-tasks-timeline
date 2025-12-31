@@ -19,7 +19,7 @@ export const ObsidianMarkdown: FunctionalComponent<ObsidianMarkdownProps> = ({
 }) => {
     const elRef = useRef<HTMLElement>();
     const delayMs = Duration.fromDurationLike(delay).toMillis();
-    const renderObsidianMarkdown = useDebounceCallback(MarkdownRenderer["render"], delayMs);
+    const renderObsidianMarkdown = useDebounceCallback(MarkdownRenderer.render, delayMs);
 
     useEffect(() => {
         const el = elRef.current;
