@@ -1,4 +1,4 @@
-import { Plugin } from "obsidian";
+import { type Plugin } from "@/lib/obsidian/api";
 
 /**
  * Tasks API v1 interface

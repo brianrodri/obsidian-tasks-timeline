@@ -2,14 +2,13 @@ import "core-js/features/iterator";
 import "core-js/features/set";
 
 import { signal } from "@preact/signals";
-import { Plugin } from "obsidian";
 
 import { PluginContextProvider } from "@/context/plugin-context";
 import { DEFAULT_SETTINGS } from "@/data/settings";
 import { TodayView } from "@/layout/today-view";
 import { Dataview } from "@/lib/obsidian-dataview/api";
 import { TasksApi } from "@/lib/obsidian-tasks/api";
-import { Obsidian, ObsidianView, WorkspaceLeaf } from "@/lib/obsidian/api";
+import { Obsidian, ObsidianView, Plugin, WorkspaceLeaf } from "@/lib/obsidian/api";
 
 const VIEW_TYPE = "obsidian-tasks-timeline" as const;
 const VIEW_HEADER = "Tasks timeline" as const;
