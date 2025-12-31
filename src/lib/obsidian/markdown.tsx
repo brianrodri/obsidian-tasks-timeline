@@ -23,10 +23,14 @@ export const ObsidianMarkdown: FunctionalComponent<ObsidianMarkdownProps> = ({
 
     useEffect(() => {
         const el = elRef.current;
-        if (el && markdown && sourcePath) {
-            const runAsync = async () => await renderObsidianMarkdown(app, markdown, el, sourcePath, component);
-            runAsync().catch(console.error);
-            return () => renderObsidianMarkdown.cancel();
+        if (el) {
+            if (!markdown || !sourcePath) {
+                el.innerHTML = "";
+            } else {
+                const runAsync = async () => renderObsidianMarkdown(app, markdown, el, sourcePath, component);
+                runAsync().catch(console.error);
+                return () => renderObsidianMarkdown.cancel();
+            }
         }
     }, [renderObsidianMarkdown, app, markdown, sourcePath, component]);
 
