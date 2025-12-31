@@ -16,7 +16,7 @@ import { Task } from "@/data/task";
 import { TaskCheckbox } from "@/layout/task-checkbox";
 import { TaskDateInput } from "@/layout/task-date-input";
 import { TaskInfoEntry } from "@/layout/task-info-entry";
-import { Markdown } from "@/lib/obsidian/markdown";
+import { ObsidianMarkdown } from "@/lib/obsidian/markdown";
 import { NetworkIcon, SignatureIcon } from "lucide-preact";
 
 export interface TaskEntryProps {
@@ -49,7 +49,7 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
             </div>
             <div class="lines">
                 <div class="content">
-                    <Markdown md={task.description} sourcePath={filePath} />
+                    <ObsidianMarkdown md={task.description} sourcePath={filePath} />
                 </div>
                 <div class="line info">
                     <TaskInfoEntry symbol={<FileIcon />} className="file">

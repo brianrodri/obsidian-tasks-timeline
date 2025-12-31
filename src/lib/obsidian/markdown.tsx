@@ -2,7 +2,8 @@ import { createElement, FunctionalComponent, JSX } from "preact";
 import { useEffect, useRef } from "preact/hooks";
 import { useDebounceCallback } from "usehooks-ts";
 
-import { MarkdownRenderer, App, Component } from "@/lib/obsidian/api";
+import { MarkdownRenderer, type App, type Component } from "@/lib/obsidian/types";
+import { Duration, DurationLike } from "luxon";
 
 /**
  * @param props - props for the component.
@@ -17,12 +18,12 @@ export const ObsidianMarkdown: FunctionalComponent<ObsidianMarkdownProps> = ({
     tagName = "span",
 }) => {
     const elRef = useRef<HTMLElement>();
-    const renderObsidianMarkdown = useDebounceCallback(MarkdownRenderer["render"], delay);
+    const delayMs = Duration.fromDurationLike(delay).toMillis();
+    const renderObsidianMarkdown = useDebounceCallback(MarkdownRenderer["render"], delayMs);
 
     useEffect(() => {
         const el = elRef.current;
         if (el) {
-            //renderObsidianMarkdown.flush();
             const runAsync = async () => await renderObsidianMarkdown(app, markdown, el, sourcePath, component);
             runAsync().catch(console.error);
             return () => renderObsidianMarkdown.cancel();
@@ -45,5 +46,5 @@ export interface ObsidianMarkdownProps {
     /** The tag used to contain the rendered Markdown source code. */
     tagName?: keyof JSX.IntrinsicElements;
     /** Custom debounce time for renders. */
-    delay?: number;
+    delay?: DurationLike;
 }

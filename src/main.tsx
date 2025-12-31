@@ -8,7 +8,8 @@ import { DEFAULT_SETTINGS } from "@/data/settings";
 import { TodayView } from "@/layout/today-view";
 import { Dataview } from "@/lib/obsidian-dataview/api";
 import { TasksApi } from "@/lib/obsidian-tasks/api";
-import { Obsidian, ObsidianView, Plugin, WorkspaceLeaf } from "@/lib/obsidian/api";
+import { Obsidian, ObsidianView } from "@/lib/obsidian/adapters";
+import { Plugin, WorkspaceLeaf } from "@/lib/obsidian/types";
 
 const VIEW_TYPE = "obsidian-tasks-timeline" as const;
 const VIEW_HEADER = "Tasks timeline" as const;

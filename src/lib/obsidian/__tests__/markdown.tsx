@@ -1,13 +1,13 @@
 import { render } from "@testing-library/preact";
 import { OmitByValue } from "utility-types";
-import { afterAll, beforeEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
-import { App, Component, MarkdownRenderer } from "@/lib/obsidian/api";
+import { App, Component, MarkdownRenderer } from "@/lib/obsidian/types";
 
 import { ObsidianMarkdown, ObsidianMarkdownProps } from "../markdown";
 
-vi.mock("@/lib/obsidian/api");
-beforeEach(() => vi.restoreAllMocks());
+vi.mock(import("@/lib/obsidian/types"));
+afterEach(() => vi.restoreAllMocks());
 
 describe("ObsidianMarkdown", () => {
     const requiredProps: OmitByValue<ObsidianMarkdownProps, undefined> = {

@@ -1,7 +1,5 @@
-import { ItemView, Keymap, type IconName, type Plugin, type UserEvent, type WorkspaceLeaf } from "./types";
+import { ItemView, Keymap, type IconName, type Plugin, type UserEvent, type WorkspaceLeaf } from "@/lib/obsidian/types";
 import { ComponentChild, ContainerNode, render } from "preact";
-
-export { MarkdownRenderer, App, Component, Plugin, type WorkspaceLeaf } from "./types";
 
 export class Obsidian {
     public readonly plugin: Plugin;
