@@ -48,8 +48,7 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
     return (
         <div class={rootElClass}>
             <div class="timeline">
-                <TaskCheckbox overdue={overdue} status={task.status} location={task.location} />
-                <div class="stripe" />
+                <TaskCheckbox status={task.status} location={task.location} />
             </div>
             <div class="lines">
                 <div class="content">

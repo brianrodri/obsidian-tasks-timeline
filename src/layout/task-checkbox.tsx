@@ -1,22 +1,15 @@
 import { useSignal } from "@preact/signals";
-import { VNode } from "preact";
 import { useEventCallback } from "usehooks-ts";
 
-import { CancelledIcon, CompletedIcon, OverdueIcon, TaskIcon } from "@/components/icons";
 import { usePluginContext } from "@/context/plugin-context";
 import { TaskLocation, TaskStatus } from "@/data/task";
 
 export interface TaskCheckboxProps {
     status: TaskStatus;
-    overdue?: boolean;
     location: TaskLocation;
 }
 
-export function TaskCheckbox({
-    status,
-    overdue,
-    location: { filePath, fileStartByte, fileStopByte },
-}: TaskCheckboxProps) {
+export function TaskCheckbox({ status, location: { filePath, fileStartByte, fileStopByte } }: TaskCheckboxProps) {
     const { obsidian, tasksApi } = usePluginContext();
     const waiting = useSignal(false);
 
@@ -32,18 +25,11 @@ export function TaskCheckbox({
     });
 
     return (
-        <div class="icon" onClick={onClick}>
-            {status === "OPEN" ?
-                overdue ?
-                    <OverdueIcon />
-                :   <TaskIcon />
-            :   STATUS_ICON_MAP[status]}
-        </div>
+        <input
+            type="checkbox"
+            checked={status === "DONE"}
+            data-task={status === "DROPPED" ? "-" : ""}
+            onClick={onClick}
+        />
     );
 }
-
-const STATUS_ICON_MAP = {
-    DONE: <CompletedIcon />,
-    DROPPED: <CancelledIcon />,
-    CUSTOM: <CancelledIcon />,
-} as const satisfies { [K in TaskStatus]?: VNode };
