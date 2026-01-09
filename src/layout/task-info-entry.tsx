@@ -11,7 +11,6 @@ export function TaskInfoEntry({ symbol, children, ...rest }: PropsWithChildren<T
     return (
         <div {...rest}>
             <div class="icon">{symbol}</div>
-
             <div class="label">{children}</div>
         </div>
     );

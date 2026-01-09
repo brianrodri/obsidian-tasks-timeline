@@ -36,15 +36,17 @@ export function TaskTimeline({
         [tasks, taskFilter],
     );
 
-    return entries.length > 0 ?
+    if (entries.length > 0) {
+        return (
             <>
-                {date?.isValid ?
-                    <div class="dateLine">
+                <div class="dateLine">
+                    <div class="relative">{label ?? relativeCalendar}</div>
+                    {date?.isValid ?
                         <div class="date">{`${date.toISODate()} ${date.weekdayShort}`}</div>
-                        <div class="relative">{relativeCalendar}</div>
-                    </div>
-                :   <div class="dateLine">{label}</div>}
+                    :   null}
+                </div>
                 <div class="content">{entries}</div>
             </>
-        :   null;
+        );
+    }
 }
