@@ -210,14 +210,12 @@
 }
 .ott .timeline .icon svg {
     color: var(--checkbox-border-color);
-}
-.ott .timeline .icon svg:hover {
-    color: var(--checkbox-border-color-hover);
-}
-.ott .timeline .icon svg {
     height: var(--checkbox-size);
     width: var(--checkbox-size);
     stroke-width: 1.75px;
+}
+.ott .timeline .icon svg:hover {
+    color: var(--checkbox-border-color-hover);
 }
 .ott .task .info {
     line-height: 22px;
