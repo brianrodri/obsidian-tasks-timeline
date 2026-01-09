@@ -12,8 +12,16 @@
     height: 100%;
     padding-bottom: 1em;
 }
+.ott a {
+    text-decoration: none !important;
+    color: inherit !important;
+}
 .ott p {
+    display: contents
     margin: 0;
+}
+.ott span {
+    display: contents;
 }
 .ott .spinner {
     color: var(--text-muted);
