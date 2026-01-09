@@ -20,6 +20,9 @@
     display: contents;
     margin: 0;
 }
+.ott p + p {
+    margin-top: var(--size-4-2)
+}
 .ott span {
     display: contents;
 }
@@ -43,24 +46,19 @@
 
 .ott .dateLine {
     align-items: center;
-    color: var(--text-muted) !important;
+    color: var(--text-normal) !important;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    font-size: 11px;
-    font-variant-numeric: tabular-nums;
-    font-weight: bold;
+    font-size: var(--font-ui-small);
+    font-weight: var(--font-medium);
     justify-content: space-between;
-    letter-spacing: 0.1em;
-    line-height: 1.3;
-    margin: 10px 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-transform: uppercase;
+    line-height: var(--line-height-tight);
+    margin: var(--size-4-3) 0;
     white-space: nowrap;
 }
 .ott .task {
-    border-radius: 10px;
+    border-radius: var(--radius-m);
     cursor: pointer;
     display: flex;
     flex-direction: row;
@@ -84,22 +82,9 @@
     flex-grow: 1;
     flex-shrink: 1;
 }
-.ott .stripe {
-    align-items: center;
-    background: var(--checkbox-border-color);
-    display: flex;
-    flex-grow: 1;
-    flex-shrink: 1;
-    justify-content: center;
-    margin: 0 auto;
-    width: 1px;
-}
-.ott .task:last-child .stripe {
-    display: none;
-}
 .ott .task.overdue .timeline .icon svg line {
     stroke-width: 2.5px !important;
-    stroke: #ff375f !important;
+    stroke: var(--color-red) !important;
 }
 
 .ott .line {
@@ -123,7 +108,7 @@
 .ott .timeline .icon svg {
     color: var(--checkbox-border-color);
     height: var(--checkbox-size);
-    stroke-width: 1.75px;
+    stroke-width: var(--icon-m-stroke-width);
     width: var(--checkbox-size);
 }
 .ott .timeline .icon svg:hover {
@@ -132,16 +117,16 @@
 .ott .task .info {
     cursor: default;
     line-height: 22px;
-    padding-bottom: 2px;
+    padding-bottom: var(--size-2-1);
 }
 .ott .task .info:empty {
     display: none;
 }
 .ott .task .content {
-    color: var(--text-normal);
+    color: var(--text-muted);
     display: block;
-    font-size: 15px;
-    font-weight: normal;
+    font-size: var(--font-ui-small);
+    font-weight: var(--font-normal);
     line-height: 22px;
     white-space: break-word;
 }
@@ -153,33 +138,33 @@
 .ott .task .info .depends-on,
 .ott .task .info .file {
     align-items: center;
-    border-radius: 3px !important;
+    border-radius: var(--radius-s) !important;
     border: none;
-    color: var(--text-muted);
+    color: var(--text-faint);
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    font-size: 9px;
-    font-weight: normal;
+    font-size: var(--font-ui-smaller);
+    font-weight: var(--font-normal);
     line-height: 1 !important;
-    margin: 2px 5px 2px 0;
+    margin: var(--size-2-1) var(--size-4-1) var(--size-2-1) 0;
     padding: 0;
     padding: 0px;
     width: auto;
 }
 .ott .info .icon {
-    height: 15px;
+    height: var(--icon-s);
     text-align: center;
 }
 .ott .info .label {
-    margin-left: 2px;
+    margin-left: var(--size-2-1);
 }
 .ott .info label.dateInput {
-    border-radius: 10px;
+    border-radius: var(--radius-m);
     border: var(--input-border-width) solid var(--interactive-accent);
     color: var(--interactive-accent);
     display: inline-flex;
-    margin-right: 3px;
+    margin-right: var(--size-2-2);
     overflow: clip;
     position: relative;
 }
@@ -188,10 +173,10 @@
     color: var(--text-normal);
 }
 .ott .info label.dateInput > .icon {
-    border-radius: 10px;
-    height: 13px;
-    padding: 2px;
-    width: 13px;
+    border-radius: var(--radius-m);
+    height: var(--font-ui-small);
+    padding: var(--size-2-1);
+    width: var(--font-ui-small);
 }
 .ott .info label.dateInput > input[type="date"] {
     cursor: pointer;
@@ -211,10 +196,10 @@
     width: 300%;
 }
 .ott .info svg {
-    height: 12px;
-    stroke-width: 1.75px;
-    width: 12px;
+    height: var(--icon-xs);
+    stroke-width: var(--icon-xs-stroke-width);
+    width: var(--icon-xs);
 }
 .ott .task.overdue .info .relative {
-    color: #ff375f !important;
+    color: var(--color-red) !important;
 }
