@@ -35,7 +35,7 @@ export function TodayView({ showFuture = true }: TodayViewProps) {
     );
 
     return (
-        <div class="taskido" id="taskido">
+        <div class="ott" id="ott">
             <div class="details">
                 <TaskTimeline key="today" date={today} tasks={plannedToday} />
                 <TaskTimeline key="unplanned" label={"To Schedule"} tasks={unplanned} />

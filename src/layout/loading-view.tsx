@@ -2,7 +2,7 @@ import { LoaderIcon } from "lucide-preact";
 
 export function LoadingView() {
     return (
-        <div class="taskido">
+        <div class="ott">
             <span class="spinner">
                 <LoaderIcon />
             </span>

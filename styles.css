@@ -1,10 +1,10 @@
-.taskido {
+.ott {
     cursor: default;
     user-select: none;
     height: 100%;
     padding-bottom: 1em;
 }
-.taskido p {
+.ott p {
     margin: 0;
 }
 @keyframes spin {
@@ -15,42 +15,42 @@
         transform: rotate(360deg);
     }
 }
-.taskido .spinner {
+.ott .spinner {
     color: var(--text-muted);
     display: flex;
     justify-content: center;
     align-content: center;
 }
-.taskido .spinner svg {
+.ott .spinner svg {
     animation: spin 3s linear infinite;
 }
-.taskido a {
+.ott a {
     text-decoration: none !important;
     color: inherit !important;
 }
-.taskido span {
+.ott span {
     display: contents;
 }
-.taskido .task .innerLink,
-.taskido .task .outerLink {
+.ott .task .innerLink,
+.ott .task .outerLink {
     color: var(--interactive-accent);
     text-decoration: underline !important;
 }
-.taskido .year {
+.ott .year {
     font-size: 30px;
     font-weight: bold;
     margin: 20px 0;
     color: var(--text-normal);
     text-align: center;
 }
-.taskido .details {
+.ott .details {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
     width: 100%;
     height: auto;
 }
-.taskido .todayHeader {
+.ott .todayHeader {
     font-size: 24px;
     font-weight: bold;
     text-align: center;
@@ -58,10 +58,10 @@
     border-radius: 10px;
     cursor: pointer;
 }
-.taskido .details.today {
+.ott .details.today {
     padding: 30px 0;
 }
-.taskido .counters {
+.ott .counters {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -69,7 +69,7 @@
     align-content: center;
     margin: 20px 0;
 }
-.taskido .counter {
+.ott .counter {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -86,21 +86,21 @@
     box-shadow: var(--input-shadow);
     cursor: pointer;
 }
-.taskido .count {
+.ott .count {
     font-size: 18px;
     font-weight: normal;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.taskido .counter .label {
+.ott .counter .label {
     font-size: 12px;
     font-weight: normal;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.taskido .dateLine {
+.ott .dateLine {
     align-items: center;
     color: var(--text-muted) !important;
     display: flex;
@@ -118,7 +118,7 @@
     text-transform: uppercase;
     white-space: nowrap;
 }
-.taskido .task {
+.ott .task {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -127,24 +127,24 @@
     margin: 0;
     cursor: pointer;
 }
-.taskido .timeline,
-.taskido .lines {
+.ott .timeline,
+.ott .lines {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
     cursor: default;
 }
-.taskido .timeline {
+.ott .timeline {
     width: 50px;
     flex-shrink: 0;
     flex-grow: 0;
 }
-.taskido .lines {
+.ott .lines {
     flex-shrink: 1;
     flex-grow: 1;
     overflow: hidden;
 }
-.taskido .stripe {
+.ott .stripe {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -154,49 +154,49 @@
     width: 1px;
     background: var(--checkbox-border-color);
 }
-.taskido .task:last-child .stripe {
+.ott .task:last-child .stripe {
     display: none;
 }
-.taskido .task.overdue .timeline .icon svg line {
+.ott .task.overdue .timeline .icon svg line {
     stroke: #ff375f !important;
     stroke-width: 2.5px !important;
 }
-.taskido .task.done .timeline .icon svg {
+.ott .task.done .timeline .icon svg {
     fill: var(--interactive-accent) !important;
     stroke: var(--interactive-accent) !important;
 }
-.taskido .task.done .timeline .icon svg path:nth-child(1) {
+.ott .task.done .timeline .icon svg path:nth-child(1) {
     fill: var(--interactive-accent) !important;
 }
-.taskido .task.done .timeline .icon svg path:nth-child(2) {
+.ott .task.done .timeline .icon svg path:nth-child(2) {
     stroke: var(--checkbox-marker-color) !important;
     stroke-width: 2.5px;
 }
-.taskido .task.done .info .tag,
-.taskido .task.done .info .repeat,
-.taskido .task.done .info .priority,
-.taskido .task.done .info .relative,
-.taskido .task.done .info .file,
-.taskido .task.cancelled .info .tag,
-.taskido .task.cancelled .info .repeat,
-.taskido .task.cancelled .info .priority,
-.taskido .task.cancelled .info .relative,
-.taskido .task.cancelled .info .file {
+.ott .task.done .info .tag,
+.ott .task.done .info .repeat,
+.ott .task.done .info .priority,
+.ott .task.done .info .relative,
+.ott .task.done .info .file,
+.ott .task.cancelled .info .tag,
+.ott .task.cancelled .info .repeat,
+.ott .task.cancelled .info .priority,
+.ott .task.cancelled .info .relative,
+.ott .task.cancelled .info .file {
     color: var(--text-muted) !important;
     line-height: 0;
 }
-.taskido .task.done .content,
-.taskido .task.cancelled .content {
+.ott .task.done .content,
+.ott .task.cancelled .content {
     text-decoration: line-through;
     color: var(--text-muted);
 }
-.taskido .line {
+.ott .line {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
 }
-.taskido .icon {
+.ott .icon {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -204,30 +204,30 @@
     flex-grow: 0;
     text-align: center;
 }
-.taskido .timeline .icon {
+.ott .timeline .icon {
     text-align: center;
     height: 22px;
 }
-.taskido .timeline .icon svg {
+.ott .timeline .icon svg {
     color: var(--checkbox-border-color);
 }
-.taskido .timeline .icon svg:hover {
+.ott .timeline .icon svg:hover {
     color: var(--checkbox-border-color-hover);
 }
-.taskido .timeline .icon svg {
+.ott .timeline .icon svg {
     height: var(--checkbox-size);
     width: var(--checkbox-size);
     stroke-width: 1.75px;
 }
-.taskido .task .info {
+.ott .task .info {
     line-height: 22px;
     padding-bottom: 2px;
     cursor: default;
 }
-.taskido .task .info:empty {
+.ott .task .info:empty {
     display: none;
 }
-.taskido .task .content {
+.ott .task .content {
     display: block;
     white-space: break-word;
     font-size: 15px;
@@ -235,13 +235,13 @@
     color: var(--text-normal);
     line-height: 22px;
 }
-.taskido .task .info .tag,
-.taskido .task .info .repeat,
-.taskido .task .info .priority,
-.taskido .task .info .relative,
-.taskido .task .info .id,
-.taskido .task .info .depends-on,
-.taskido .task .info .file {
+.ott .task .info .tag,
+.ott .task .info .repeat,
+.ott .task .info .priority,
+.ott .task .info .relative,
+.ott .task .info .id,
+.ott .task .info .depends-on,
+.ott .task .info .file {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -257,14 +257,14 @@
     padding: 0;
     border-radius: 3px !important;
 }
-.taskido .info .icon {
+.ott .info .icon {
     text-align: center;
     height: 15px;
 }
-.taskido .info .label {
+.ott .info .label {
     margin-left: 2px;
 }
-.taskido .info label.dateInput {
+.ott .info label.dateInput {
     display: inline-flex;
     position: relative;
     overflow: clip;
@@ -273,17 +273,17 @@
     color: var(--interactive-accent);
     border: var(--input-border-width) solid var(--interactive-accent);
 }
-.taskido .info label.dateInput:hover {
+.ott .info label.dateInput:hover {
     color: var(--text-normal);
     border: var(--input-border-width) solid var(--text-normal);
 }
-.taskido .info label.dateInput > .icon {
+.ott .info label.dateInput > .icon {
     padding: 2px;
     border-radius: 10px;
     width: 13px;
     height: 13px;
 }
-.taskido .info label.dateInput > input[type="date"] {
+.ott .info label.dateInput > input[type="date"] {
     position: absolute;
     top: 0;
     left: 0;
@@ -292,7 +292,7 @@
     opacity: 0;
     cursor: pointer;
 }
-.taskido .info label.dateInput > input[type="date"]::-webkit-calendar-picker-indicator {
+.ott .info label.dateInput > input[type="date"]::-webkit-calendar-picker-indicator {
     position: absolute;
     top: -150%;
     left: -150%;
@@ -300,16 +300,16 @@
     height: 300%;
     cursor: pointer;
 }
-.taskido .info svg {
+.ott .info svg {
     height: 12px;
     width: 12px;
     stroke-width: 1.75px;
 }
-.taskido .task.overdue .info .relative {
+.ott .task.overdue .info .relative {
     color: #ff375f !important;
 }
 /* Quick Entry Panel */
-.taskido .quickEntryPanel {
+.ott .quickEntryPanel {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -322,7 +322,7 @@
     overflow: hidden;
     padding: 5px;
 }
-.taskido .quickEntryPanel .left {
+.ott .quickEntryPanel .left {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -334,7 +334,7 @@
     border-radius: 5px;
     padding: 0 5px !important;
 }
-.taskido .quickEntryPanel .right {
+.ott .quickEntryPanel .right {
     display: block;
     width: auto;
     flex-shrink: 1;
@@ -342,22 +342,22 @@
     overflow: hidden;
     border-radius: 5px;
 }
-.taskido .quickEntryPanel select,
-.taskido .quickEntryPanel input,
-.taskido .quickEntryPanel button {
+.ott .quickEntryPanel select,
+.ott .quickEntryPanel input,
+.ott .quickEntryPanel button {
     box-shadow: none !important;
     border: none !important;
     background: none !important;
     border-radius: 0 !important;
 }
-.taskido .quickEntryPanel select,
-.taskido .quickEntryPanel button {
+.ott .quickEntryPanel select,
+.ott .quickEntryPanel button {
     cursor: pointer;
 }
-.taskido .quickEntryPanel input {
+.ott .quickEntryPanel input {
     cursor: text;
 }
-.taskido .quickEntryPanel select {
+.ott .quickEntryPanel select {
     height: 15px;
     width: 100%;
     font-size: 11px;
@@ -368,17 +368,17 @@
     margin: 2.5px 0 !important;
     color: var(--text-muted);
 }
-.taskido .quickEntryPanel select:hover,
-.taskido .quickEntryPanel button:hover {
+.ott .quickEntryPanel select:hover,
+.ott .quickEntryPanel button:hover {
     color: var(--text-normal);
 }
-.taskido .quickEntryPanel select option,
-.taskido .quickEntryPanel select optgroup {
+.ott .quickEntryPanel select option,
+.ott .quickEntryPanel select optgroup {
     background: var(--background-primary);
     font-weight: normal;
     color: var(--text-normal);
 }
-.taskido .quickEntryPanel input {
+.ott .quickEntryPanel input {
     height: 20px;
     line-height: 20px;
     width: 100%;
@@ -389,7 +389,7 @@
     margin: 0 !important;
     font-size: 14px;
 }
-.taskido .quickEntryPanel button {
+.ott .quickEntryPanel button {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -401,71 +401,71 @@
     margin: 0 !important;
     color: var(--text-muted);
 }
-.taskido .quickEntryPanel svg {
+.ott .quickEntryPanel svg {
     height: 15px;
     width: 15px;
     stroke-width: 1.75px;
 }
-.taskido .quickEntryPanel select:active,
-.taskido .quickEntryPanel input:active,
-.taskido .quickEntryPanel button:active {
+.ott .quickEntryPanel select:active,
+.ott .quickEntryPanel input:active,
+.ott .quickEntryPanel button:active {
     border: none !important;
     box-shadow: none !important;
     transition: none !important;
 }
 /* Classes */
-.taskido.todayFocus .todayHeader {
+.ott.todayFocus .todayHeader {
     color: var(--interactive-accent);
 }
-.taskido.todoFocus .counter#todo,
-.taskido.todoFilter .counter#todo,
-.taskido.overdueFocus .counter#overdue,
-.taskido.overdueFilter .counter#overdue,
-.taskido.unplannedFocus .counter#unplanned,
-.taskido.unplannedFilter .counter#unplanned {
+.ott.todoFocus .counter#todo,
+.ott.todoFilter .counter#todo,
+.ott.overdueFocus .counter#overdue,
+.ott.overdueFilter .counter#overdue,
+.ott.unplannedFocus .counter#unplanned,
+.ott.unplannedFilter .counter#unplanned {
     color: var(--interactive-accent);
     background: hsla(var(--interactive-accent-hsl), 0.2);
     box-shadow: var(--input-shadow);
 }
-.taskido.noYear .year,
-.taskido.noRepeat .repeat,
-.taskido.noTag .tag,
-.taskido.noPriority .priority,
-.taskido.noFile .task .file,
-.taskido.noHeader .task .header,
-.taskido.noFile .task .info > .file,
-.taskido.noInfo .task .line:nth-child(2),
-.taskido.noDone .year[data-types="done"],
-.taskido.noDone .details[data-types="done"],
-.taskido.noDone .task.done,
-.taskido.noUnplanned .task.unplanned,
-.taskido.noUnplanned .counter#unplanned,
-.taskido.noUnplanned .year[data-types="unplanned"],
-.taskido.noUnplanned .details[data-types="unplanned"],
-.taskido.noRelative .relative,
-.taskido.noQuickEntry .quickEntryPanel,
-.taskido.noCounters .counters {
+.ott.noYear .year,
+.ott.noRepeat .repeat,
+.ott.noTag .tag,
+.ott.noPriority .priority,
+.ott.noFile .task .file,
+.ott.noHeader .task .header,
+.ott.noFile .task .info > .file,
+.ott.noInfo .task .line:nth-child(2),
+.ott.noDone .year[data-types="done"],
+.ott.noDone .details[data-types="done"],
+.ott.noDone .task.done,
+.ott.noUnplanned .task.unplanned,
+.ott.noUnplanned .counter#unplanned,
+.ott.noUnplanned .year[data-types="unplanned"],
+.ott.noUnplanned .details[data-types="unplanned"],
+.ott.noRelative .relative,
+.ott.noQuickEntry .quickEntryPanel,
+.ott.noCounters .counters {
     display: none !important;
 }
-.taskido.noColor .task .file {
+.ott.noColor .task .file {
     color: var(--text-muted) !important;
 }
-.taskido.noColor .task .info .file {
+.ott.noColor .task .info .file {
     color: var(--text-muted) !important;
 }
 /* Focus */
-.taskido.todayFocus .details:not(.today),
-.taskido.todayFocus .year {
+.ott.todayFocus .details:not(.today),
+.ott.todayFocus .year {
     display: none !important;
 }
-.taskido.todayFocus .details.today {
+.ott.todayFocus .details.today {
     padding: 0;
 }
-.taskido.todoFocus .details.today .task.due,
-.taskido.todoFocus .details.today .task.scheduled,
-.taskido.todoFocus .details.today .task.process,
-.taskido.todoFocus .details.today .task.start,
-.taskido.overdueFocus .task.overdue,
-.taskido.unplannedFocus .task.unplanned {
+.ott.todoFocus .details.today .task.due,
+.ott.todoFocus .details.today .task.scheduled,
+.ott.todoFocus .details.today .task.process,
+.ott.todoFocus .details.today .task.start,
+.ott.overdueFocus .task.overdue,
+.ott.unplannedFocus .task.unplanned {
     background: hsla(var(--interactive-accent-hsl), 0.2);
 }
