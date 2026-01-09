@@ -75,7 +75,6 @@
 .ott .lines {
     flex-shrink: 1;
     flex-grow: 1;
-    overflow: hidden;
 }
 .ott .stripe {
     display: flex;
