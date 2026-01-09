@@ -1,3 +1,11 @@
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
 .ott {
     cursor: default;
     user-select: none;
@@ -6,14 +14,6 @@
 }
 .ott p {
     margin: 0;
-}
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
 }
 .ott .spinner {
     color: var(--text-muted);
