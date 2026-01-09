@@ -2,36 +2,44 @@
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
 }
+
 .ott {
     cursor: default;
     height: 100%;
     padding-bottom: 1em;
     user-select: none;
 }
+
 .ott a {
     color: inherit !important;
     text-decoration: none !important;
 }
+
 .ott p {
     display: contents;
     margin: 0;
 }
-.ott p + p {
-    margin-top: var(--size-4-2)
+
+.ott p+p {
+    margin-top: var(--p-spacing)
 }
+
 .ott span {
     display: contents;
 }
+
 .ott .spinner {
     align-content: center;
     color: var(--text-muted);
     display: flex;
     justify-content: center;
 }
+
 .ott .spinner svg {
     animation: spin 3s linear infinite;
 }
@@ -57,6 +65,7 @@
     margin: var(--size-4-3) 0;
     white-space: nowrap;
 }
+
 .ott .task {
     align-items: flex-start;
     border-radius: var(--radius-m);
@@ -67,6 +76,7 @@
     margin: 0;
     padding: 0;
 }
+
 .ott .timeline,
 .ott .lines {
     cursor: default;
@@ -74,19 +84,23 @@
     flex-direction: column;
     flex-wrap: nowrap;
 }
+
 .ott .timeline {
     display: block;
     line-height: var(--line-height-normal);
     padding-right: var(--size-4-2);
 }
+
 .ott .timeline input[type="checkbox"] {
     cursor: pointer;
     vertical-align: middle;
 }
+
 .ott .lines {
     flex-grow: 1;
     flex-shrink: 1;
 }
+
 .ott .task.overdue .timeline .icon svg line {
     stroke-width: 2.5px !important;
     stroke: var(--color-red) !important;
@@ -98,6 +112,7 @@
     flex-direction: row;
     flex-wrap: wrap;
 }
+
 .ott .icon {
     align-items: center;
     display: flex;
@@ -106,27 +121,33 @@
     justify-content: center;
     text-align: center;
 }
+
 .ott .timeline .icon {
     height: 22px;
     text-align: center;
 }
+
 .ott .timeline .icon svg {
     color: var(--checkbox-border-color);
     height: var(--checkbox-size);
     stroke-width: var(--icon-m-stroke-width);
     width: var(--checkbox-size);
 }
+
 .ott .timeline .icon svg:hover {
     color: var(--checkbox-border-color-hover);
 }
+
 .ott .task .info {
     cursor: default;
     line-height: 22px;
     padding-bottom: var(--size-2-1);
 }
+
 .ott .task .info:empty {
     display: none;
 }
+
 .ott .task .content {
     color: var(--text-muted);
     display: block;
@@ -135,6 +156,7 @@
     line-height: var(--line-height-normal);
     white-space: break-word;
 }
+
 .ott .task .info .tag,
 .ott .task .info .repeat,
 .ott .task .info .priority,
@@ -157,13 +179,16 @@
     padding: 0px;
     width: auto;
 }
+
 .ott .info .icon {
     height: var(--icon-s);
     text-align: center;
 }
+
 .ott .info .label {
     margin-left: var(--size-2-1);
 }
+
 .ott .info label.dateInput {
     border-radius: var(--radius-m);
     border: var(--input-border-width) solid var(--interactive-accent);
@@ -173,17 +198,20 @@
     overflow: clip;
     position: relative;
 }
+
 .ott .info label.dateInput:hover {
     border: var(--input-border-width) solid var(--text-normal);
     color: var(--text-normal);
 }
-.ott .info label.dateInput > .icon {
+
+.ott .info label.dateInput>.icon {
     border-radius: var(--radius-m);
     height: var(--font-ui-small);
     padding: var(--size-2-1);
     width: var(--font-ui-small);
 }
-.ott .info label.dateInput > input[type="date"] {
+
+.ott .info label.dateInput>input[type="date"] {
     cursor: pointer;
     height: 300%;
     left: 0;
@@ -192,7 +220,8 @@
     top: 0;
     width: 300%;
 }
-.ott .info label.dateInput > input[type="date"]::-webkit-calendar-picker-indicator {
+
+.ott .info label.dateInput>input[type="date"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
     height: 300%;
     left: -150%;
@@ -200,11 +229,13 @@
     top: -150%;
     width: 300%;
 }
+
 .ott .info svg {
     height: var(--icon-xs);
     stroke-width: var(--icon-xs-stroke-width);
     width: var(--icon-xs);
 }
+
 .ott .task.overdue .info .relative {
     color: var(--color-red) !important;
 }
