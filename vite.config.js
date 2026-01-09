@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => ({
                 { src: "styles.css", dest: "./" },
                 { src: "manifest.json", dest: "./" },
             ],
+            watch: { reloadPageOnChange: true },
         }),
     ],
     build: {
