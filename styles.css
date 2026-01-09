@@ -10,6 +10,7 @@
 
 .ott {
     cursor: default;
+    font-size: var(--font-ui-small);
     height: 100%;
     padding-bottom: 1em;
     user-select: none;
@@ -58,7 +59,6 @@
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    font-size: var(--font-ui-small);
     font-weight: var(--font-medium);
     justify-content: space-between;
     line-height: var(--line-height-tight);
@@ -151,7 +151,6 @@
 .ott .task .content {
     color: var(--text-muted);
     display: block;
-    font-size: var(--font-ui-small);
     font-weight: var(--font-normal);
     line-height: var(--line-height-normal);
     white-space: break-word;
