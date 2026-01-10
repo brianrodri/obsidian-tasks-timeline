@@ -1,3 +1,4 @@
+import "../styles.css";
 import "core-js/features/iterator";
 import "core-js/features/set";
 

@@ -4,17 +4,9 @@ import { viteStaticCopy } from "vite-plugin-static-copy";
 import path from "path";
 
 export default defineConfig(({ mode }) => ({
-    plugins: [
-        preact(),
-        viteStaticCopy({
-            targets: [
-                { src: "styles.css", dest: "./" },
-                { src: "manifest.json", dest: "./" },
-            ],
-            watch: { reloadPageOnChange: true },
-        }),
-    ],
+    plugins: [preact(), viteStaticCopy({ targets: [{ src: "manifest.json", dest: "./" }] })],
     build: {
+        cssCodeSplit: false, // Otherwise "styles.css" won't be generated.
         emptyOutDir: false, // Otherwise helpful files like ".hotreload" will be wiped.
         lib: {
             entry: "src/main.tsx",
@@ -24,6 +16,7 @@ export default defineConfig(({ mode }) => ({
         rollupOptions: {
             treeshake: true,
             external: ["obsidian"],
+            output: { assetFileNames: "styles.css" },
         },
         sourcemap: mode === "development" ? "inline" : false,
     },
