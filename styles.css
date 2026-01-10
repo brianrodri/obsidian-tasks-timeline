@@ -98,14 +98,14 @@
     justify-content: center;
 }
 
-.ott .info svg {
+.ott .task .lines svg {
     color: var(--text-faint);
     height: var(--icon-xs);
     stroke-width: var(--icon-stroke);
     width: var(--icon-xs);
 }
 
-.ott .info .label {
+.ott .task .lines .label {
     margin-left: var(--size-2-1);
 }
 
@@ -118,30 +118,24 @@
 }
 
 .ott .task .lines {
-    display: block;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--size-4-1);
+    line-height: var(--line-height-normal);
+    padding-bottom: var(--size-2-1);
 }
 
 .ott .task .content {
     color: var(--text-muted);
     display: inline;
     font-weight: var(--font-normal);
-    line-height: var(--line-height-normal);
+    margin-right: var(--size-4-1);
+    user-select: text;
 }
 
-.ott .task .info {
-    cursor: default;
-    display: inline-flex;
-    flex-wrap: wrap;
-    line-height: 22px;
-    padding-bottom: var(--size-2-1);
-    vertical-align: middle;
-}
-
-.ott .task .info:empty {
-    display: none;
-}
-
-.ott .task .info :is(.tag, .repeat, .priority, .relative, .id, .depends-on, .file) {
+.ott .task .lines :is(.tag, .repeat, .priority, .relative, .id, .depends-on, .file) {
     align-items: center;
     background-color: var(--background-secondary);
     border: none;
@@ -151,25 +145,26 @@
     font-size: var(--font-ui-smaller);
     font-weight: var(--font-normal);
     line-height: 1;
-    margin-left: var(--size-4-1);
+    margin-left: calc(-1 * var(--size-4-1));
     padding: var(--size-2-1) var(--size-4-1);
+    white-space: nowrap;
 }
 
-.ott .task .info :is(.tag, .repeat, .priority, .relative, .id, .depends-on, .file):hover {
+.ott .task .lines :is(.tag, .repeat, .priority, .relative, .id, .depends-on, .file):hover {
     background-color: var(--background-modifier-hover);
     color: var(--text-muted);
 }
 
-.ott .task .info .file {
+.ott .task .lines .file {
     cursor: pointer;
     position: relative;
 }
 
-.ott .task .info :is(.tag, .repeat, .priority, .relative, .id, .depends-on, .file):hover .icon svg {
+.ott .task .lines :is(.tag, .repeat, .priority, .relative, .id, .depends-on, .file):hover .icon svg {
     color: var(--text-muted);
 }
 
-.ott .task .info .file a::before {
+.ott .task .lines .file a::before {
     content: "";
     inset: 0;
     position: absolute;
@@ -180,24 +175,24 @@
     stroke-width: 2.5px;
 }
 
-.ott .task.overdue .info .relative {
+.ott .task.overdue .lines .relative {
     color: var(--color-red);
 }
 
-.ott .task .info .date-input,
-.ott .task .info .date-input * {
+.ott .task .lines .date-input,
+.ott .task .lines .date-input * {
     cursor: pointer;
 }
 
-.ott .task .info .date-input:hover .icon svg {
+.ott .task .lines .date-input:hover .icon svg {
     color: var(--text-muted);
 }
 
-.ott .task .info .date-input>.label {
+.ott .task .lines .date-input>.label {
     display: inline;
 }
 
-.ott .task .info .date-input>input[type="date"] {
+.ott .task .lines .date-input>input[type="date"] {
     height: 0;
     opacity: 0;
     pointer-events: none;
