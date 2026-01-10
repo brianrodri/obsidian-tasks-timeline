@@ -40,7 +40,12 @@ export function TaskTimeline({
         return (
             <>
                 <div class="date-line">
-                    <div class="date">{date?.isValid ? `${date.toISODate()} ${date.weekdayShort}` : label}</div>
+                    <div class="date">
+                        {date?.isValid ? `${date.toISODate()} ${date.weekdayShort}` : label}
+                        {entries.length > 1 ?
+                            <span class="counter">{` (${entries.length})`}</span>
+                        :   null}
+                    </div>
                     <div class="relative">{relativeCalendar}</div>
                 </div>
                 <div class="content">{entries}</div>

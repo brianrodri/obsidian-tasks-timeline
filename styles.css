@@ -56,6 +56,7 @@
     background-color: var(--background-modifier-hover);
 }
 
+.ott .date-line .counter,
 .ott .date-line .relative {
     color: var(--text-faint);
 }
@@ -147,7 +148,6 @@
     line-height: 1;
     margin-left: calc(-1 * var(--size-4-1));
     padding: var(--size-2-1) var(--size-4-1);
-    white-space: nowrap;
 }
 
 .ott .task .lines :is(.tag, .repeat, .priority, .relative, .id, .depends-on, .file):hover {
