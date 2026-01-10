@@ -43,7 +43,10 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
                     <span class="header">{` > ${fileSection}`}</span>
                 :   null}
             </>
-        :   fileName;
+        :   <>
+                {task.folder}
+                <span class="header">{` > ${fileName}`}</span>
+            </>;
 
     return (
         <div class={rootElClass}>

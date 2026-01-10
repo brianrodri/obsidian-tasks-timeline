@@ -1,4 +1,3 @@
-/* v8 ignore next 1 */
 import { isNumber, isSet, isString } from "lodash";
 import { DateTime } from "luxon";
 
@@ -57,6 +56,14 @@ export class Task implements TaskFields {
             isString(part.id) ? part.id : "",
             isSet(part.dependsOn) && part.dependsOn.values().every(isString) ? part.dependsOn : new Set(),
         );
+    }
+
+    public get folder(): string | undefined {
+        if (this.location.filePath) {
+            const parts = this.location.filePath.split("/");
+            return parts.length > 1 ? parts.at(-2) : undefined;
+        }
+        return undefined;
     }
 
     public get happensDate(): DateTime {
