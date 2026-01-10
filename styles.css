@@ -1,42 +1,36 @@
 @keyframes spin {
-    0% {
+    from {
         transform: rotate(0deg);
     }
 
-    100% {
+    to {
         transform: rotate(360deg);
     }
 }
 
 .ott {
-    cursor: default;
     font-size: var(--font-ui-small);
     height: 100%;
-    padding-bottom: 1em;
     user-select: none;
 }
 
 .ott a {
-    color: inherit !important;
-    text-decoration: none !important;
+    color: inherit;
+    text-decoration: none;
 }
 
-.ott p {
+.ott :is(p, span) {
     display: contents;
     margin: 0;
 }
 
 .ott p+p {
-    margin-top: var(--p-spacing)
-}
-
-.ott span {
-    display: contents;
+    margin-top: var(--p-spacing);
 }
 
 .ott .spinner {
     align-content: center;
-    color: var(--text-muted);
+    color: var(--text-normal);
     display: flex;
     justify-content: center;
 }
@@ -45,50 +39,39 @@
     animation: spin 3s linear infinite;
 }
 
-.ott .details {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    height: auto;
-    width: 100%;
-}
-
-.ott .dateLine {
+.ott .date-line {
     align-items: center;
-    color: var(--text-normal) !important;
+    border-radius: var(--radius-s);
+    color: var(--text-normal);
     display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
     font-weight: var(--font-medium);
     justify-content: space-between;
-    line-height: var(--line-height-tight);
-    margin: var(--size-4-3) 0;
+    line-height: var(--line-height-normal);
+    margin-bottom: var(--size-4-1);
+    padding: var(--size-4-1) var(--size-4-2);
     white-space: nowrap;
 }
 
-.ott .task {
-    align-items: flex-start;
-    border-radius: var(--radius-m);
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    margin: 0;
-    padding: 0;
+.ott .date-line:hover {
+    background-color: var(--background-modifier-hover);
 }
 
-.ott .timeline,
-.ott .lines {
-    cursor: default;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
+.ott .date-line .relative {
+    color: var(--text-faint);
+}
+
+.ott .date-line :is(.date, .relative)::first-letter {
+    text-transform: uppercase;
+}
+
+.ott .content+.date-line {
+    margin-top: var(--size-4-4);
 }
 
 .ott .timeline {
     display: block;
     line-height: var(--line-height-normal);
-    padding-right: var(--size-4-2);
+    padding-inline: var(--size-4-2) var(--size-2-2);
 }
 
 .ott .timeline input[type="checkbox"] {
@@ -97,144 +80,127 @@
 }
 
 .ott .lines {
-    flex-grow: 1;
-    flex-shrink: 1;
-}
-
-.ott .task.overdue .timeline .icon svg line {
-    stroke-width: 2.5px !important;
-    stroke: var(--color-red) !important;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
 }
 
 .ott .line {
     align-items: center;
     display: flex;
-    flex-direction: row;
     flex-wrap: wrap;
 }
 
 .ott .icon {
     align-items: center;
     display: flex;
-    flex-grow: 0;
-    flex-shrink: 0;
+    flex: 0 0 auto;
     justify-content: center;
-    text-align: center;
 }
 
-.ott .timeline .icon {
-    height: 22px;
-    text-align: center;
-}
-
-.ott .timeline .icon svg {
-    color: var(--checkbox-border-color);
-    height: var(--checkbox-size);
-    stroke-width: var(--icon-m-stroke-width);
-    width: var(--checkbox-size);
-}
-
-.ott .timeline .icon svg:hover {
-    color: var(--checkbox-border-color-hover);
-}
-
-.ott .task .info {
-    cursor: default;
-    line-height: 22px;
-    padding-bottom: var(--size-2-1);
-}
-
-.ott .task .info:empty {
-    display: none;
-}
-
-.ott .task .content {
-    color: var(--text-muted);
-    display: block;
-    font-weight: var(--font-normal);
-    line-height: var(--line-height-normal);
-    white-space: break-word;
-}
-
-.ott .task .info .tag,
-.ott .task .info .repeat,
-.ott .task .info .priority,
-.ott .task .info .relative,
-.ott .task .info .id,
-.ott .task .info .depends-on,
-.ott .task .info .file {
-    align-items: center;
-    border-radius: var(--radius-s) !important;
-    border: none;
+.ott .info svg {
     color: var(--text-faint);
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    font-size: var(--font-ui-smaller);
-    font-weight: var(--font-normal);
-    line-height: 1 !important;
-    margin: var(--size-2-1) var(--size-4-1) var(--size-2-1) 0;
-    padding: 0;
-    padding: 0px;
-    width: auto;
-}
-
-.ott .info .icon {
-    height: var(--icon-s);
-    text-align: center;
+    height: var(--icon-xs);
+    stroke-width: var(--icon-stroke);
+    width: var(--icon-xs);
 }
 
 .ott .info .label {
     margin-left: var(--size-2-1);
 }
 
-.ott .info label.dateInput {
+.ott .task {
+    align-items: baseline;
     border-radius: var(--radius-m);
-    border: var(--input-border-width) solid var(--interactive-accent);
-    color: var(--interactive-accent);
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.ott .task .lines {
+    display: block;
+}
+
+.ott .task .content {
+    color: var(--text-muted);
+    display: inline;
+    font-weight: var(--font-normal);
+    line-height: var(--line-height-normal);
+}
+
+.ott .task .info {
+    cursor: default;
     display: inline-flex;
-    margin-right: var(--size-2-2);
-    overflow: clip;
+    flex-wrap: wrap;
+    line-height: 22px;
+    padding-bottom: var(--size-2-1);
+    vertical-align: middle;
+}
+
+.ott .task .info:empty {
+    display: none;
+}
+
+.ott .task .info :is(.tag, .repeat, .priority, .relative, .id, .depends-on, .file) {
+    align-items: center;
+    background-color: var(--background-secondary);
+    border: none;
+    border-radius: var(--radius-s);
+    color: var(--text-faint);
+    display: flex;
+    font-size: var(--font-ui-smaller);
+    font-weight: var(--font-normal);
+    line-height: 1;
+    margin-left: var(--size-4-1);
+    padding: var(--size-2-1) var(--size-4-1);
+}
+
+.ott .task .info :is(.tag, .repeat, .priority, .relative, .id, .depends-on, .file):hover {
+    background-color: var(--background-modifier-hover);
+    color: var(--text-muted);
+}
+
+.ott .task .info .file {
+    cursor: pointer;
     position: relative;
 }
 
-.ott .info label.dateInput:hover {
-    border: var(--input-border-width) solid var(--text-normal);
-    color: var(--text-normal);
+.ott .task .info :is(.tag, .repeat, .priority, .relative, .id, .depends-on, .file):hover .icon svg {
+    color: var(--text-muted);
 }
 
-.ott .info label.dateInput>.icon {
-    border-radius: var(--radius-m);
-    height: var(--font-ui-small);
-    padding: var(--size-2-1);
-    width: var(--font-ui-small);
-}
-
-.ott .info label.dateInput>input[type="date"] {
-    cursor: pointer;
-    height: 300%;
-    left: 0;
-    opacity: 0;
+.ott .task .info .file a::before {
+    content: "";
+    inset: 0;
     position: absolute;
-    top: 0;
-    width: 300%;
 }
 
-.ott .info label.dateInput>input[type="date"]::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-    height: 300%;
-    left: -150%;
-    position: absolute;
-    top: -150%;
-    width: 300%;
-}
-
-.ott .info svg {
-    height: var(--icon-xs);
-    stroke-width: var(--icon-xs-stroke-width);
-    width: var(--icon-xs);
+.ott .task.overdue .timeline .icon svg line {
+    stroke: var(--color-red);
+    stroke-width: 2.5px;
 }
 
 .ott .task.overdue .info .relative {
-    color: var(--color-red) !important;
+    color: var(--color-red);
+}
+
+.ott .task .info .date-input,
+.ott .task .info .date-input * {
+    cursor: pointer;
+}
+
+.ott .task .info .date-input:hover .icon svg {
+    color: var(--text-muted);
+}
+
+.ott .task .info .date-input>.label {
+    display: inline;
+}
+
+.ott .task .info .date-input>input[type="date"] {
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    width: 0;
 }

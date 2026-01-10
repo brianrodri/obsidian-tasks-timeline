@@ -1,7 +1,7 @@
 import { lowerCase } from "lodash";
 import { DateTime } from "luxon";
 import { VNode } from "preact";
-import { TargetedEvent, useState } from "preact/compat";
+import { useRef, useState } from "preact/hooks";
 import { useEventCallback } from "usehooks-ts";
 import { PickByValue } from "utility-types";
 
@@ -22,9 +22,10 @@ export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
     } = task;
     const { obsidian } = usePluginContext();
     const [disabled, setDisabled] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-    const onInput = useEventCallback((event: TargetedEvent<HTMLInputElement>) => {
-        const { value } = event.currentTarget;
+    const onInput = useEventCallback((event: Event) => {
+        const { value } = event.currentTarget as HTMLInputElement;
         if (filePath !== undefined && !disabled && DateTime.fromISO(value).isValid) {
             event.preventDefault();
             const process = (text: string) => writeEmojiTaskField(text, field, value);
@@ -36,20 +37,23 @@ export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
         }
     });
 
+    const onClick = useEventCallback(() => {
+        inputRef.current?.showPicker();
+    });
+
     if (field === "scheduledDate" || fieldValue.isValid) {
         return (
-            <div class="relative">
-                <label class="dateInput">
-                    <div class="icon">{symbol}</div>
-                    <input
-                        aria-label={`Set ${lowerCase(field)}`}
-                        type="date"
-                        value={fieldValue.toISODate() ?? ""}
-                        disabled={disabled}
-                        onInput={onInput}
-                    />
-                </label>
+            <div class="relative date-input" onClick={onClick}>
+                <div class="icon">{symbol}</div>
                 <span class="label">{fieldValue.toISODate() ?? "todo"}</span>
+                <input
+                    ref={inputRef}
+                    aria-label={`Set ${lowerCase(field)}`}
+                    type="date"
+                    value={fieldValue.toISODate() ?? ""}
+                    disabled={disabled}
+                    onInput={onInput}
+                />
             </div>
         );
     }

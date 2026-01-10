@@ -37,8 +37,8 @@ export function TodayView({ showFuture = true }: TodayViewProps) {
     return (
         <div class="ott" id="ott">
             <div class="details">
-                <TaskTimeline key="today" relativeCalendar={"Today"} date={today} tasks={plannedToday} />
-                <TaskTimeline key="unplanned" label={"To Schedule"} tasks={unplanned} />
+                <TaskTimeline key="today" label="today" tasks={plannedToday} />
+                <TaskTimeline key="unplanned" label="backlog" tasks={unplanned} />
                 <GroupedTaskTimelines tasks={plannedLater} />
             </div>
         </div>

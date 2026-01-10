@@ -39,11 +39,9 @@ export function TaskTimeline({
     if (entries.length > 0) {
         return (
             <>
-                <div class="dateLine">
-                    <div class="relative">{label ?? relativeCalendar}</div>
-                    {date?.isValid ?
-                        <div class="date">{`${date.toISODate()} ${date.weekdayShort}`}</div>
-                    :   null}
+                <div class="date-line">
+                    <div class="date">{date?.isValid ? `${date.toISODate()} ${date.weekdayShort}` : label}</div>
+                    <div class="relative">{relativeCalendar}</div>
                 </div>
                 <div class="content">{entries}</div>
             </>
