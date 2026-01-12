@@ -50,7 +50,7 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
                     />
                 </span>
                 <TaskInfoEntry symbol={<FileIcon />} className="file">
-                    <VaultLink className="internal-link" href={obsidianHref} sourcePath={filePath}>
+                    <VaultLink href={obsidianHref} sourcePath={filePath}>
                         {fileSection && fileSection !== fileName ?
                             `${fileName} › ${fileSection}`
                         : task.folder ?

@@ -1,10 +1,11 @@
 import { HTMLAttributes } from "preact";
 import { PropsWithChildren } from "preact/compat";
 import { useEventCallback } from "usehooks-ts";
+import { Omit } from "utility-types";
 
 import { usePluginContext } from "@/context/plugin-context";
 
-export interface VaultLinkProps extends HTMLAttributes<HTMLAnchorElement> {
+export interface VaultLinkProps extends Omit<HTMLAttributes<HTMLAnchorElement>, "className"> {
     href?: string;
     sourcePath?: string;
 }
@@ -25,7 +26,7 @@ export function VaultLink({ href, sourcePath, children, ...rest }: PropsWithChil
     });
 
     return (
-        <a {...rest} onClick={onClick} onMouseOver={onMouseOver}>
+        <a className="internal-link" {...rest} onClick={onClick} onMouseOver={onMouseOver}>
             {children}
         </a>
     );
