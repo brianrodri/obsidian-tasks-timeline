@@ -173,7 +173,6 @@
 
 .ott .task.overdue .timeline .icon svg line {
     stroke: var(--color-red);
-    stroke-width: 2.5px;
 }
 
 .ott .task.overdue .lines .relative {
