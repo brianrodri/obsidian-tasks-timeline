@@ -158,6 +158,7 @@
 .ott .task .lines .file {
     cursor: pointer;
     position: relative;
+    white-space: nowrap;
 }
 
 .ott .task .lines :is(.tag, .repeat, .priority, .relative, .id, .depends-on, .file):hover .icon svg {
