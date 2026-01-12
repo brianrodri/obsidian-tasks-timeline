@@ -40,13 +40,13 @@
 }
 
 .ott .date-line {
-    align-items: top;
+    align-items: center;
     border-radius: var(--radius-s);
     color: var(--text-normal);
     display: flex;
     font-weight: var(--font-medium);
     justify-content: space-between;
-    line-height: var(--line-height-normal);
+    line-height: var(--line-height-tight);
     margin-bottom: var(--size-4-1);
     padding: var(--size-4-1) var(--size-4-2);
     white-space: nowrap;
@@ -71,13 +71,14 @@
 
 .ott .timeline {
     display: block;
-    line-height: var(--line-height-normal);
+    line-height: var(--line-height-tight);
     padding-inline: var(--size-4-2) var(--size-2-2);
 }
 
 .ott .timeline input[type="checkbox"] {
     cursor: pointer;
-    vertical-align: text-top;
+    margin: 0;
+    vertical-align: middle;
 }
 
 .ott .lines {
@@ -87,13 +88,13 @@
 }
 
 .ott .line {
-    align-items: top;
+    align-items: center;
     display: flex;
     flex-wrap: wrap;
 }
 
 .ott .icon {
-    align-items: top;
+    align-items: center;
     display: flex;
     flex: 0 0 auto;
     justify-content: center;
@@ -111,20 +112,21 @@
 }
 
 .ott .task {
-    align-items: top;
+    align-items: flex-start;
     border-radius: var(--radius-m);
     display: flex;
+    line-height: var(--line-height-tight);
     margin: 0;
     padding: 0;
 }
 
 .ott .task .lines {
-    align-items: top;
+    align-items: center;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     gap: var(--size-4-1);
-    line-height: var(--line-height-normal);
+    margin-top: 0.1em;
     padding-bottom: var(--size-2-1);
 }
 
@@ -132,7 +134,7 @@
     color: var(--text-muted);
     display: inline;
     font-weight: var(--font-normal);
-    margin-right: var(--size-4-1);
+    margin: 0 var(--size-4-1);
     user-select: text;
 }
 
