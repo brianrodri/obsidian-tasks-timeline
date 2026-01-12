@@ -35,19 +35,6 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
         : overdue ? "task overdue"
         : "task";
 
-    const fileLabel =
-        fileSection ?
-            <>
-                {fileName}
-                {fileName !== fileSection ?
-                    <span class="header">{` > ${fileSection}`}</span>
-                :   null}
-            </>
-        :   <>
-                {task.folder}
-                <span class="header">{` > ${fileName}`}</span>
-            </>;
-
     return (
         <div class={rootElClass}>
             <div class="timeline">
@@ -64,7 +51,11 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
                 </span>
                 <TaskInfoEntry symbol={<FileIcon />} className="file">
                     <VaultLink className="internal-link" href={obsidianHref} sourcePath={filePath}>
-                        {fileLabel}
+                        {fileSection && fileSection !== fileName ?
+                            `${fileName} › ${fileSection}`
+                        : task.folder ?
+                            `${task.folder} › ${fileName}`
+                        :   fileName}
                     </VaultLink>
                 </TaskInfoEntry>
                 <TaskInfoEntry symbol={<SignatureIcon />} className="id">
