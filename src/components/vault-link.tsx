@@ -1,4 +1,5 @@
-import { HTMLAttributes, PropsWithChildren } from "preact/compat";
+import { HTMLAttributes } from "preact";
+import { PropsWithChildren } from "preact/compat";
 import { useEventCallback } from "usehooks-ts";
 
 import { usePluginContext } from "@/context/plugin-context";
