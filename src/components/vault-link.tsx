@@ -1,11 +1,10 @@
 import { HTMLAttributes } from "preact";
 import { PropsWithChildren } from "preact/compat";
 import { useEventCallback } from "usehooks-ts";
-import { Omit } from "utility-types";
 
 import { usePluginContext } from "@/context/plugin-context";
 
-export interface VaultLinkProps extends Omit<HTMLAttributes<HTMLAnchorElement>, "className"> {
+export interface VaultLinkProps extends HTMLAttributes<HTMLAnchorElement> {
     href?: string;
     sourcePath?: string;
 }

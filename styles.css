@@ -95,7 +95,7 @@
 
 .ott .icon {
     align-items: center;
-    display: flex;
+    display: inline-flex;
     flex: 0 0 auto;
     justify-content: center;
 }
@@ -109,6 +109,7 @@
 
 .ott .task .lines .label {
     margin-left: var(--size-2-1);
+    white-space: pre-wrap;
 }
 
 .ott .task {
@@ -136,6 +137,7 @@
     font-weight: var(--font-normal);
     margin: 0 var(--size-4-1);
     user-select: text;
+    white-space: pre-wrap;
 }
 
 .ott .task .lines :is(.tag, .repeat, .priority, .relative, .id, .depends-on, .file) {
@@ -167,7 +169,7 @@
     color: var(--text-muted);
 }
 
-.ott .task .lines .file a::before {
+.ott .task .lines .file::before {
     content: "";
     inset: 0;
     position: absolute;

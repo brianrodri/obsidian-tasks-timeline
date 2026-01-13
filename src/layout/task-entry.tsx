@@ -1,9 +1,12 @@
+import { trimStart } from "lodash";
+
 import {
     CancelledIcon,
     CompletedIcon,
     CreatedIcon,
+    DependsOnIcon,
     DueIcon,
-    FileIcon,
+    IdIcon,
     PriorityIcon,
     RepeatIcon,
     ScheduledIcon,
@@ -13,12 +16,11 @@ import {
 import { VaultLink } from "@/components/vault-link";
 import { usePluginContext } from "@/context/plugin-context";
 import { Task } from "@/data/task";
-
 import { TaskCheckbox } from "@/layout/task-checkbox";
 import { TaskDateInput } from "@/layout/task-date-input";
 import { TaskInfoEntry } from "@/layout/task-info-entry";
+import { TaskLocation } from "@/layout/task-location";
 import { ObsidianMarkdown } from "@/lib/obsidian/markdown";
-import { NetworkIcon, SignatureIcon } from "lucide-preact";
 
 export interface TaskEntryProps {
     task: Task;
@@ -26,7 +28,7 @@ export interface TaskEntryProps {
 
 export const TaskEntry = ({ task }: TaskEntryProps) => {
     const overdue = task.dueDate.isValid && task.dueDate.diffNow().as("days") < -1;
-    const { filePath, fileName, fileSection, obsidianHref } = task.location;
+    const { filePath, fileSection, obsidianHref } = task.location;
     const { plugin } = usePluginContext();
 
     const rootElClass =
@@ -49,16 +51,10 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
                         sourcePath={filePath}
                     />
                 </span>
-                <TaskInfoEntry symbol={<FileIcon />} className="file">
-                    <VaultLink href={obsidianHref} sourcePath={filePath}>
-                        {fileSection && fileSection !== fileName ?
-                            `${fileName} › ${fileSection}`
-                        : task.folder ?
-                            `${task.folder} › ${fileName}`
-                        :   fileName}
-                    </VaultLink>
-                </TaskInfoEntry>
-                <TaskInfoEntry symbol={<SignatureIcon />} className="id">
+                <VaultLink href={obsidianHref} sourcePath={filePath} className="file">
+                    <TaskLocation path={filePath} section={fileSection} />
+                </VaultLink>
+                <TaskInfoEntry symbol={<IdIcon />} className="id">
                     {task.id}
                 </TaskInfoEntry>
                 <TaskInfoEntry symbol={<TagsIcon />} className="tag">
@@ -70,8 +66,12 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
                 <TaskInfoEntry symbol={<RepeatIcon />} className="repeat">
                     {task.recurrenceRule}
                 </TaskInfoEntry>
-                <TaskInfoEntry symbol={<NetworkIcon />} className="depends-on">
-                    {task.dependsOn.values().toArray().join(", ")}
+                <TaskInfoEntry symbol={<DependsOnIcon />} className="depends-on">
+                    {task.dependsOn
+                        .values()
+                        .map((id) => trimStart(id, "#"))
+                        .toArray()
+                        .join(", ")}
                 </TaskInfoEntry>
                 <TaskDateInput field="dueDate" symbol={<DueIcon />} task={task} />
                 <TaskDateInput field="doneDate" symbol={<CompletedIcon />} task={task} />

@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
         },
         rollupOptions: {
             treeshake: true,
-            external: ["obsidian"],
+            external: ["obsidian", "path"],
             output: { assetFileNames: "styles.css" },
         },
         sourcemap: mode === "development" ? "inline" : false,

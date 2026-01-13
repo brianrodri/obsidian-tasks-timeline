@@ -26,6 +26,7 @@
         "lodash": "^4.17.21",
         "lucide-preact": "^0.562.0",
         "luxon": "^3.7.2",
+        "path-browserify": "^1.0.1",
         "preact": "^10.28.2",
         "react": "npm:@preact/compat",
         "react-dom": "npm:@preact/compat",
