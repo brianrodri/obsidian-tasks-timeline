@@ -47,7 +47,7 @@
     font-weight: var(--font-medium);
     justify-content: space-between;
     line-height: var(--line-height-tight);
-    margin-bottom: var(--size-4-1);
+    margin-bottom: var(--size-4-3);
     padding: var(--size-4-1) var(--size-4-2);
     white-space: nowrap;
 }
