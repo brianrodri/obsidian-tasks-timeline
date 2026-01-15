@@ -1,5 +1,4 @@
 import { ChevronRight, FileTextIcon, FolderOpenIcon, HashIcon } from "lucide-preact";
-import { basename, parse } from "path";
 import { memo } from "preact/compat";
 
 const PART_SEPARATOR_ICON = <ChevronRight />;
@@ -13,8 +12,7 @@ export interface TaskLocationProps {
 }
 
 export const TaskLocation = memo(({ path, section }: TaskLocationProps) => {
-    const { name, dir } = parse(path ?? "");
-    const folder = basename(dir);
+    const { name, folder } = parseFilePath(path ?? "");
     const parts = [];
     if (folder) {
         parts.push(<span class="icon">{FOLDER_ICON}</span>, <span class="label">{` ${folder}`}</span>);
@@ -29,3 +27,13 @@ export const TaskLocation = memo(({ path, section }: TaskLocationProps) => {
     }
     return parts.slice(-5);
 });
+
+function parseFilePath(filePath: string) {
+    const lastSlash = filePath.lastIndexOf("/");
+    const fileName = lastSlash >= 0 ? filePath.slice(lastSlash + 1) : filePath;
+    const name = fileName.replace(/\.[^.]*$/, "");
+    const dir = lastSlash >= 0 ? filePath.slice(0, lastSlash) : "";
+    const dirLastSlash = dir.lastIndexOf("/");
+    const folder = dirLastSlash >= 0 ? dir.slice(dirLastSlash + 1) : dir;
+    return { name, folder };
+}
