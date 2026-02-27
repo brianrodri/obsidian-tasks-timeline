@@ -137,7 +137,7 @@
 
 .ott .task .lines :is(.tag, .repeat, .priority, .relative, .id, .depends-on, .file) {
     align-items: center;
-    background-color: var(--background-secondary);
+    background-color: rgba(var(--mono-rgb-100), 0.06);
     border: none;
     border-radius: var(--radius-s);
     color: var(--text-faint);
@@ -150,7 +150,7 @@
 }
 
 .ott .task .lines :is(.tag, .repeat, .priority, .relative, .id, .depends-on, .file):hover {
-    background-color: var(--background-modifier-hover);
+    background-color: rgba(var(--mono-rgb-100), 0.12);
     color: var(--text-muted);
 }
 
