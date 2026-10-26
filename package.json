@@ -27,7 +27,6 @@
     },
     "dependencies": {
         "@preact/signals": "^2.11.3",
-        "core-js": "^3.51.0",
         "lodash": "^4.18.1",
         "lucide-preact": "^1.61.0",
         "luxon": "^3.7.2",
@@ -75,7 +74,6 @@
         "obsidian-calendar-ui": "brianrodri/obsidian-calendar-ui"
     },
     "allowScripts": {
-        "core-js@3.51.0": true,
         "fsevents@2.3.3": true,
         "github:lishid/cm-language#b817e72a9861b3f8a50a92a2ea53cbafc4f88eb3": true
     }

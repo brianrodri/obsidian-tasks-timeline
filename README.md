@@ -2,6 +2,12 @@
 
 [![CI][ci-badge]][ci-definition] [![codecov][codecov-badge]][codecov-report]
 
+## Requirements
+
+The plugin ships no polyfills and relies on ES2025 features (Set methods and
+iterator helpers) being native. That means Obsidian desktop, Obsidian mobile on
+iOS 18.4 or later, or Android with an up-to-date system WebView.
+
 This is a sample plugin for Obsidian (<https://obsidian.md>).
 
 This project uses Typescript to provide type checking and documentation.
