@@ -36,10 +36,6 @@ export default class TasksTimelinePlugin extends Plugin {
         });
     }
 
-    public override onunload(): void {
-        this.obsidian.detachView(VIEW_TYPE);
-    }
-
     private createView(leaf: WorkspaceLeaf): ObsidianView {
         const timelineView = (
             <PluginContextProvider
