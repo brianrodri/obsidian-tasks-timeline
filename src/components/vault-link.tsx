@@ -1,5 +1,5 @@
-import { HTMLAttributes } from "preact";
-import { PropsWithChildren } from "preact/compat";
+import type { HTMLAttributes } from "preact";
+import type { PropsWithChildren } from "preact/compat";
 import { useEventCallback } from "usehooks-ts";
 
 import { usePluginContext } from "@/context/plugin-context";
@@ -14,7 +14,9 @@ export function VaultLink({ href, sourcePath, children, ...rest }: PropsWithChil
 
     const onClick = useEventCallback((event: Event) => {
         if (href && sourcePath) {
-            obsidian.openVaultLink(event, href, sourcePath);
+            obsidian.openVaultLink(event, href, sourcePath).catch((error: unknown) => {
+                console.error(error);
+            });
         }
     });
 

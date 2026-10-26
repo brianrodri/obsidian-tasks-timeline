@@ -1,36 +1,9 @@
 {
-    "compilerOptions": {
-        // Type Checking
-        "downlevelIteration": true,
-        "strict": true,
-
-        // Modules
-        "baseUrl": ".",
-        "module": "ESNext",
-        "moduleResolution": "Node",
-        "paths": {
-            "@/*": ["./src/*"],
-            "react": ["./node_modules/preact/compat"],
-            "react-dom": ["./node_modules/preact/compat"]
-        },
-
-        // Emit
-        "noEmit": true,
-        "inlineSources": true,
-        "inlineSourceMap": true,
-
-        // Interop Constraints
-        "esModuleInterop": true,
-        "isolatedModules": true,
-        "noImplicitOverride": true,
-
-        // Language and Environment
-        "jsx": "react-jsx",
-        "jsxImportSource": "preact",
-        "skipLibCheck": true, // Only concerned w/ type checking the package code.
-        "target": "ESNext",
-        "lib": ["ESNext", "DOM"]
-    },
-    "include": ["src"],
-    "exclude": ["node_modules"]
+    // `tsc` here is TypeScript 7 (package.json aliases "@typescript/native" to typescript@7), while the `typescript`
+    // package is aliased to the 6.x compatibility build (@typescript/typescript6) because the tools below still load the
+    // TypeScript compiler API, which 7.0 does not ship. Collapse both back into a single `typescript` dependency once:
+    // TODO(typescript-eslint/typescript-eslint#10940): typescript-eslint accepts TypeScript 7 (peer range is `<6.1.0`).
+    // TODO(TypeStrong/typedoc#3098): TypeDoc accepts TypeScript 7 (0.28 caps at 6.0.x).
+    "files": [],
+    "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
 }

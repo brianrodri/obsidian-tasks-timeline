@@ -1,0 +1,47 @@
+{
+    "compilerOptions": {
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+        "target": "ES2025",
+        "lib": ["ES2025", "DOM", "DOM.Iterable"],
+        "types": ["vite/client"],
+        "allowArbitraryExtensions": true,
+        "skipLibCheck": true,
+        "paths": {
+            "@/*": ["./src/*"],
+            "react": ["./node_modules/preact/compat/"],
+            "react-dom": ["./node_modules/preact/compat/"],
+            // TODO(blacksmithgu/obsidian-dataview#2080): drop these mappings once dataview publishes resolvable .d.ts
+            // files. Its declarations import their own internals with bare specifiers such as "api/plugin-api", which
+            // only resolve inside its source tree; mapping them here makes its types real instead of silently `any`.
+            "api/*": ["./node_modules/obsidian-dataview/lib/api/*"],
+            "data-import/*": ["./node_modules/obsidian-dataview/lib/data-import/*"],
+            "data-index/*": ["./node_modules/obsidian-dataview/lib/data-index/*"],
+            "data-model/*": ["./node_modules/obsidian-dataview/lib/data-model/*"],
+            "expression/*": ["./node_modules/obsidian-dataview/lib/expression/*"],
+            "index": ["./node_modules/obsidian-dataview/lib/index"],
+            "query/*": ["./node_modules/obsidian-dataview/lib/query/*"],
+            "settings": ["./node_modules/obsidian-dataview/lib/settings"],
+            "ui/*": ["./node_modules/obsidian-dataview/lib/ui/*"],
+            "util/*": ["./node_modules/obsidian-dataview/lib/util/*"]
+        },
+
+        /* Bundler mode */
+        "module": "preserve",
+        "allowImportingTsExtensions": true,
+        "verbatimModuleSyntax": true,
+        "moduleDetection": "force",
+        "noEmit": true,
+        "jsx": "react-jsx",
+        "jsxImportSource": "preact",
+
+        /* Linting */
+        "erasableSyntaxOnly": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noUncheckedIndexedAccess": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true
+    },
+    "include": ["src"]
+}

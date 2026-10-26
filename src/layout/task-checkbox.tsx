@@ -2,7 +2,7 @@ import { useSignal } from "@preact/signals";
 import { useEventCallback } from "usehooks-ts";
 
 import { usePluginContext } from "@/context/plugin-context";
-import { TaskLocation, TaskStatus } from "@/data/task";
+import type { TaskLocation, TaskStatus } from "@/data/task";
 
 export interface TaskCheckboxProps {
     status: TaskStatus;
@@ -20,7 +20,9 @@ export function TaskCheckbox({ status, location: { filePath, fileStartByte, file
             .processFileRange(filePath, fileStartByte, fileStopByte, (data: string) =>
                 tasksApi.executeToggleTaskDoneCommand(data, filePath),
             )
-            .catch((error) => console.error(error))
+            .catch((error: unknown) => {
+                console.error(error);
+            })
             .finally(() => (waiting.value = false));
     });
 

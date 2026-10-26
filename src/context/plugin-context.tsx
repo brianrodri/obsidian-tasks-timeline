@@ -1,13 +1,13 @@
-import { Signal, useComputed } from "@preact/signals";
-import { PropsWithChildren, createContext, useContext } from "preact/compat";
+import { type Signal, useComputed } from "@preact/signals";
+import { type PropsWithChildren, createContext, use } from "preact/compat";
 
-import { PluginSettings } from "@/data/settings";
+import type { PluginSettings } from "@/data/settings";
 import { TaskLookup } from "@/data/task-lookup";
 import { LoadingView } from "@/layout/loading-view";
-import { Obsidian } from "@/lib/obsidian/adapters";
-import { Plugin, WorkspaceLeaf } from "@/lib/obsidian/types";
-import { Dataview } from "@/lib/obsidian-dataview/api";
-import { TasksApi } from "@/lib/obsidian-tasks/api";
+import type { Dataview } from "@/lib/obsidian-dataview/api";
+import type { TasksApi } from "@/lib/obsidian-tasks/api";
+import type { Obsidian } from "@/lib/obsidian/adapters";
+import type { Plugin, WorkspaceLeaf } from "@/lib/obsidian/types";
 
 export const PluginContext = createContext<PluginContextValue | null>(null);
 
@@ -23,7 +23,7 @@ export interface PluginContextValue {
 }
 
 export function usePluginContext(): PluginContextValue {
-    const value = useContext(PluginContext);
+    const value = use(PluginContext);
     if (!value) {
         throw new Error("context must be used from within a provider");
     }
@@ -56,10 +56,10 @@ export function PluginContextProvider({
     );
 
     return dataviewSignal.value ?
-            <PluginContext.Provider
+            <PluginContext
                 value={{ dataview: dataviewSignal.value, settings: settingsSignal.value, taskLookup, ...rest }}
             >
                 {children}
-            </PluginContext.Provider>
+            </PluginContext>
         :   <LoadingView />;
 }

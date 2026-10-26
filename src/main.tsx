@@ -10,7 +10,7 @@ import { TodayView } from "@/layout/today-view";
 import { Dataview } from "@/lib/obsidian-dataview/api";
 import { TasksApi } from "@/lib/obsidian-tasks/api";
 import { Obsidian, ObsidianView } from "@/lib/obsidian/adapters";
-import { Plugin, WorkspaceLeaf } from "@/lib/obsidian/types";
+import { Plugin, type WorkspaceLeaf } from "@/lib/obsidian/types";
 
 const VIEW_TYPE = "obsidian-tasks-timeline" as const;
 const VIEW_HEADER = "Tasks timeline" as const;
@@ -21,7 +21,7 @@ export default class TasksTimelinePlugin extends Plugin {
     private readonly obsidian = new Obsidian(this);
     private readonly dataviewSignal = signal<Dataview>();
 
-    public override async onload(): Promise<void> {
+    public override onload(): void {
         this.registerView(VIEW_TYPE, (leaf) => this.createView(leaf));
         this.addRibbonIcon(VIEW_ICON, `Open ${VIEW_HEADER.toLowerCase()}`, () => this.obsidian.revealView(VIEW_TYPE));
 
@@ -31,13 +31,13 @@ export default class TasksTimelinePlugin extends Plugin {
                 this.dataviewSignal.value = await Dataview.ensureDataviewReady(this);
                 await this.obsidian.attachView(VIEW_TYPE);
             } catch (error: unknown) {
-                console.error(`Failed to load ${VIEW_TYPE}: ${error}`);
+                console.error(`Failed to load ${VIEW_TYPE}`, error);
             }
         });
     }
 
-    public override async onunload(): Promise<void> {
-        await this.obsidian.detachView(VIEW_TYPE);
+    public override onunload(): void {
+        this.obsidian.detachView(VIEW_TYPE);
     }
 
     private createView(leaf: WorkspaceLeaf): ObsidianView {

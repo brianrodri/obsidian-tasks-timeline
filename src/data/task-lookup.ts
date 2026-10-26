@@ -1,37 +1,41 @@
 import { memoize, partition, sortBy, sortedIndex, sortedLastIndex } from "lodash";
-import { DateTime, Interval } from "luxon";
+import { type DateTime, Interval } from "luxon";
 
-import { Task } from "@/data/task";
+import type { Task } from "@/data/task";
 
 export class TaskLookup {
     public readonly revision: number;
     public readonly undatedTasks: readonly Task[];
+    public readonly isTaskActionable: (task: Task) => boolean;
+    public readonly getTasksHappeningOn: (date: DateTime) => readonly Task[];
+    public readonly getTasksHappeningBefore: (date: DateTime) => readonly Task[];
+    public readonly getTasksHappeningAfter: (date: DateTime) => readonly Task[];
     private readonly tasksBySortedDateKey: ReadonlyMap<string, readonly Task[]>;
     private readonly sortedDateKeys: readonly string[];
     private readonly openTaskIds: ReadonlySet<string>;
 
-    public constructor(tasks: Task[] = [], revision: number = 0) {
+    public constructor(tasks: Task[] = [], revision = 0) {
         this.revision = revision;
 
         this.openTaskIds = new Set(tasks.filter((task) => task.id && task.status === "OPEN").map((task) => task.id));
 
-        const [withKeys, withoutKeys] = partition(tasks, TaskLookup.getTaskDateKey);
-        this.tasksBySortedDateKey = Map.groupBy(sortBy(withKeys, TaskLookup.getTaskDateKey), TaskLookup.getTaskDateKey);
+        const [withKeys, withoutKeys] = partition(tasks, getTaskDateKey);
+        this.tasksBySortedDateKey = Map.groupBy(sortBy(withKeys, getTaskDateKey), getTaskDateKey);
         this.sortedDateKeys = this.tasksBySortedDateKey.keys().toArray();
         this.undatedTasks = withoutKeys;
 
-        this.isTaskActionable = memoize(this.isTaskActionable.bind(this));
-        this.getTasksHappeningBefore = memoize(this.getTasksHappeningBefore.bind(this), TaskLookup.getDateKey);
-        this.getTasksHappeningOn = memoize(this.getTasksHappeningOn.bind(this), TaskLookup.getDateKey);
-        this.getTasksHappeningAfter = memoize(this.getTasksHappeningAfter.bind(this), TaskLookup.getDateKey);
+        this.isTaskActionable = memoize((task: Task) => this.computeIsTaskActionable(task));
+        this.getTasksHappeningOn = memoize((date: DateTime) => this.computeTasksHappeningOn(date), getDateKey);
+        this.getTasksHappeningBefore = memoize((date: DateTime) => this.computeTasksHappeningBefore(date), getDateKey);
+        this.getTasksHappeningAfter = memoize((date: DateTime) => this.computeTasksHappeningAfter(date), getDateKey);
     }
 
-    public getTasksHappeningOn(date: DateTime): readonly Task[] {
+    private computeTasksHappeningOn(date: DateTime): readonly Task[] {
         if (!date.isValid) return [];
 
         const interval = Interval.after(date.startOf("day"), { days: 1 });
-        const start = sortedIndex(this.sortedDateKeys, TaskLookup.getDateKey(interval.start));
-        const end = sortedIndex(this.sortedDateKeys, TaskLookup.getDateKey(interval.end));
+        const start = sortedIndex(this.sortedDateKeys, getDateKey(interval.start));
+        const end = sortedIndex(this.sortedDateKeys, getDateKey(interval.end));
 
         return this.tasksBySortedDateKey
             .values()
@@ -41,10 +45,10 @@ export class TaskLookup {
             .toArray();
     }
 
-    public getTasksHappeningBefore(date: DateTime): readonly Task[] {
+    private computeTasksHappeningBefore(date: DateTime): readonly Task[] {
         if (!date.isValid) return [];
 
-        const end = sortedIndex(this.sortedDateKeys, TaskLookup.getDateKey(date));
+        const end = sortedIndex(this.sortedDateKeys, getDateKey(date));
 
         return this.tasksBySortedDateKey
             .values()
@@ -53,10 +57,10 @@ export class TaskLookup {
             .toArray();
     }
 
-    public getTasksHappeningAfter(date: DateTime): readonly Task[] {
+    private computeTasksHappeningAfter(date: DateTime): readonly Task[] {
         if (!date.isValid) return [];
 
-        const start = sortedLastIndex(this.sortedDateKeys, TaskLookup.getDateKey(date));
+        const start = sortedLastIndex(this.sortedDateKeys, getDateKey(date));
 
         return this.tasksBySortedDateKey
             .values()
@@ -72,15 +76,15 @@ export class TaskLookup {
      *
      * @see {@link https://publish.obsidian.md/tasks/Getting+Started/Task+Dependencies}
      */
-    public isTaskActionable(task: Task): boolean {
+    private computeIsTaskActionable(task: Task): boolean {
         return task.status === "OPEN" && task.dependsOn.isDisjointFrom(this.openTaskIds);
     }
+}
 
-    static getTaskDateKey(task?: Task | null): string {
-        return task ? TaskLookup.getDateKey(task.happensDate) : "";
-    }
+function getTaskDateKey(task?: Task | null): string {
+    return task ? getDateKey(task.happensDate) : "";
+}
 
-    public static getDateKey(date?: DateTime | null): string {
-        return date?.toISODate() ?? "";
-    }
+function getDateKey(date?: DateTime | null): string {
+    return date?.toISODate() ?? "";
 }

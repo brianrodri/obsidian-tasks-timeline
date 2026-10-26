@@ -1,7 +1,7 @@
-import { Signal } from "@preact/signals";
+import type { Signal } from "@preact/signals";
 import { vi } from "vitest";
 
-import { Dataview as RealDataview } from "../api";
+import type { Dataview as RealDataview } from "../api";
 
 const getTasks = vi.fn();
 

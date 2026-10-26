@@ -1,6 +1,6 @@
 import { isEmpty } from "lodash";
-import { HTMLAttributes, VNode } from "preact";
-import { PropsWithChildren } from "preact/compat";
+import type { HTMLAttributes, VNode } from "preact";
+import type { PropsWithChildren } from "preact/compat";
 
 export interface TaskInfoEntryProps extends HTMLAttributes<HTMLDivElement> {
     symbol?: VNode;

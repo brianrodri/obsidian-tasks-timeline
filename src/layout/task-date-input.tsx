@@ -1,19 +1,19 @@
 import { lowerCase } from "lodash";
 import { DateTime } from "luxon";
-import { VNode } from "preact";
+import type { VNode } from "preact";
 import { useRef, useState } from "preact/hooks";
 import { useEventCallback } from "usehooks-ts";
-import { PickByValue } from "utility-types";
+import type { PickByValue } from "utility-types";
 
 import { usePluginContext } from "@/context/plugin-context";
-import { Task, TaskFields } from "@/data/task";
+import type { Task, TaskFields } from "@/data/task";
 import { writeEmojiTaskField } from "@/lib/obsidian-tasks/parse-task-fields";
 
-export type TaskDateInputProps = {
+export interface TaskDateInputProps {
     symbol?: VNode;
     field: keyof PickByValue<TaskFields, DateTime>;
     task: Task;
-};
+}
 
 export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
     const {
@@ -32,8 +32,12 @@ export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
             setDisabled(true);
             obsidian
                 .processFileRange(filePath, fileStartByte, fileStopByte, process)
-                .catch((error) => console.error(error))
-                .finally(() => setDisabled(false));
+                .catch((error: unknown) => {
+                    console.error(error);
+                })
+                .finally(() => {
+                    setDisabled(false);
+                });
         }
     });
 

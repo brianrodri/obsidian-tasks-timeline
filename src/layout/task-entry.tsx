@@ -15,7 +15,7 @@ import {
 } from "@/components/icons";
 import { VaultLink } from "@/components/vault-link";
 import { usePluginContext } from "@/context/plugin-context";
-import { Task } from "@/data/task";
+import type { Task } from "@/data/task";
 import { TaskCheckbox } from "@/layout/task-checkbox";
 import { TaskDateInput } from "@/layout/task-date-input";
 import { TaskInfoEntry } from "@/layout/task-info-entry";

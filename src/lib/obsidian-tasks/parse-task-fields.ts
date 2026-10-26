@@ -1,8 +1,8 @@
 import { groupBy } from "lodash";
 import { DateTime } from "luxon";
-import { PickByValue, ValuesType } from "utility-types";
+import type { PickByValue, ValuesType } from "utility-types";
 
-import { TaskFields } from "@/data/task";
+import type { TaskFields } from "@/data/task";
 
 const FIELD_KEY_BY_EMOJI = {
     "➕": "createdDate",
@@ -30,9 +30,11 @@ const PRIORITY_BY_EMOJI = {
     "⏬": 5,
 } as const satisfies Record<keyof PickByValue<typeof FIELD_KEY_BY_EMOJI, "priority">, number>;
 
-const EMOJIS_BY_FIELD_KEY = groupBy(
+const EMOJI_PATTERN = new RegExp(Object.keys(FIELD_KEY_BY_EMOJI).join("|"), "g");
+
+const EMOJIS_BY_FIELD_KEY: Partial<Record<FieldKey, readonly Emoji[]>> = groupBy(
     Object.keys(FIELD_KEY_BY_EMOJI) as Emoji[],
-    (emoji) => FIELD_KEY_BY_EMOJI[emoji] as FieldKey,
+    (emoji) => FIELD_KEY_BY_EMOJI[emoji],
 );
 
 type Emoji = keyof typeof FIELD_KEY_BY_EMOJI;
@@ -40,55 +42,49 @@ type PriorityEmoji = keyof typeof PRIORITY_BY_EMOJI;
 type FieldKey = ValuesType<typeof FIELD_KEY_BY_EMOJI>;
 
 export function readEmojiTaskFields(text: string): Partial<TaskFields> {
-    const matches = [
-        ...text.matchAll(new RegExp(Object.keys(FIELD_KEY_BY_EMOJI).join("|"), "g")),
-        /$/.exec(text) as RegExpExecArray,
-    ];
+    const matches = [...text.matchAll(EMOJI_PATTERN)];
+    const result: Partial<TaskFields> = { description: text.slice(0, matches[0]?.index ?? text.length).trim() };
 
-    const result: Partial<TaskFields> = { description: text.slice(0, matches[0].index).trim() };
-
-    for (let i = 0; i < matches.length - 1; ++i) {
-        const [start, stop] = matches.slice(i, i + 2);
-        const emoji = start[0] as Emoji;
-        const fieldKey = FIELD_KEY_BY_EMOJI[emoji] as FieldKey;
-        const fieldValue = text.slice(start.index + emoji.length, stop.index).trim();
-        if (fieldKey) {
-            switch (fieldKey) {
-                case "priority":
-                    result[fieldKey] = PRIORITY_BY_EMOJI[emoji as PriorityEmoji];
-                    break;
-                case "createdDate":
-                case "cancelledDate":
-                case "doneDate":
-                case "dueDate":
-                case "startDate":
-                case "scheduledDate":
-                    result[fieldKey] = DateTime.fromISO(fieldValue);
-                    break;
-                case "dependsOn":
-                    result[fieldKey] = new Set(fieldValue.split(",").map((id) => id.trim()));
-                    break;
-                default:
-                    result[fieldKey] = fieldValue;
-                    break;
-            }
+    matches.forEach((match, i) => {
+        const emoji = match[0] as Emoji;
+        const fieldKey = FIELD_KEY_BY_EMOJI[emoji];
+        const fieldValue = text.slice(match.index + emoji.length, matches[i + 1]?.index ?? text.length).trim();
+        switch (fieldKey) {
+            case "priority":
+                result[fieldKey] = PRIORITY_BY_EMOJI[emoji as PriorityEmoji];
+                break;
+            case "createdDate":
+            case "cancelledDate":
+            case "doneDate":
+            case "dueDate":
+            case "startDate":
+            case "scheduledDate":
+                result[fieldKey] = DateTime.fromISO(fieldValue);
+                break;
+            case "dependsOn":
+                result[fieldKey] = new Set(fieldValue.split(",").map((id) => id.trim()));
+                break;
+            default:
+                result[fieldKey] = fieldValue;
+                break;
         }
-    }
+    });
 
     return result;
 }
 
 export function writeEmojiTaskField(text: string, fieldKey: FieldKey, value: string): string {
-    const emojis = EMOJIS_BY_FIELD_KEY[fieldKey];
-    if (!emojis) {
+    const [primaryEmoji, ...otherEmojis] = EMOJIS_BY_FIELD_KEY[fieldKey] ?? [];
+    if (!primaryEmoji) {
         return text;
     }
 
-    const [start, stop] = [...text.matchAll(new RegExp(emojis.join("|"), "g")), /$/.exec(text) as RegExpExecArray];
-    if (start && stop) {
-        return `${text.slice(0, start.index + start[0].length)} ${value} ${text.slice(stop.index)}`;
+    const [start, next] = [...text.matchAll(new RegExp([primaryEmoji, ...otherEmojis].join("|"), "g"))];
+    if (start) {
+        const stop = next?.index ?? text.length;
+        return `${text.slice(0, start.index + start[0].length)} ${value} ${text.slice(stop)}`;
     }
 
     const trailingWhitespaceStart = /\s*$/.exec(text)?.index ?? text.length;
-    return `${text.slice(0, trailingWhitespaceStart)} ${emojis[0]} ${value}${text.slice(trailingWhitespaceStart)}`;
+    return `${text.slice(0, trailingWhitespaceStart)} ${primaryEmoji} ${value}${text.slice(trailingWhitespaceStart)}`;
 }

@@ -3,28 +3,42 @@ import { DateTime } from "luxon";
 
 export const TASK_STATUSES = ["OPEN", "DONE", "DROPPED", "CUSTOM"] as const;
 
-export type TaskStatus = typeof TASK_STATUSES extends ReadonlyArray<infer T> ? T : never;
+export type TaskStatus = typeof TASK_STATUSES extends readonly (infer T)[] ? T : never;
 
 export class Task implements TaskFields {
     public readonly key: string;
+    public readonly status: TaskStatus;
+    public readonly customStatus: TaskStatus extends "CUSTOM" ? string : undefined;
+    public readonly description: string;
+    public readonly priority: number;
+    public readonly recurrenceRule: string;
+    public readonly cancelledDate: DateTime;
+    public readonly createdDate: DateTime;
+    public readonly doneDate: DateTime;
+    public readonly dueDate: DateTime;
+    public readonly scheduledDate: DateTime;
+    public readonly startDate: DateTime;
+    public readonly tags: ReadonlySet<string>;
+    public readonly location: TaskLocation;
+    public readonly id: string;
+    public readonly dependsOn: ReadonlySet<string>;
 
-    private constructor(
-        public readonly status: TaskStatus,
-        public readonly customStatus: TaskStatus extends "CUSTOM" ? string : undefined,
-        public readonly description: string,
-        public readonly priority: number,
-        public readonly recurrenceRule: string,
-        public readonly cancelledDate: DateTime,
-        public readonly createdDate: DateTime,
-        public readonly doneDate: DateTime,
-        public readonly dueDate: DateTime,
-        public readonly scheduledDate: DateTime,
-        public readonly startDate: DateTime,
-        public readonly tags: ReadonlySet<string>,
-        public readonly location: TaskLocation,
-        public readonly id: string,
-        public readonly dependsOn: ReadonlySet<string>,
-    ) {
+    private constructor(fields: TaskFields) {
+        this.status = fields.status;
+        this.customStatus = fields.customStatus;
+        this.description = fields.description;
+        this.priority = fields.priority;
+        this.recurrenceRule = fields.recurrenceRule;
+        this.cancelledDate = fields.cancelledDate;
+        this.createdDate = fields.createdDate;
+        this.doneDate = fields.doneDate;
+        this.dueDate = fields.dueDate;
+        this.scheduledDate = fields.scheduledDate;
+        this.startDate = fields.startDate;
+        this.tags = fields.tags;
+        this.location = fields.location;
+        this.id = fields.id;
+        this.dependsOn = fields.dependsOn;
         this.key = JSON.stringify(this);
     }
 
@@ -32,30 +46,32 @@ export class Task implements TaskFields {
         const {
             fileStartByte = 0,
             fileStopByte = 0,
-            fileLine = undefined,
-            filePath = undefined,
-            fileSection = undefined,
-            fileName = undefined,
-            obsidianHref = undefined,
+            fileLine,
+            filePath,
+            fileSection,
+            fileName,
+            obsidianHref,
         } = part.location ?? {};
 
-        return new Task(
-            part.status && TASK_STATUSES.includes(part.status) ? part.status : "OPEN",
-            part.status === "CUSTOM" && isString(part.customStatus) ? part.customStatus : undefined,
-            isString(part.description) ? part.description : "",
-            isNumber(part.priority) ? part.priority : 3,
-            isString(part.recurrenceRule) ? part.recurrenceRule : "",
-            DateTime.isDateTime(part.cancelledDate) ? part.cancelledDate : DateTime.invalid("unspecified"),
-            DateTime.isDateTime(part.createdDate) ? part.createdDate : DateTime.invalid("unspecified"),
-            DateTime.isDateTime(part.doneDate) ? part.doneDate : DateTime.invalid("unspecified"),
-            DateTime.isDateTime(part.dueDate) ? part.dueDate : DateTime.invalid("unspecified"),
-            DateTime.isDateTime(part.scheduledDate) ? part.scheduledDate : DateTime.invalid("unspecified"),
-            DateTime.isDateTime(part.startDate) ? part.startDate : DateTime.invalid("unspecified"),
-            isSet(part.tags) && part.tags.values().every(isString) ? part.tags : new Set(),
-            { fileStartByte, fileStopByte, fileLine, filePath, fileSection, fileName, obsidianHref },
-            isString(part.id) ? part.id : "",
-            isSet(part.dependsOn) && part.dependsOn.values().every(isString) ? part.dependsOn : new Set(),
-        );
+        return new Task({
+            status: part.status && TASK_STATUSES.includes(part.status) ? part.status : "OPEN",
+            customStatus: part.status === "CUSTOM" && isString(part.customStatus) ? part.customStatus : undefined,
+            description: isString(part.description) ? part.description : "",
+            priority: isNumber(part.priority) ? part.priority : 3,
+            recurrenceRule: isString(part.recurrenceRule) ? part.recurrenceRule : "",
+            cancelledDate:
+                DateTime.isDateTime(part.cancelledDate) ? part.cancelledDate : DateTime.invalid("unspecified"),
+            createdDate: DateTime.isDateTime(part.createdDate) ? part.createdDate : DateTime.invalid("unspecified"),
+            doneDate: DateTime.isDateTime(part.doneDate) ? part.doneDate : DateTime.invalid("unspecified"),
+            dueDate: DateTime.isDateTime(part.dueDate) ? part.dueDate : DateTime.invalid("unspecified"),
+            scheduledDate:
+                DateTime.isDateTime(part.scheduledDate) ? part.scheduledDate : DateTime.invalid("unspecified"),
+            startDate: DateTime.isDateTime(part.startDate) ? part.startDate : DateTime.invalid("unspecified"),
+            tags: isSet(part.tags) && part.tags.values().every(isString) ? part.tags : new Set(),
+            location: { fileStartByte, fileStopByte, fileLine, filePath, fileSection, fileName, obsidianHref },
+            id: isString(part.id) ? part.id : "",
+            dependsOn: isSet(part.dependsOn) && part.dependsOn.values().every(isString) ? part.dependsOn : new Set(),
+        });
     }
 
     public get folder(): string | undefined {

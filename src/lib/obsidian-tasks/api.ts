@@ -1,4 +1,4 @@
-import { type Plugin } from "@/lib/obsidian/types";
+import type { App, Plugin } from "@/lib/obsidian/types";
 
 /**
  * Tasks API v1 interface
@@ -23,20 +23,24 @@ interface TasksApiV1 {
     executeToggleTaskDoneCommand(line: string, path: string): string;
 }
 
+/** Obsidian's undocumented plugin registry, see https://publish.obsidian.md/tasks/Advanced/Tasks+Api */
+interface AppWithPlugins extends App {
+    plugins?: { plugins?: Record<string, { apiV1?: TasksApiV1 } | undefined> };
+}
+
 export class TasksApi implements TasksApiV1 {
     private readonly apiV1: TasksApiV1;
 
     public constructor(plugin?: Plugin) {
-        // @ts-expect-error - official guidance for accessing the plugin, see:
-        // https://publish.obsidian.md/tasks/Advanced/Tasks+Api
-        const apiV1 = plugin?.app?.plugins?.plugins?.["obsidian-tasks-plugin"].apiV1 as TasksApiV1;
+        const app: AppWithPlugins | undefined = plugin?.app;
+        const apiV1 = app?.plugins?.plugins?.["obsidian-tasks-plugin"]?.apiV1;
         if (!apiV1) {
             throw new Error("obsidian-tasks-plugin must be installed");
         }
         this.apiV1 = apiV1;
     }
 
-    public async createTaskLineModal(): Promise<string> {
+    public createTaskLineModal(): Promise<string> {
         return this.apiV1.createTaskLineModal();
     }
 

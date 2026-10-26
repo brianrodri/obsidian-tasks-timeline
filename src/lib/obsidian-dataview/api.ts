@@ -1,11 +1,11 @@
-import { Signal, signal } from "@preact/signals";
+import { type Signal, signal } from "@preact/signals";
 import { DateTime } from "luxon";
-import { DataviewApi, getAPI, isPluginEnabled } from "obsidian-dataview";
-import { SMarkdownPage, STask } from "obsidian-dataview/lib/data-model/serialized/markdown";
+import { type DataviewApi, getAPI, isPluginEnabled } from "obsidian-dataview";
+import type { SMarkdownPage, STask } from "obsidian-dataview/lib/data-model/serialized/markdown";
 
-import { Task, TaskLocation, TaskStatus } from "@/data/task";
-import type { Plugin } from "@/lib/obsidian/types";
+import { Task, type TaskLocation, type TaskStatus } from "@/data/task";
 import { readEmojiTaskFields } from "@/lib/obsidian-tasks/parse-task-fields";
+import type { Plugin } from "@/lib/obsidian/types";
 
 export class Dataview {
     private readonly plugin: Plugin;
@@ -15,8 +15,10 @@ export class Dataview {
 
     public constructor(plugin?: Plugin) {
         if (!plugin) throw new Error("plugin is required");
+        const dv = getAPI(plugin.app);
+        if (!dv) throw new Error("obsidian-dataview must be installed and enabled");
         this.plugin = plugin;
-        this.dv = getAPI(this.plugin.app) as DataviewApi;
+        this.dv = dv;
 
         this.revision = signal(this.dv.index.revision);
 
@@ -39,22 +41,25 @@ export class Dataview {
             } else {
                 plugin.registerEvent(
                     // @ts-expect-error - obsidian doesn't define types for third-party events.
-                    plugin.app.metadataCache.on("dataview:index-ready", () => resolve(new Dataview(plugin))),
+                    plugin.app.metadataCache.on("dataview:index-ready", () => {
+                        resolve(new Dataview(plugin));
+                    }),
                 );
             }
         });
     }
 
     public getTasks(pageQuery: string, originFile?: string): Task[] {
-        const pages = this.dv.pages(pageQuery, originFile).array();
+        // Dataview types `pages()` as generic records, but at runtime it yields serialized pages.
+        const pages = this.dv.pages(pageQuery, originFile).array() as SMarkdownPage[];
 
-        return pages.flatMap((page: SMarkdownPage) =>
-            // @ts-expect-error DataviewApi is wrong about the type of file.tasks.
-            page.file.tasks.array().map((sTask: STask) => {
+        return pages.flatMap((page) =>
+            // Dataview types `file.tasks` as a plain array, but at runtime it is an iterable `DataArray` proxy.
+            Array.from(page.file.tasks).map((sTask: STask) => {
                 const emojiFields = readEmojiTaskFields(sTask.text);
 
-                const scheduledDate: DateTime<boolean> =
-                    sTask.scheduled?.isValid ? sTask.scheduled
+                const scheduledDate =
+                    DateTime.isDateTime(sTask.scheduled) && sTask.scheduled.isValid ? sTask.scheduled
                     : emojiFields.scheduledDate?.isValid ? emojiFields.scheduledDate
                     : page.file.day;
 
@@ -63,7 +68,7 @@ export class Dataview {
                     : sTask.checked ? "DROPPED"
                     : "OPEN";
 
-                const tags: Set<string> = new Set(sTask.tags);
+                const tags = new Set<string>(sTask.tags);
 
                 const location: TaskLocation = {
                     filePath: sTask.path,

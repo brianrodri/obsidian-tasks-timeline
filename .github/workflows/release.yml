@@ -13,13 +13,15 @@ jobs:
       issues: write # to be able to comment on released issues
       pull-requests: write # to be able to comment on released pull requests
       id-token: write # to enable use of OIDC for npm provenance
+      attestations: write # to be able to attest build provenance
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
-          node-version: latest
+          node-version: lts/*
+          cache: npm
       - name: Install dependencies
         run: npm clean-install
         env:
@@ -31,6 +33,12 @@ jobs:
         run: npm run coverage
       - name: Build plugin
         run: npm run build
+      - name: Attest build provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            dist/main.js
+            dist/styles.css
       - name: Release update
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,12 +1,12 @@
+import type { DateTime } from "luxon";
 import { useCallback, useMemo } from "preact/hooks";
 
-import { Task } from "@/data/task";
+import type { Task } from "@/data/task";
 import { TaskEntry } from "@/layout/task-entry";
-import { DateTime } from "luxon";
 
 interface TaskTimelineProps {
     tasks: readonly Task[];
-    date?: DateTime<true>;
+    date?: DateTime;
     label?: string;
     relativeCalendar?: string | null;
     showDone?: boolean;
@@ -41,7 +41,7 @@ export function TaskTimeline({
             <>
                 <div class="date-line">
                     <div class="date">
-                        {date?.isValid ? `${date.toISODate()} ${date.weekdayShort}` : label}
+                        {date?.isValid ? [date.toISODate(), date.weekdayShort].join(" ") : label}
                         {entries.length > 1 ?
                             <span class="counter">{` (${entries.length})`}</span>
                         :   null}
@@ -52,4 +52,5 @@ export function TaskTimeline({
             </>
         );
     }
+    return null;
 }

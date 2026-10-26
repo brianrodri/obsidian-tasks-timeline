@@ -1,5 +1,6 @@
-import { ItemView, Keymap, type IconName, type Plugin, type UserEvent, type WorkspaceLeaf } from "@/lib/obsidian/types";
-import { ComponentChild, ContainerNode, render } from "preact";
+import { type ComponentChild, render } from "preact";
+
+import { type IconName, ItemView, Keymap, type Plugin, type UserEvent, type WorkspaceLeaf } from "@/lib/obsidian/types";
 
 export class Obsidian {
     public readonly plugin: Plugin;
@@ -9,12 +10,12 @@ export class Obsidian {
         this.plugin = plugin;
     }
 
-    public async loadData<T>(defaults: T): Promise<T> {
-        const data = (await this.plugin.loadData()) ?? {};
+    public async loadData<T extends object>(defaults: T): Promise<T> {
+        const data = (await this.plugin.loadData()) as Partial<T> | null;
         return { ...defaults, ...data };
     }
 
-    public async saveData<T>(settings: T): Promise<void> {
+    public async saveData(settings: unknown): Promise<void> {
         await this.plugin.saveData(settings);
     }
 
@@ -55,13 +56,13 @@ export class Obsidian {
     public async attachView(type: string): Promise<void> {
         const [leaf] = this.plugin.app.workspace.getLeavesOfType(type);
         if (!leaf) {
-            await this.detachView(type);
+            this.detachView(type);
             await this.plugin.app.workspace.getRightLeaf(false)?.setViewState({ type });
         }
     }
 
-    public async detachView(type: string): Promise<void> {
-        return this.plugin.app.workspace.detachLeavesOfType(type);
+    public detachView(type: string): void {
+        this.plugin.app.workspace.detachLeavesOfType(type);
     }
 
     public async revealView(type: string): Promise<void> {
@@ -69,7 +70,7 @@ export class Obsidian {
         if (leaf) {
             await this.plugin.app.workspace.revealLeaf(leaf);
         } else {
-            await this.detachView(type);
+            this.detachView(type);
             await this.plugin.app.workspace.getRightLeaf(false)?.setViewState({ type, active: true });
             this.plugin.app.workspace.rightSplit.expand();
         }
@@ -77,17 +78,23 @@ export class Obsidian {
 }
 
 export class ObsidianView extends ItemView {
-    private container: ContainerNode;
+    private readonly viewType: string;
+    private readonly displayText: string;
+    private readonly iconName: IconName;
+    private readonly component: ComponentChild;
 
     public constructor(
         leaf: WorkspaceLeaf,
-        private readonly viewType: string,
-        private readonly displayText: string,
-        private readonly iconName: IconName,
-        private readonly component: ComponentChild,
+        viewType: string,
+        displayText: string,
+        iconName: IconName,
+        component: ComponentChild,
     ) {
         super(leaf);
-        this.container = this.containerEl.children[1];
+        this.viewType = viewType;
+        this.displayText = displayText;
+        this.iconName = iconName;
+        this.component = component;
     }
 
     public override getViewType(): string {
@@ -102,11 +109,13 @@ export class ObsidianView extends ItemView {
         return this.iconName;
     }
 
-    protected override async onOpen(): Promise<void> {
-        render(this.component, this.container);
+    protected override onOpen(): Promise<void> {
+        render(this.component, this.contentEl);
+        return Promise.resolve();
     }
 
-    protected override async onClose(): Promise<void> {
-        render(null, this.container);
+    protected override onClose(): Promise<void> {
+        render(null, this.contentEl);
+        return Promise.resolve();
     }
 }

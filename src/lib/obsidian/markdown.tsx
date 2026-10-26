@@ -1,9 +1,9 @@
-import { createElement, FunctionalComponent, JSX } from "preact";
+import { Duration, type DurationLike } from "luxon";
+import { type FunctionalComponent, type JSX, createElement } from "preact";
 import { useEffect, useRef } from "preact/hooks";
 import { useDebounceCallback } from "usehooks-ts";
 
-import { MarkdownRenderer, type App, type Component } from "@/lib/obsidian/types";
-import { Duration, DurationLike } from "luxon";
+import { type App, type Component, MarkdownRenderer } from "@/lib/obsidian/types";
 
 /**
  * @param props - props for the component.
@@ -17,25 +17,31 @@ export const ObsidianMarkdown: FunctionalComponent<ObsidianMarkdownProps> = ({
     delay = 500,
     tagName = "span",
 }) => {
-    const elRef = useRef<HTMLElement>();
+    const elRef = useRef<HTMLElement | null>(null);
     const delayMs = Duration.fromDurationLike(delay).toMillis();
-    const renderObsidianMarkdown = useDebounceCallback(MarkdownRenderer.render, delayMs);
+    const renderObsidianMarkdown = useDebounceCallback(renderMarkdown, delayMs);
 
     useEffect(() => {
         const el = elRef.current;
-        if (el) {
-            if (!markdown || !sourcePath) {
-                el.innerHTML = "";
-            } else {
-                const runAsync = async () => renderObsidianMarkdown(app, markdown, el, sourcePath, component);
-                runAsync().catch(console.error);
-                return () => renderObsidianMarkdown.cancel();
-            }
+        if (el && markdown && sourcePath) {
+            const runAsync = async () => renderObsidianMarkdown(app, markdown, el, sourcePath, component);
+            runAsync().catch((error: unknown) => {
+                console.error(error);
+            });
+        } else {
+            el?.replaceChildren();
         }
+        return () => {
+            renderObsidianMarkdown.cancel();
+        };
     }, [renderObsidianMarkdown, app, markdown, sourcePath, component]);
 
+    // eslint-disable-next-line react-hooks/refs -- the ref object is handed to the element, not read during render.
     return createElement(tagName, { ref: elRef });
 };
+
+/** Wraps the static method so it can be passed around without binding concerns. */
+const renderMarkdown = (...args: Parameters<typeof MarkdownRenderer.render>) => MarkdownRenderer.render(...args);
 
 /** Configures how Obsidian (the app) will render its markdown. */
 export interface ObsidianMarkdownProps {
