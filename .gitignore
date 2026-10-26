@@ -13,3 +13,7 @@ test-vault/.obsidian/plugins/*
 !test-vault/.obsidian/plugins/hot-reload/
 test-vault/.obsidian/plugins/obsidian-tasks-timeline/*
 !test-vault/.obsidian/plugins/obsidian-tasks-timeline/.hotreload
+
+# devenv
+.devenv*
+devenv.local.nix
