@@ -3,10 +3,9 @@
     "name": "Obsidian Tasks Timeline",
     "version": "1.0.0",
     "minAppVersion": "0.15.0",
-    "description": "Demonstrates some of the capabilities of the Obsidian API.",
-    "author": "Obsidian",
-    "authorUrl": "https://obsidian.md",
-    "fundingUrl": "https://obsidian.md/pricing",
+    "description": "A timeline view of your Tasks plugin tasks, powered by Dataview.",
+    "author": "Brian Rodriguez",
+    "authorUrl": "https://github.com/brianrodri",
     "isDesktopOnly": false,
     "manifest_version": 2
 }
