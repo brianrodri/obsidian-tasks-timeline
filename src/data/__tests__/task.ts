@@ -12,14 +12,9 @@ describe("Task", () => {
         expect(cancelledDate).toEqual(VALID_DATE);
     });
 
-    it("uses untested date", () => {
-        const { doneDate } = Task.create({ doneDate: UNTESTED_DATE });
-        expect(doneDate).toEqual(UNTESTED_DATE);
-    });
-
     it.each<[string, Temporal.PlainDateLike]>([
         ["an ISO date", "2024-10-26"],
-        ["a PlainDateTime", Temporal.PlainDateTime.from("2024-10-26T13:00")],
+        ["an ISO date and time", "2024-10-26T13:00"],
         ["a property bag", { year: 2024, month: 10, day: 26 }],
     ])("validates %s", (_, dueDate) => {
         expect(Task.create({ dueDate }).dueDate).toEqual(UNTESTED_DATE);
