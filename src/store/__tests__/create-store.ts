@@ -90,4 +90,39 @@ describe("createStore", () => {
         expect(store.backlog.value).toBe(store.backlog.value);
         expect(store.upcoming.value).toBe(store.upcoming.value);
     });
+
+    describe("interning", () => {
+        const inFile = (fileLine: number, description: string, fileStartByte: number) =>
+            Task.create({
+                description,
+                scheduledDate: TODAY,
+                location: { filePath: "a.md", fileLine, fileStartByte, fileStopByte: fileStartByte + 10 },
+            });
+
+        it("keeps every unedited task the same instance across revisions", () => {
+            const { store, getTasks } = createReadyStore(inFile(1, "a", 0), inFile(2, "b", 10), inFile(3, "c", 20));
+            const [a, , c] = store.tasks.value;
+
+            // A new revision re-reads every task as a new instance, as a cache miss would.
+            getTasks.mockReturnValue([inFile(1, "a", 0), inFile(2, "edited", 10), inFile(3, "c", 20)]);
+            store.revision.value++;
+
+            const [nextA, nextB, nextC] = store.tasks.value;
+            expect(nextA).toBe(a);
+            expect(nextB?.description).toEqual("edited");
+            expect(nextC).toBe(c);
+        });
+
+        it("keeps the identity of a task below an edited one in the same file", () => {
+            const { store, getTasks } = createReadyStore(inFile(1, "a", 0), inFile(2, "b", 10));
+            const [, below] = store.tasks.value;
+
+            getTasks.mockReturnValue([inFile(1, "a, longer", 0), inFile(2, "b", 18)]);
+            store.revision.value++;
+
+            const [, nextBelow] = store.tasks.value;
+            expect(nextBelow).not.toBe(below);
+            expect(nextBelow?.identity).toEqual(below?.identity);
+        });
+    });
 });
