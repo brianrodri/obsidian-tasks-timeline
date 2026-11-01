@@ -1,0 +1,58 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { Obsidian } from "@/lib/obsidian/adapters";
+import type { Plugin } from "@/lib/obsidian/types";
+
+import { connectStore } from "../connect-store";
+import { createStore } from "../create-store";
+
+function createFakePlugin() {
+    const handlers = new Map<string, () => void>();
+    const disposers: (() => void)[] = [];
+    const plugin = {
+        app: {
+            metadataCache: {
+                on: vi.fn((name: string, handler: () => void) => {
+                    handlers.set(name, handler);
+                    return { name };
+                }),
+            },
+        },
+        registerEvent: vi.fn(),
+        registerInterval: vi.fn((id: number) => id),
+        register: vi.fn((disposer: () => void) => disposers.push(disposer)),
+        saveData: vi.fn(() => Promise.resolve()),
+    };
+    return {
+        plugin,
+        obsidian: new Obsidian(plugin as unknown as Plugin),
+        fire: (name: string) => handlers.get(name)?.(),
+        unload: () => {
+            disposers.forEach((dispose) => {
+                dispose();
+            });
+        },
+    };
+}
+
+describe("connectStore", () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    it("bumps the revision when dataview metadata changes", () => {
+        const store = createStore();
+        const { plugin, obsidian, fire } = createFakePlugin();
+        connectStore(store, obsidian);
+        const before = store.revision.value;
+
+        fire("dataview:metadata-change");
+
+        expect(store.revision.value).toBeGreaterThan(before);
+        expect(plugin.registerEvent).toHaveBeenCalledWith({ name: "dataview:metadata-change" });
+    });
+});
