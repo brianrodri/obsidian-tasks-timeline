@@ -35,10 +35,12 @@ interface GroupedTaskTimelinesProps {
 }
 
 const GroupedTaskTimelines = memo(({ groups }: GroupedTaskTimelinesProps) => {
+    const { store } = useAppContext();
+    const today = store.today.value;
     let prevRelativeDate: string | null = null;
 
     return groups.value.map(({ date, tasks }) => {
-        const relativeDate = toRelativeCalendar(date);
+        const relativeDate = toRelativeCalendar(date, today);
         const timeline = (
             <TaskTimeline
                 key={date.toString()}
@@ -59,7 +61,7 @@ const GroupedTaskTimelines = memo(({ groups }: GroupedTaskTimelinesProps) => {
  */
 export function toRelativeCalendar(
     date: Temporal.PlainDate,
-    base: Temporal.PlainDate = Temporal.Now.plainDateISO(),
+    base: Temporal.PlainDate,
     locales?: Intl.LocalesArgument,
 ): string {
     const formatter = new Intl.RelativeTimeFormat(locales, { numeric: "auto" });
