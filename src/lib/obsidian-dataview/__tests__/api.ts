@@ -69,10 +69,7 @@ function setup() {
         pages: vi.fn(() => ({ array: () => pages })),
         value: { isDate: (value: unknown) => value instanceof FakeDateTime },
     };
-    const plugin = {
-        app: { plugins: { plugins: { dataview: { api } } }, metadataCache: { on: vi.fn() } },
-        registerEvent: vi.fn(),
-    };
+    const plugin = { app: { plugins: { plugins: { dataview: { api } } } } };
     const dataview = new Dataview(plugin as unknown as Plugin);
     return {
         read: (...inputs: FakeTaskInput[]) => {
