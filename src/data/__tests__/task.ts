@@ -12,7 +12,7 @@ describe("Task", () => {
         expect(cancelledDate).toEqual(VALID_DATE);
     });
 
-    it.each<[string, Temporal.PlainDateLike]>([
+    it.each([
         ["an ISO date", "2024-10-26"],
         ["an ISO date and time", "2024-10-26T13:00"],
         ["a property bag", { year: 2024, month: 10, day: 26 }],
@@ -20,7 +20,7 @@ describe("Task", () => {
         expect(Task.create({ dueDate }).dueDate).toEqual(UNTESTED_DATE);
     });
 
-    it.each<[string, Temporal.PlainDateLike | null]>([
+    it.each([
         ["null", null],
         ["text that is not a date", "tomorrow"],
         ["an ISO date that does not exist", "2024-02-31"],
