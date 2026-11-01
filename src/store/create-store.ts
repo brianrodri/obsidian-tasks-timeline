@@ -13,11 +13,12 @@ export function createStore(): Store {
     const today = signal(Temporal.Now.plainDateISO());
     const dataview = signal<TaskSource>();
 
+    const intern = createTaskInterner();
     const tasks = computed(() => {
         // Dataview's index is not a signal, so subscribe to its revision to re-run the query when the index changes.
         noop(revision.value);
-        if (status.value !== "ready") return [];
-        return dataview.value?.getTasks(settings.value.pageQuery) ?? [];
+        if (status.value !== "ready") return intern([]);
+        return intern(dataview.value?.getTasks(settings.value.pageQuery) ?? []);
     });
     const lookup = computed(() => new TaskLookup([...tasks.value]));
     const planned = computed(() => {
@@ -34,6 +35,22 @@ export function createStore(): Store {
     });
 
     return { status, settings, revision, today, dataview, tasks, lookup, planned, backlog, upcoming };
+}
+
+/**
+ * Returns a function that swaps each task for the one it returned last time with the same identity, when the two are
+ * {@link Task.equals | equal}, so unchanged tasks keep their instance and downstream equality checks stay cheap.
+ */
+function createTaskInterner(): (tasks: readonly Task[]) => readonly Task[] {
+    let previousByIdentity = new Map<string, Task>();
+    return (tasks) => {
+        const interned = tasks.map((task) => {
+            const previous = previousByIdentity.get(task.identity);
+            return previous?.equals(task) ? previous : task;
+        });
+        previousByIdentity = new Map(interned.map((task) => [task.identity, task]));
+        return interned;
+    };
 }
 
 /** Groups tasks that are already sorted by {@link Task.happensDate}, keeping their order. */
