@@ -6,7 +6,6 @@ export const TASK_STATUSES = ["OPEN", "DONE", "DROPPED", "CUSTOM"] as const;
 export type TaskStatus = typeof TASK_STATUSES extends readonly (infer T)[] ? T : never;
 
 export class Task implements TaskFields {
-    public readonly key: string;
     public readonly status: TaskStatus;
     public readonly customStatus: TaskStatus extends "CUSTOM" ? string : undefined;
     public readonly description: string;
@@ -39,7 +38,6 @@ export class Task implements TaskFields {
         this.location = fields.location;
         this.id = fields.id;
         this.dependsOn = fields.dependsOn;
-        this.key = JSON.stringify(this);
     }
 
     public static create(part: TaskInput): Task {
@@ -70,6 +68,16 @@ export class Task implements TaskFields {
             id: isString(part.id) ? part.id : "",
             dependsOn: isSet(part.dependsOn) && part.dependsOn.values().every(isString) ? part.dependsOn : new Set(),
         });
+    }
+
+    /**
+     * Names the same task across re-reads of its file, for use as a key.
+     *
+     * Best-effort without an id: a task without one is named by its line, which shifts when lines are added above it.
+     */
+    public get identity(): string {
+        const { filePath = "", fileLine } = this.location;
+        return this.id ? `id:${filePath}:${this.id}` : `line:${filePath}:${fileLine}`;
     }
 
     public get folder(): string | undefined {

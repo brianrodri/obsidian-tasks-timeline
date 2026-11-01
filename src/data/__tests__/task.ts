@@ -54,4 +54,28 @@ describe("Task", () => {
         const expectedDate = isoDates[expected as keyof typeof isoDates];
         expect(happensDate).toEqual(Temporal.PlainDate.from(expectedDate));
     });
+
+    describe("identity", () => {
+        const at = (fileLine: number, id?: string) =>
+            Task.create({ id, location: { filePath: "a.md", fileLine, fileStartByte: 0, fileStopByte: 0 } });
+
+        it("follows the task's id when it has one, wherever the line moves", () => {
+            expect(at(1, "abc").identity).toEqual(at(9, "abc").identity);
+            expect(at(1, "abc").identity).not.toEqual(at(1, "xyz").identity);
+        });
+
+        it("follows the task's line when it has no id", () => {
+            expect(at(1).identity).toEqual(at(1).identity);
+            expect(at(1).identity).not.toEqual(at(2).identity);
+        });
+
+        it("differs between files", () => {
+            const other = Task.create({ id: "abc", location: { filePath: "b.md", fileStartByte: 0, fileStopByte: 0 } });
+            expect(at(1, "abc").identity).not.toEqual(other.identity);
+        });
+
+        it("does not mistake an id for a line number", () => {
+            expect(at(1, "1").identity).not.toEqual(at(1).identity);
+        });
+    });
 });
