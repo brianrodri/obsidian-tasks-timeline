@@ -1,6 +1,30 @@
 import { type ComponentChild, render } from "preact";
 
-import { type IconName, ItemView, Keymap, type Plugin, type UserEvent, type WorkspaceLeaf } from "@/lib/obsidian/types";
+import {
+    type App,
+    type IconName,
+    ItemView,
+    Keymap,
+    type Plugin,
+    type UserEvent,
+    type WorkspaceLeaf,
+} from "@/lib/obsidian/types";
+
+/** Obsidian's undocumented plugin registry, see https://publish.obsidian.md/tasks/Advanced/Tasks+Api */
+interface AppWithPlugins extends App {
+    plugins?: { enabledPlugins?: Set<string>; plugins?: Record<string, unknown> };
+}
+
+/** Returns another plugin's instance, typed by the caller as the parts of it they rely on. */
+export function getPlugin<T extends object>(app: App, id: string): Partial<T> | undefined {
+    const { plugins }: AppWithPlugins = app;
+    return plugins?.plugins?.[id] as Partial<T> | undefined;
+}
+
+export function isPluginEnabled(app: App, id: string): boolean {
+    const { plugins }: AppWithPlugins = app;
+    return plugins?.enabledPlugins?.has(id) ?? false;
+}
 
 export class Obsidian {
     public readonly plugin: Plugin;

@@ -1,11 +1,12 @@
 import { type Signal, signal } from "@preact/signals";
 import { DateTime } from "luxon";
-import { type DataviewApi, getAPI, isPluginEnabled } from "obsidian-dataview";
+import type { DataviewApi } from "obsidian-dataview";
 import type { SMarkdownPage, STask } from "obsidian-dataview/lib/data-model/serialized/markdown";
 
 import { Task, type TaskLocation, type TaskStatus } from "@/data/task";
 import { readEmojiTaskFields } from "@/lib/obsidian-tasks/parse-task-fields";
-import type { Plugin } from "@/lib/obsidian/types";
+import { getPlugin, isPluginEnabled } from "@/lib/obsidian/adapters";
+import type { App, Plugin } from "@/lib/obsidian/types";
 
 export class Dataview {
     private readonly plugin: Plugin;
@@ -15,7 +16,7 @@ export class Dataview {
 
     public constructor(plugin?: Plugin) {
         if (!plugin) throw new Error("plugin is required");
-        const dv = getAPI(plugin.app);
+        const dv = getDataviewApi(plugin.app);
         if (!dv) throw new Error("obsidian-dataview must be installed and enabled");
         this.plugin = plugin;
         this.dv = dv;
@@ -34,9 +35,9 @@ export class Dataview {
     /** IMPORTANT: Must be called within `onLayoutReady` callback, otherwise the plugin will freeze! */
     static async ensureDataviewReady(plugin: Plugin): Promise<Dataview> {
         return new Promise<Dataview>((resolve, reject) => {
-            if (!isPluginEnabled(plugin.app)) {
+            if (!isPluginEnabled(plugin.app, DATAVIEW_ID)) {
                 reject(new Error("obsidian-dataview must be installed and enabled"));
-            } else if (getAPI(plugin.app)?.index.initialized) {
+            } else if (getDataviewApi(plugin.app)?.index.initialized) {
                 resolve(new Dataview(plugin));
             } else {
                 plugin.registerEvent(
@@ -84,4 +85,10 @@ export class Dataview {
             }),
         );
     }
+}
+
+const DATAVIEW_ID = "dataview";
+
+function getDataviewApi(app: App): DataviewApi | undefined {
+    return getPlugin<{ api: DataviewApi }>(app, DATAVIEW_ID)?.api;
 }
