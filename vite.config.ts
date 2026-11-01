@@ -23,6 +23,7 @@ export default defineConfig(({ mode }) => ({
     test: {
         environment: "jsdom",
         include: ["src/**/__tests__/*.{ts,tsx}"],
+        setupFiles: ["temporal-polyfill/global"],
         coverage: {
             include: ["src/"],
             exclude: ["src/main.tsx", "**/__mocks__/*", "**/__tests__/*"],

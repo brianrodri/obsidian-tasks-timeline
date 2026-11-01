@@ -1,5 +1,4 @@
 import { memoize, partition, sortBy, sortedIndex, sortedLastIndex } from "lodash";
-import { type DateTime, Interval } from "luxon";
 
 import type { Task } from "@/data/task";
 
@@ -7,9 +6,9 @@ export class TaskLookup {
     public readonly revision: number;
     public readonly undatedTasks: readonly Task[];
     public readonly isTaskActionable: (task: Task) => boolean;
-    public readonly getTasksHappeningOn: (date: DateTime) => readonly Task[];
-    public readonly getTasksHappeningBefore: (date: DateTime) => readonly Task[];
-    public readonly getTasksHappeningAfter: (date: DateTime) => readonly Task[];
+    public readonly getTasksHappeningOn: (date: Temporal.PlainDate) => readonly Task[];
+    public readonly getTasksHappeningBefore: (date: Temporal.PlainDate) => readonly Task[];
+    public readonly getTasksHappeningAfter: (date: Temporal.PlainDate) => readonly Task[];
     private readonly tasksBySortedDateKey: ReadonlyMap<string, readonly Task[]>;
     private readonly sortedDateKeys: readonly string[];
     private readonly openTaskIds: ReadonlySet<string>;
@@ -25,17 +24,23 @@ export class TaskLookup {
         this.undatedTasks = withoutKeys;
 
         this.isTaskActionable = memoize((task: Task) => this.computeIsTaskActionable(task));
-        this.getTasksHappeningOn = memoize((date: DateTime) => this.computeTasksHappeningOn(date), getDateKey);
-        this.getTasksHappeningBefore = memoize((date: DateTime) => this.computeTasksHappeningBefore(date), getDateKey);
-        this.getTasksHappeningAfter = memoize((date: DateTime) => this.computeTasksHappeningAfter(date), getDateKey);
+        this.getTasksHappeningOn = memoize(
+            (date: Temporal.PlainDate) => this.computeTasksHappeningOn(date),
+            getDateKey,
+        );
+        this.getTasksHappeningBefore = memoize(
+            (date: Temporal.PlainDate) => this.computeTasksHappeningBefore(date),
+            getDateKey,
+        );
+        this.getTasksHappeningAfter = memoize(
+            (date: Temporal.PlainDate) => this.computeTasksHappeningAfter(date),
+            getDateKey,
+        );
     }
 
-    private computeTasksHappeningOn(date: DateTime): readonly Task[] {
-        if (!date.isValid) return [];
-
-        const interval = Interval.after(date.startOf("day"), { days: 1 });
-        const start = sortedIndex(this.sortedDateKeys, getDateKey(interval.start));
-        const end = sortedIndex(this.sortedDateKeys, getDateKey(interval.end));
+    private computeTasksHappeningOn(date: Temporal.PlainDate): readonly Task[] {
+        const start = sortedIndex(this.sortedDateKeys, getDateKey(date));
+        const end = sortedIndex(this.sortedDateKeys, getDateKey(date.add({ days: 1 })));
 
         return this.tasksBySortedDateKey
             .values()
@@ -45,9 +50,7 @@ export class TaskLookup {
             .toArray();
     }
 
-    private computeTasksHappeningBefore(date: DateTime): readonly Task[] {
-        if (!date.isValid) return [];
-
+    private computeTasksHappeningBefore(date: Temporal.PlainDate): readonly Task[] {
         const end = sortedIndex(this.sortedDateKeys, getDateKey(date));
 
         return this.tasksBySortedDateKey
@@ -57,9 +60,7 @@ export class TaskLookup {
             .toArray();
     }
 
-    private computeTasksHappeningAfter(date: DateTime): readonly Task[] {
-        if (!date.isValid) return [];
-
+    private computeTasksHappeningAfter(date: Temporal.PlainDate): readonly Task[] {
         const start = sortedLastIndex(this.sortedDateKeys, getDateKey(date));
 
         return this.tasksBySortedDateKey
@@ -85,6 +86,6 @@ function getTaskDateKey(task?: Task | null): string {
     return task ? getDateKey(task.happensDate) : "";
 }
 
-function getDateKey(date?: DateTime | null): string {
-    return date?.toISODate() ?? "";
+function getDateKey(date?: Temporal.PlainDate | null): string {
+    return date?.toString() ?? "";
 }

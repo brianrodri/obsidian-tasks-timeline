@@ -1,4 +1,5 @@
 import "../styles.css";
+import "temporal-polyfill/global";
 
 import { signal } from "@preact/signals";
 

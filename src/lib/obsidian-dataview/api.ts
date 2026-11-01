@@ -1,5 +1,4 @@
 import { type Signal, signal } from "@preact/signals";
-import { DateTime } from "luxon";
 import type { DataviewApi } from "obsidian-dataview";
 import type { SMarkdownPage, STask } from "obsidian-dataview/lib/data-model/serialized/markdown";
 
@@ -60,9 +59,7 @@ export class Dataview {
                 const emojiFields = readEmojiTaskFields(sTask.text);
 
                 const scheduledDate =
-                    DateTime.isDateTime(sTask.scheduled) && sTask.scheduled.isValid ? sTask.scheduled
-                    : emojiFields.scheduledDate?.isValid ? emojiFields.scheduledDate
-                    : page.file.day;
+                    this.toPlainDate(sTask.scheduled) ?? emojiFields.scheduledDate ?? this.toPlainDate(page.file.day);
 
                 const status: TaskStatus =
                     sTask.fullyCompleted ? "DONE"
@@ -84,6 +81,12 @@ export class Dataview {
                 return Task.create({ ...emojiFields, status, scheduledDate, tags, location });
             }),
         );
+    }
+
+    /** Dataview hands out Luxon `DateTime`s; convert them so the rest of the plugin only deals with Temporal. */
+    private toPlainDate(value: unknown): Temporal.PlainDate | undefined {
+        const isoDate = this.dv.value.isDate(value) ? value.toISODate() : null;
+        return isoDate ? Temporal.PlainDate.from(isoDate) : undefined;
     }
 }
 

@@ -1,5 +1,4 @@
 import { render } from "@testing-library/preact";
-import type { DurationLike } from "luxon";
 import type { OmitByValue } from "utility-types";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -32,12 +31,12 @@ describe("ObsidianMarkdown", () => {
     });
 
     it("should throw an error when 'props.delay' is invalid", () => {
-        const props = { ...requiredProps, delay: "one hour" as DurationLike };
-        expect(() => render(<ObsidianMarkdown {...props} />)).toThrowErrorMatchingSnapshot();
+        const props = { ...requiredProps, delay: "one hour" };
+        expect(() => render(<ObsidianMarkdown {...props} />)).toThrow(RangeError);
     });
 
     it("should rerender when 'props.markdown' stops changing for a while", async () => {
-        let props = { ...requiredProps, delay: 500 };
+        let props = { ...requiredProps, delay: { milliseconds: 500 } };
 
         props = { ...props, markdown: "Apple" };
         const { container, rerender } = render(<ObsidianMarkdown {...props} />);
@@ -71,7 +70,7 @@ describe("ObsidianMarkdown", () => {
     });
 
     it("should not rerender when 'props.markdown' keeps changing", async () => {
-        let props = { ...requiredProps, delay: 500 };
+        let props = { ...requiredProps, delay: { milliseconds: 500 } };
 
         props = { ...props, markdown: "Apple" };
         const { container, rerender } = render(<ObsidianMarkdown {...props} />);

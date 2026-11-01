@@ -1,5 +1,4 @@
 import { isNumber, isSet, isString } from "lodash";
-import { DateTime } from "luxon";
 
 export const TASK_STATUSES = ["OPEN", "DONE", "DROPPED", "CUSTOM"] as const;
 
@@ -12,12 +11,12 @@ export class Task implements TaskFields {
     public readonly description: string;
     public readonly priority: number;
     public readonly recurrenceRule: string;
-    public readonly cancelledDate: DateTime;
-    public readonly createdDate: DateTime;
-    public readonly doneDate: DateTime;
-    public readonly dueDate: DateTime;
-    public readonly scheduledDate: DateTime;
-    public readonly startDate: DateTime;
+    public readonly cancelledDate: Temporal.PlainDate | undefined;
+    public readonly createdDate: Temporal.PlainDate | undefined;
+    public readonly doneDate: Temporal.PlainDate | undefined;
+    public readonly dueDate: Temporal.PlainDate | undefined;
+    public readonly scheduledDate: Temporal.PlainDate | undefined;
+    public readonly startDate: Temporal.PlainDate | undefined;
     public readonly tags: ReadonlySet<string>;
     public readonly location: TaskLocation;
     public readonly id: string;
@@ -59,14 +58,12 @@ export class Task implements TaskFields {
             description: isString(part.description) ? part.description : "",
             priority: isNumber(part.priority) ? part.priority : 3,
             recurrenceRule: isString(part.recurrenceRule) ? part.recurrenceRule : "",
-            cancelledDate:
-                DateTime.isDateTime(part.cancelledDate) ? part.cancelledDate : DateTime.invalid("unspecified"),
-            createdDate: DateTime.isDateTime(part.createdDate) ? part.createdDate : DateTime.invalid("unspecified"),
-            doneDate: DateTime.isDateTime(part.doneDate) ? part.doneDate : DateTime.invalid("unspecified"),
-            dueDate: DateTime.isDateTime(part.dueDate) ? part.dueDate : DateTime.invalid("unspecified"),
-            scheduledDate:
-                DateTime.isDateTime(part.scheduledDate) ? part.scheduledDate : DateTime.invalid("unspecified"),
-            startDate: DateTime.isDateTime(part.startDate) ? part.startDate : DateTime.invalid("unspecified"),
+            cancelledDate: toPlainDate(part.cancelledDate),
+            createdDate: toPlainDate(part.createdDate),
+            doneDate: toPlainDate(part.doneDate),
+            dueDate: toPlainDate(part.dueDate),
+            scheduledDate: toPlainDate(part.scheduledDate),
+            startDate: toPlainDate(part.startDate),
             tags: isSet(part.tags) && part.tags.values().every(isString) ? part.tags : new Set(),
             location: { fileStartByte, fileStopByte, fileLine, filePath, fileSection, fileName, obsidianHref },
             id: isString(part.id) ? part.id : "",
@@ -82,42 +79,54 @@ export class Task implements TaskFields {
         return undefined;
     }
 
-    public get happensDate(): DateTime {
+    public get happensDate(): Temporal.PlainDate | undefined {
         const { doneDate, cancelledDate, startDate, scheduledDate, dueDate, createdDate } = this;
 
-        if (doneDate.isValid) {
+        if (doneDate) {
             return doneDate;
         }
-        if (cancelledDate.isValid) {
+        if (cancelledDate) {
             return cancelledDate;
         }
-        if (scheduledDate.isValid && startDate.isValid && dueDate.isValid) {
-            return DateTime.min(DateTime.max(scheduledDate, startDate), dueDate);
+        if (scheduledDate && startDate && dueDate) {
+            return minDate(maxDate(scheduledDate, startDate), dueDate);
         }
-        if (scheduledDate.isValid && startDate.isValid) {
-            return DateTime.max(scheduledDate, startDate);
+        if (scheduledDate && startDate) {
+            return maxDate(scheduledDate, startDate);
         }
-        if (scheduledDate.isValid && dueDate.isValid) {
-            return DateTime.min(scheduledDate, dueDate);
+        if (scheduledDate && dueDate) {
+            return minDate(scheduledDate, dueDate);
         }
-        if (startDate.isValid && dueDate.isValid) {
-            return DateTime.min(startDate, dueDate);
+        if (startDate && dueDate) {
+            return minDate(startDate, dueDate);
         }
-        if (scheduledDate.isValid) {
+        if (scheduledDate) {
             return scheduledDate;
         }
-        if (startDate.isValid) {
+        if (startDate) {
             return startDate;
         }
-        if (dueDate.isValid) {
+        if (dueDate) {
             return dueDate;
         }
-        if (createdDate.isValid) {
+        if (createdDate) {
             return createdDate;
         }
 
-        return DateTime.invalid("task has no valid dates");
+        return undefined;
     }
+}
+
+function toPlainDate(value: unknown): Temporal.PlainDate | undefined {
+    return value instanceof Temporal.PlainDate ? value : undefined;
+}
+
+function minDate(a: Temporal.PlainDate, b: Temporal.PlainDate): Temporal.PlainDate {
+    return Temporal.PlainDate.compare(a, b) <= 0 ? a : b;
+}
+
+function maxDate(a: Temporal.PlainDate, b: Temporal.PlainDate): Temporal.PlainDate {
+    return Temporal.PlainDate.compare(a, b) >= 0 ? a : b;
 }
 
 export interface TaskFields {
@@ -126,12 +135,12 @@ export interface TaskFields {
     description: string;
     priority: number;
     recurrenceRule: string;
-    cancelledDate: DateTime;
-    createdDate: DateTime;
-    doneDate: DateTime;
-    dueDate: DateTime;
-    scheduledDate: DateTime;
-    startDate: DateTime;
+    cancelledDate: Temporal.PlainDate | undefined;
+    createdDate: Temporal.PlainDate | undefined;
+    doneDate: Temporal.PlainDate | undefined;
+    dueDate: Temporal.PlainDate | undefined;
+    scheduledDate: Temporal.PlainDate | undefined;
+    startDate: Temporal.PlainDate | undefined;
     tags: ReadonlySet<string>;
     location: TaskLocation;
     id: string;

@@ -1,5 +1,4 @@
 import { groupBy } from "lodash";
-import { DateTime } from "luxon";
 import type { PickByValue, ValuesType } from "utility-types";
 
 import type { TaskFields } from "@/data/task";
@@ -59,7 +58,7 @@ export function readEmojiTaskFields(text: string): Partial<TaskFields> {
             case "dueDate":
             case "startDate":
             case "scheduledDate":
-                result[fieldKey] = DateTime.fromISO(fieldValue);
+                result[fieldKey] = parsePlainDate(fieldValue);
                 break;
             case "dependsOn":
                 result[fieldKey] = new Set(fieldValue.split(",").map((id) => id.trim()));
@@ -87,4 +86,12 @@ export function writeEmojiTaskField(text: string, fieldKey: FieldKey, value: str
 
     const trailingWhitespaceStart = /\s*$/.exec(text)?.index ?? text.length;
     return `${text.slice(0, trailingWhitespaceStart)} ${primaryEmoji} ${value}${text.slice(trailingWhitespaceStart)}`;
+}
+
+function parsePlainDate(text: string): Temporal.PlainDate | undefined {
+    try {
+        return Temporal.PlainDate.from(text);
+    } catch {
+        return undefined;
+    }
 }
