@@ -67,4 +67,14 @@ describe("createActions", () => {
 
         await expect(actions.toggleTask(TASK)).rejects.toBe(error);
     });
+
+    it("writes a task date field in place", async () => {
+        const { obsidian, actions } = setup();
+
+        await actions.setTaskDate(TASK, "dueDate", "2024-10-26");
+
+        expect(obsidian.processFileRange).toHaveBeenCalledWith("notes/a.md", 10, 20, expect.any(Function));
+        const transform = obsidian.processFileRange.mock.calls[0]?.[3];
+        expect(transform?.("- [ ] a")).toEqual("- [ ] a 📅 2024-10-26");
+    });
 });

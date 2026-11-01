@@ -1,5 +1,6 @@
 import type { Task } from "@/data/task";
 import type { TasksApi } from "@/lib/obsidian-tasks/api";
+import { writeEmojiTaskField } from "@/lib/obsidian-tasks/parse-task-fields";
 import type { Obsidian } from "@/lib/obsidian/adapters";
 import type { Actions } from "@/store/create-actions.types";
 import type { Store } from "@/store/create-store.types";
@@ -20,6 +21,9 @@ export function createActions(store: Store, obsidian: Obsidian, tasksApi: TasksA
         },
         toggleTask(task) {
             return processTask(task, (text, filePath) => tasksApi.executeToggleTaskDoneCommand(text, filePath));
+        },
+        setTaskDate(task, field, isoDate) {
+            return processTask(task, (text) => writeEmojiTaskField(text, field, isoDate));
         },
     };
 }
