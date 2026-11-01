@@ -1,10 +1,17 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { Task } from "@/data/task";
+import { Task, type TaskInput } from "@/data/task";
 
 import { createStore } from "../create-store";
 
 const TODAY = Temporal.PlainDate.from("2024-10-25");
+
+/** Creates a task on its own line of a file, so it has an identity of its own. */
+const onLine = (fileLine: number, input: TaskInput) =>
+    Task.create({
+        ...input,
+        location: { filePath: "a.md", fileLine, fileStartByte: fileLine * 10, fileStopByte: fileLine * 10 + 9 },
+    });
 
 function createReadyStore(...tasks: Task[]) {
     const getTasks = vi.fn(() => tasks);
@@ -65,8 +72,8 @@ describe("createStore", () => {
 
     it("groups upcoming tasks by date", () => {
         const [first, second] = [TODAY.add({ days: 1 }), TODAY.add({ days: 3 })];
-        const a = Task.create({ description: "a", scheduledDate: first });
-        const b = Task.create({ description: "b", scheduledDate: second });
+        const a = onLine(1, { description: "a", scheduledDate: first });
+        const b = onLine(2, { description: "b", scheduledDate: second });
         const c = Task.create({ description: "c", scheduledDate: first });
         const { store } = createReadyStore(a, b, c);
         expect(store.upcoming.value).toEqual([
@@ -89,6 +96,42 @@ describe("createStore", () => {
         expect(store.planned.value).toBe(store.planned.value);
         expect(store.backlog.value).toBe(store.backlog.value);
         expect(store.upcoming.value).toBe(store.upcoming.value);
+    });
+
+    it("keeps every section the same reference when a revision changes none of its tasks", () => {
+        const fresh = () => [
+            onLine(1, { description: "planned", scheduledDate: TODAY }),
+            onLine(2, { description: "backlog", scheduledDate: TODAY.subtract({ days: 1 }) }),
+            onLine(3, { description: "upcoming", scheduledDate: TODAY.add({ days: 1 }) }),
+        ];
+        const { store, getTasks } = createReadyStore(...fresh());
+        const before = { planned: store.planned.value, backlog: store.backlog.value, upcoming: store.upcoming.value };
+
+        getTasks.mockReturnValue(fresh());
+        store.revision.value++;
+
+        expect(store.planned.value).toBe(before.planned);
+        expect(store.backlog.value).toBe(before.backlog);
+        expect(store.upcoming.value).toBe(before.upcoming);
+    });
+
+    it("keeps an upcoming group the same reference when only another group changes", () => {
+        const [first, second] = [TODAY.add({ days: 1 }), TODAY.add({ days: 2 })];
+        const { store, getTasks } = createReadyStore(
+            onLine(1, { description: "a", scheduledDate: first }),
+            Task.create({ description: "b", scheduledDate: second }),
+        );
+        const [firstGroup, secondGroup] = store.upcoming.value;
+
+        getTasks.mockReturnValue([
+            onLine(1, { description: "a", scheduledDate: first }),
+            onLine(2, { description: "b, edited", scheduledDate: second }),
+        ]);
+        store.revision.value++;
+
+        const [nextFirstGroup, nextSecondGroup] = store.upcoming.value;
+        expect(nextFirstGroup).toBe(firstGroup);
+        expect(nextSecondGroup).not.toBe(secondGroup);
     });
 
     describe("interning", () => {
