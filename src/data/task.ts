@@ -7,7 +7,7 @@ export type TaskStatus = typeof TASK_STATUSES extends readonly (infer T)[] ? T :
 
 export class Task implements TaskFields {
     public readonly status: TaskStatus;
-    public readonly customStatus: TaskStatus extends "CUSTOM" ? string : undefined;
+    public readonly customStatus: string | undefined;
     public readonly description: string;
     public readonly priority: number;
     public readonly recurrenceRule: string;
@@ -122,7 +122,7 @@ export type TaskInput = Partial<
 
 export interface TaskFields {
     status: TaskStatus;
-    customStatus: TaskStatus extends "CUSTOM" ? string : undefined;
+    customStatus: string | undefined;
     description: string;
     priority: number;
     recurrenceRule: string;

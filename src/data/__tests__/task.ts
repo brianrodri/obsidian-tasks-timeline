@@ -55,6 +55,11 @@ describe("Task", () => {
         expect(happensDate).toEqual(Temporal.PlainDate.from(expectedDate));
     });
 
+    it("keeps the custom status of a custom task", () => {
+        expect(Task.create({ status: "CUSTOM", customStatus: "?" }).customStatus).toEqual("?");
+        expect(Task.create({ status: "OPEN", customStatus: "?" }).customStatus).toBeUndefined();
+    });
+
     describe("identity", () => {
         const at = (fileLine: number, id?: string) =>
             Task.create({ id, location: { filePath: "a.md", fileLine, fileStartByte: 0, fileStopByte: 0 } });
