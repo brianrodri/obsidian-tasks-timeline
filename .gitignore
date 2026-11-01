@@ -17,3 +17,4 @@ test-vault/.obsidian/plugins/obsidian-tasks-timeline/*
 # devenv
 .devenv*
 devenv.local.nix
+.direnv
