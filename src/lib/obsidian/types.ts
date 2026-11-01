@@ -4,6 +4,7 @@ export {
     ItemView,
     Keymap,
     MarkdownRenderer,
+    Notice,
     Plugin,
     type IconName,
     type PaneType,
