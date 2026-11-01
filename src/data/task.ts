@@ -82,39 +82,16 @@ export class Task implements TaskFields {
 
     public get happensDate(): Temporal.PlainDate | undefined {
         const { doneDate, cancelledDate, startDate, scheduledDate, dueDate, createdDate } = this;
+        const notBefore = [scheduledDate, startDate]
+            .filter((date) => date !== undefined)
+            .sort((a, b) => Temporal.PlainDate.compare(a, b))
+            .at(-1);
+        const plannedDate = [notBefore, dueDate]
+            .filter((date) => date !== undefined)
+            .sort((a, b) => Temporal.PlainDate.compare(a, b))
+            .at(0);
 
-        if (doneDate) {
-            return doneDate;
-        }
-        if (cancelledDate) {
-            return cancelledDate;
-        }
-        if (scheduledDate && startDate && dueDate) {
-            return minDate(maxDate(scheduledDate, startDate), dueDate);
-        }
-        if (scheduledDate && startDate) {
-            return maxDate(scheduledDate, startDate);
-        }
-        if (scheduledDate && dueDate) {
-            return minDate(scheduledDate, dueDate);
-        }
-        if (startDate && dueDate) {
-            return minDate(startDate, dueDate);
-        }
-        if (scheduledDate) {
-            return scheduledDate;
-        }
-        if (startDate) {
-            return startDate;
-        }
-        if (dueDate) {
-            return dueDate;
-        }
-        if (createdDate) {
-            return createdDate;
-        }
-
-        return undefined;
+        return doneDate ?? cancelledDate ?? plannedDate ?? createdDate;
     }
 }
 
@@ -126,14 +103,6 @@ function toPlainDate(value?: Temporal.PlainDateLike | null): Temporal.PlainDate 
     } catch {
         return undefined;
     }
-}
-
-function minDate(a: Temporal.PlainDate, b: Temporal.PlainDate): Temporal.PlainDate {
-    return Temporal.PlainDate.compare(a, b) <= 0 ? a : b;
-}
-
-function maxDate(a: Temporal.PlainDate, b: Temporal.PlainDate): Temporal.PlainDate {
-    return Temporal.PlainDate.compare(a, b) >= 0 ? a : b;
 }
 
 export type TaskDateField = keyof PickByValueExact<TaskFields, Temporal.PlainDate | undefined>;

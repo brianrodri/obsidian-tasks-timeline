@@ -23,8 +23,8 @@ export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
     const onInput = useEventCallback((event: Event) => {
-        const { value } = event.currentTarget as HTMLInputElement;
-        if (filePath !== undefined && !disabled && isPlainDate(value)) {
+        const { value, valueAsDate } = event.currentTarget as HTMLInputElement;
+        if (filePath !== undefined && !disabled && valueAsDate !== null) {
             event.preventDefault();
             const process = (text: string) => writeEmojiTaskField(text, field, value);
             setDisabled(true);
@@ -60,13 +60,4 @@ export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
         );
     }
     return null;
-}
-
-function isPlainDate(text: string): boolean {
-    try {
-        Temporal.PlainDate.from(text);
-        return true;
-    } catch {
-        return false;
-    }
 }

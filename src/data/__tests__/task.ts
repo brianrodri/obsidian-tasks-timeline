@@ -42,6 +42,12 @@ describe("Task", () => {
         [{ scheduledDate: "2024-10-26", startDate: "2024-10-27", dueDate: "2024-10-25" }, "dueDate"],
         [{ scheduledDate: "2024-10-26", dueDate: "2024-10-25" }, "dueDate"],
         [{ startDate: "2024-10-27", dueDate: "2024-10-28" }, "startDate"],
+        [{ cancelledDate: "2024-10-31", dueDate: "2024-10-01" }, "cancelledDate"],
+        [{ scheduledDate: "2024-10-26", startDate: "2024-10-27" }, "startDate"],
+        [{ scheduledDate: "2024-10-28", startDate: "2024-10-27" }, "scheduledDate"],
+        [{ scheduledDate: "2024-10-26", createdDate: "2024-10-24" }, "scheduledDate"],
+        [{ startDate: "2024-10-27", createdDate: "2024-10-24" }, "startDate"],
+        [{ dueDate: "2024-10-28", createdDate: "2024-10-24" }, "dueDate"],
         [{ createdDate: "2024-10-24" }, "createdDate"],
     ])("happens on %s when task defines exactly %j", (isoDates, expected) => {
         const { happensDate } = Task.create(isoDates);
