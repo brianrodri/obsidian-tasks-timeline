@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import type { App, Plugin } from "@/lib/obsidian/types";
+import { type App, Notice, type Plugin } from "@/lib/obsidian/types";
 
 import { Obsidian, getPlugin, isPluginEnabled } from "../adapters";
 
@@ -47,5 +47,18 @@ describe("Obsidian.processFileRange", () => {
         await expect(new Obsidian(plugin).processFileRange("missing.md", 0, 1, (text) => text)).rejects.toThrow(
             "missing.md",
         );
+    });
+});
+
+describe("Obsidian.reportError", () => {
+    it("logs the error and shows it to the user in a notice", () => {
+        const error = new Error("boom");
+        const consoleError = vi.spyOn(console, "error").mockImplementation(vi.fn());
+
+        new Obsidian({} as Plugin).reportError("Failed to toggle the task", error);
+
+        expect(consoleError).toHaveBeenCalledWith("Failed to toggle the task", error);
+        expect(Notice).toHaveBeenCalledWith("Failed to toggle the task: boom");
+        consoleError.mockRestore();
     });
 });

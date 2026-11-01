@@ -1,27 +1,24 @@
 import { useSignal } from "@preact/signals";
 import { useEventCallback } from "usehooks-ts";
 
-import { usePluginContext } from "@/context/plugin-context";
-import type { TaskLocation, TaskStatus } from "@/data/task";
+import { useAppContext } from "@/context/app-context";
+import type { Task } from "@/data/task";
 
 export interface TaskCheckboxProps {
-    status: TaskStatus;
-    location: TaskLocation;
+    task: Task;
 }
 
-export function TaskCheckbox({ status, location: { filePath, fileStartByte, fileStopByte } }: TaskCheckboxProps) {
-    const { obsidian, tasksApi } = usePluginContext();
+export function TaskCheckbox({ task }: TaskCheckboxProps) {
+    const { actions, obsidian } = useAppContext();
     const waiting = useSignal(false);
 
     const onClick = useEventCallback(() => {
-        if (!filePath || waiting.value) return;
+        if (waiting.value) return;
         waiting.value = true;
-        obsidian
-            .processFileRange(filePath, fileStartByte, fileStopByte, (data: string) =>
-                tasksApi.executeToggleTaskDoneCommand(data, filePath),
-            )
+        actions
+            .toggleTask(task)
             .catch((error: unknown) => {
-                console.error(error);
+                obsidian.reportError("Failed to toggle the task", error);
             })
             .finally(() => (waiting.value = false));
     });
@@ -29,8 +26,8 @@ export function TaskCheckbox({ status, location: { filePath, fileStartByte, file
     return (
         <input
             type="checkbox"
-            checked={status === "DONE"}
-            data-task={status === "DROPPED" ? "-" : ""}
+            checked={task.status === "DONE"}
+            data-task={task.status === "DROPPED" ? "-" : ""}
             onClick={onClick}
         />
     );
