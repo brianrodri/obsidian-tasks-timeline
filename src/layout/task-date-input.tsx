@@ -2,15 +2,15 @@ import { lowerCase } from "lodash";
 import type { VNode } from "preact";
 import { useRef, useState } from "preact/hooks";
 import { useEventCallback } from "usehooks-ts";
-import type { PickByValueExact } from "utility-types";
 
 import { usePluginContext } from "@/context/plugin-context";
-import type { Task, TaskFields } from "@/data/task";
+import type { Task, TaskDateField } from "@/data/task";
 import { writeEmojiTaskField } from "@/lib/obsidian-tasks/parse-task-fields";
+import { toPlainDate } from "@/lib/temporal/plain-date";
 
 export interface TaskDateInputProps {
     symbol?: VNode;
-    field: keyof PickByValueExact<TaskFields, Temporal.PlainDate | undefined>;
+    field: TaskDateField;
     task: Task;
 }
 
@@ -25,7 +25,7 @@ export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
 
     const onInput = useEventCallback((event: Event) => {
         const { value } = event.currentTarget as HTMLInputElement;
-        if (filePath !== undefined && !disabled && isPlainDate(value)) {
+        if (filePath !== undefined && !disabled && toPlainDate(value)) {
             event.preventDefault();
             const process = (text: string) => writeEmojiTaskField(text, field, value);
             setDisabled(true);
@@ -61,13 +61,4 @@ export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
         );
     }
     return null;
-}
-
-function isPlainDate(text: string): boolean {
-    try {
-        Temporal.PlainDate.from(text);
-        return true;
-    } catch {
-        return false;
-    }
 }

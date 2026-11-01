@@ -1,4 +1,7 @@
 import { isNumber, isSet, isString } from "lodash";
+import type { PickByValueExact } from "utility-types";
+
+import { toPlainDate } from "@/lib/temporal/plain-date";
 
 export const TASK_STATUSES = ["OPEN", "DONE", "DROPPED", "CUSTOM"] as const;
 
@@ -41,7 +44,7 @@ export class Task implements TaskFields {
         this.key = JSON.stringify(this);
     }
 
-    public static create(part: Partial<TaskFields>): Task {
+    public static create(part: TaskInput): Task {
         const {
             fileStartByte = 0,
             fileStopByte = 0,
@@ -117,10 +120,6 @@ export class Task implements TaskFields {
     }
 }
 
-function toPlainDate(value: unknown): Temporal.PlainDate | undefined {
-    return value instanceof Temporal.PlainDate ? value : undefined;
-}
-
 function minDate(a: Temporal.PlainDate, b: Temporal.PlainDate): Temporal.PlainDate {
     return Temporal.PlainDate.compare(a, b) <= 0 ? a : b;
 }
@@ -128,6 +127,13 @@ function minDate(a: Temporal.PlainDate, b: Temporal.PlainDate): Temporal.PlainDa
 function maxDate(a: Temporal.PlainDate, b: Temporal.PlainDate): Temporal.PlainDate {
     return Temporal.PlainDate.compare(a, b) >= 0 ? a : b;
 }
+
+export type TaskDateField = keyof PickByValueExact<TaskFields, Temporal.PlainDate | undefined>;
+
+/** Raw fields accepted by {@link Task.create}, which validates them into {@link TaskFields}. */
+export type TaskInput = Partial<
+    Omit<TaskFields, TaskDateField> & Record<TaskDateField, Temporal.PlainDateLike | null | undefined>
+>;
 
 export interface TaskFields {
     status: TaskStatus;

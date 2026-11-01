@@ -1,4 +1,3 @@
-import mapValues from "lodash/mapValues";
 import { describe, expect, it } from "vitest";
 
 import { Task } from "../task";
@@ -18,6 +17,17 @@ describe("Task", () => {
         expect(doneDate).toEqual(UNTESTED_DATE);
     });
 
+    it.each<[string, Temporal.PlainDateLike]>([
+        ["an ISO date", "2024-10-26"],
+        ["a property bag", { year: 2024, month: 10, day: 26 }],
+    ])("validates %s", (_, dueDate) => {
+        expect(Task.create({ dueDate }).dueDate).toEqual(UNTESTED_DATE);
+    });
+
+    it.each(["tomorrow", "2024-02-31"])("drops invalid date %j", (dueDate) => {
+        expect(Task.create({ dueDate }).dueDate).toBeUndefined();
+    });
+
     it("can be converted to and from itself", () => {
         const fields = EMPTY;
         const copy = Task.create(fields);
@@ -33,8 +43,7 @@ describe("Task", () => {
         [{ startDate: "2024-10-27", dueDate: "2024-10-28" }, "startDate"],
         [{ createdDate: "2024-10-24" }, "createdDate"],
     ])("happens on %s when task defines exactly %j", (isoDates, expected) => {
-        const dates = mapValues(isoDates, (d) => Temporal.PlainDate.from(d));
-        const { happensDate } = Task.create(dates);
+        const { happensDate } = Task.create(isoDates);
         const expectedDate = isoDates[expected as keyof typeof isoDates];
         expect(happensDate).toEqual(Temporal.PlainDate.from(expectedDate));
     });
