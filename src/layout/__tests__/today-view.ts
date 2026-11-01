@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { toRelativeCalendar } from "../relative-calendar";
+import { toRelativeCalendar } from "../today-view";
 
 describe("toRelativeCalendar", () => {
     const base = Temporal.PlainDate.from("2024-10-25");
