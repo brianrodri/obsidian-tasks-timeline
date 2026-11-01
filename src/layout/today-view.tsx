@@ -1,3 +1,4 @@
+import type { ReadonlySignal } from "@preact/signals";
 import { memo } from "preact/compat";
 
 import { useAppContext } from "@/context/app-context";
@@ -8,16 +9,17 @@ export interface TodayViewProps {
     showFuture?: boolean;
 }
 
+/** Passes each section down as a signal, so only the timeline reading a changed section re-renders. */
 export function TodayView({ showFuture = true }: TodayViewProps) {
     const { store } = useAppContext();
 
     return (
         <div class="ott" id="ott">
             <div class="details">
-                <TaskTimeline key="today" label="today" tasks={store.planned.value} />
-                <TaskTimeline key="unplanned" label="backlog" tasks={store.backlog.value} />
+                <TaskTimeline key="today" label="today" tasks={store.planned} />
+                <TaskTimeline key="unplanned" label="backlog" tasks={store.backlog} />
                 {showFuture ?
-                    <GroupedTaskTimelines groups={store.upcoming.value} />
+                    <GroupedTaskTimelines groups={store.upcoming} />
                 :   null}
             </div>
         </div>
@@ -25,13 +27,13 @@ export function TodayView({ showFuture = true }: TodayViewProps) {
 }
 
 interface GroupedTaskTimelinesProps {
-    groups: readonly UpcomingGroup[];
+    groups: ReadonlySignal<readonly UpcomingGroup[]>;
 }
 
 const GroupedTaskTimelines = memo(({ groups }: GroupedTaskTimelinesProps) => {
     let prevRelativeDate: string | null = null;
 
-    return groups.map(({ date, tasks }) => {
+    return groups.value.map(({ date, tasks }) => {
         const relativeDate = toRelativeCalendar(date);
         const timeline = (
             <TaskTimeline
