@@ -80,6 +80,27 @@ export class Task implements TaskFields {
         return this.id ? `id:${filePath}:${this.id}` : `line:${filePath}:${fileLine}`;
     }
 
+    /** Returns whether every field matches `other`'s, so one may stand in for the other. */
+    public equals(other: Task): boolean {
+        return (
+            this.status === other.status &&
+            this.customStatus === other.customStatus &&
+            this.description === other.description &&
+            this.priority === other.priority &&
+            this.recurrenceRule === other.recurrenceRule &&
+            areDatesEqual(this.cancelledDate, other.cancelledDate) &&
+            areDatesEqual(this.createdDate, other.createdDate) &&
+            areDatesEqual(this.doneDate, other.doneDate) &&
+            areDatesEqual(this.dueDate, other.dueDate) &&
+            areDatesEqual(this.scheduledDate, other.scheduledDate) &&
+            areDatesEqual(this.startDate, other.startDate) &&
+            areSetsEqual(this.tags, other.tags) &&
+            areLocationsEqual(this.location, other.location) &&
+            this.id === other.id &&
+            areSetsEqual(this.dependsOn, other.dependsOn)
+        );
+    }
+
     public get folder(): string | undefined {
         if (this.location.filePath) {
             const parts = this.location.filePath.split("/");
@@ -101,6 +122,26 @@ export class Task implements TaskFields {
 
         return doneDate ?? cancelledDate ?? plannedDate ?? createdDate;
     }
+}
+
+function areDatesEqual(a: Temporal.PlainDate | undefined, b: Temporal.PlainDate | undefined): boolean {
+    return a === undefined || b === undefined ? a === b : a.equals(b);
+}
+
+function areSetsEqual(a: ReadonlySet<string>, b: ReadonlySet<string>): boolean {
+    return a.size === b.size && a.isSubsetOf(b);
+}
+
+function areLocationsEqual(a: TaskLocation, b: TaskLocation): boolean {
+    return (
+        a.filePath === b.filePath &&
+        a.fileName === b.fileName &&
+        a.fileSection === b.fileSection &&
+        a.fileLine === b.fileLine &&
+        a.fileStartByte === b.fileStartByte &&
+        a.fileStopByte === b.fileStopByte &&
+        a.obsidianHref === b.obsidianHref
+    );
 }
 
 /** Validates raw date data, returning `undefined` when it does not describe a real calendar date. */
