@@ -1,5 +1,4 @@
 import { sortedLastIndexBy } from "lodash";
-import { DateTime } from "luxon";
 import { memo } from "preact/compat";
 import { useMemo } from "preact/hooks";
 
@@ -16,7 +15,7 @@ export function TodayView({ showFuture = true }: TodayViewProps) {
     const { getTasksHappeningBefore, getTasksHappeningOn, getTasksHappeningAfter, isTaskActionable, undatedTasks } =
         taskLookup.value;
 
-    const today = DateTime.now().startOf("day");
+    const today = Temporal.Now.plainDateISO();
 
     const plannedToday = useMemo(
         () => getTasksHappeningOn(today).filter(isTaskActionable),
@@ -55,12 +54,12 @@ const GroupedTaskTimelines = memo(({ tasks }: GroupedTaskTimelinesProps) => {
     for (let indexStartIncl = 0; indexStartIncl < tasks.length;) {
         const firstTask = tasks[indexStartIncl];
         if (!firstTask) break;
-        const indexStopExcl = sortedLastIndexBy(tasks, firstTask, (task) => task.happensDate.toISODate());
-        const relativeDate = firstTask.happensDate.toRelativeCalendar();
+        const indexStopExcl = sortedLastIndexBy(tasks, firstTask, (task) => task.happensDate?.toString());
+        const relativeDate = firstTask.happensDate ? toRelativeCalendar(firstTask.happensDate) : null;
 
         timelines.push(
             <TaskTimeline
-                key={firstTask.happensDate.toISODate()}
+                key={firstTask.happensDate?.toString()}
                 tasks={tasks.slice(indexStartIncl, indexStopExcl)}
                 date={firstTask.happensDate}
                 relativeCalendar={relativeDate !== prevRelativeDate ? relativeDate : null}
@@ -73,3 +72,28 @@ const GroupedTaskTimelines = memo(({ tasks }: GroupedTaskTimelinesProps) => {
 
     return timelines;
 });
+
+/**
+ * Describes `date` relative to `base` in the coarsest calendar unit that differs, like "tomorrow" or "next month".
+ *
+ * Matches the output of Luxon's `DateTime#toRelativeCalendar`.
+ */
+export function toRelativeCalendar(
+    date: Temporal.PlainDate,
+    base: Temporal.PlainDate = Temporal.Now.plainDateISO(),
+    locales?: Intl.LocalesArgument,
+): string {
+    const formatter = new Intl.RelativeTimeFormat(locales, { numeric: "auto" });
+
+    const years = date.year - base.year;
+    if (years !== 0) {
+        return formatter.format(years, "years");
+    }
+
+    const months = date.month - base.month;
+    if (months !== 0) {
+        return formatter.format(months, "months");
+    }
+
+    return formatter.format(base.until(date).days, "days");
+}

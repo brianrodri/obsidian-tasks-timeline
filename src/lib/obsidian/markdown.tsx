@@ -1,4 +1,3 @@
-import { Duration, type DurationLike } from "luxon";
 import { type FunctionalComponent, type JSX, createElement } from "preact";
 import { useEffect, useRef } from "preact/hooks";
 import { useDebounceCallback } from "usehooks-ts";
@@ -14,11 +13,11 @@ export const ObsidianMarkdown: FunctionalComponent<ObsidianMarkdownProps> = ({
     component,
     markdown,
     sourcePath,
-    delay = 500,
+    delay = { milliseconds: 500 },
     tagName = "span",
 }) => {
     const elRef = useRef<HTMLElement | null>(null);
-    const delayMs = Duration.fromDurationLike(delay).toMillis();
+    const delayMs = Temporal.Duration.from(delay).total("milliseconds");
     const renderObsidianMarkdown = useDebounceCallback(renderMarkdown, delayMs);
 
     useEffect(() => {
@@ -56,5 +55,5 @@ export interface ObsidianMarkdownProps {
     /** The tag used to contain the rendered Markdown source code. */
     tagName?: keyof JSX.IntrinsicElements;
     /** Custom debounce time for renders. */
-    delay?: DurationLike;
+    delay?: Temporal.DurationLike;
 }

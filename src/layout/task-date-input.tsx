@@ -1,17 +1,15 @@
 import { lowerCase } from "lodash";
-import { DateTime } from "luxon";
 import type { VNode } from "preact";
 import { useRef, useState } from "preact/hooks";
 import { useEventCallback } from "usehooks-ts";
-import type { PickByValue } from "utility-types";
 
 import { usePluginContext } from "@/context/plugin-context";
-import type { Task, TaskFields } from "@/data/task";
+import type { Task, TaskDateField } from "@/data/task";
 import { writeEmojiTaskField } from "@/lib/obsidian-tasks/parse-task-fields";
 
 export interface TaskDateInputProps {
     symbol?: VNode;
-    field: keyof PickByValue<TaskFields, DateTime>;
+    field: TaskDateField;
     task: Task;
 }
 
@@ -25,8 +23,8 @@ export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
     const onInput = useEventCallback((event: Event) => {
-        const { value } = event.currentTarget as HTMLInputElement;
-        if (filePath !== undefined && !disabled && DateTime.fromISO(value).isValid) {
+        const { value, valueAsDate } = event.currentTarget as HTMLInputElement;
+        if (filePath !== undefined && !disabled && valueAsDate !== null) {
             event.preventDefault();
             const process = (text: string) => writeEmojiTaskField(text, field, value);
             setDisabled(true);
@@ -45,16 +43,16 @@ export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
         inputRef.current?.showPicker();
     });
 
-    if (field === "scheduledDate" || fieldValue.isValid) {
+    if (field === "scheduledDate" || fieldValue) {
         return (
             <div class="relative date-input" onClick={onClick}>
                 <div class="icon">{symbol}</div>
-                <span class="label">{fieldValue.toISODate() ?? "todo"}</span>
+                <span class="label">{fieldValue?.toString() ?? "todo"}</span>
                 <input
                     ref={inputRef}
                     aria-label={`Set ${lowerCase(field)}`}
                     type="date"
-                    value={fieldValue.toISODate() ?? ""}
+                    value={fieldValue?.toString() ?? ""}
                     disabled={disabled}
                     onInput={onInput}
                 />

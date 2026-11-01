@@ -1,5 +1,5 @@
 import { isNumber, isSet, isString } from "lodash";
-import { DateTime } from "luxon";
+import type { PickByValueExact } from "utility-types";
 
 export const TASK_STATUSES = ["OPEN", "DONE", "DROPPED", "CUSTOM"] as const;
 
@@ -12,12 +12,12 @@ export class Task implements TaskFields {
     public readonly description: string;
     public readonly priority: number;
     public readonly recurrenceRule: string;
-    public readonly cancelledDate: DateTime;
-    public readonly createdDate: DateTime;
-    public readonly doneDate: DateTime;
-    public readonly dueDate: DateTime;
-    public readonly scheduledDate: DateTime;
-    public readonly startDate: DateTime;
+    public readonly cancelledDate: Temporal.PlainDate | undefined;
+    public readonly createdDate: Temporal.PlainDate | undefined;
+    public readonly doneDate: Temporal.PlainDate | undefined;
+    public readonly dueDate: Temporal.PlainDate | undefined;
+    public readonly scheduledDate: Temporal.PlainDate | undefined;
+    public readonly startDate: Temporal.PlainDate | undefined;
     public readonly tags: ReadonlySet<string>;
     public readonly location: TaskLocation;
     public readonly id: string;
@@ -42,7 +42,7 @@ export class Task implements TaskFields {
         this.key = JSON.stringify(this);
     }
 
-    public static create(part: Partial<TaskFields>): Task {
+    public static create(part: TaskInput): Task {
         const {
             fileStartByte = 0,
             fileStopByte = 0,
@@ -59,14 +59,12 @@ export class Task implements TaskFields {
             description: isString(part.description) ? part.description : "",
             priority: isNumber(part.priority) ? part.priority : 3,
             recurrenceRule: isString(part.recurrenceRule) ? part.recurrenceRule : "",
-            cancelledDate:
-                DateTime.isDateTime(part.cancelledDate) ? part.cancelledDate : DateTime.invalid("unspecified"),
-            createdDate: DateTime.isDateTime(part.createdDate) ? part.createdDate : DateTime.invalid("unspecified"),
-            doneDate: DateTime.isDateTime(part.doneDate) ? part.doneDate : DateTime.invalid("unspecified"),
-            dueDate: DateTime.isDateTime(part.dueDate) ? part.dueDate : DateTime.invalid("unspecified"),
-            scheduledDate:
-                DateTime.isDateTime(part.scheduledDate) ? part.scheduledDate : DateTime.invalid("unspecified"),
-            startDate: DateTime.isDateTime(part.startDate) ? part.startDate : DateTime.invalid("unspecified"),
+            cancelledDate: toPlainDate(part.cancelledDate),
+            createdDate: toPlainDate(part.createdDate),
+            doneDate: toPlainDate(part.doneDate),
+            dueDate: toPlainDate(part.dueDate),
+            scheduledDate: toPlainDate(part.scheduledDate),
+            startDate: toPlainDate(part.startDate),
             tags: isSet(part.tags) && part.tags.values().every(isString) ? part.tags : new Set(),
             location: { fileStartByte, fileStopByte, fileLine, filePath, fileSection, fileName, obsidianHref },
             id: isString(part.id) ? part.id : "",
@@ -82,43 +80,37 @@ export class Task implements TaskFields {
         return undefined;
     }
 
-    public get happensDate(): DateTime {
+    public get happensDate(): Temporal.PlainDate | undefined {
         const { doneDate, cancelledDate, startDate, scheduledDate, dueDate, createdDate } = this;
+        const notBefore = [scheduledDate, startDate]
+            .filter((date) => date !== undefined)
+            .sort((a, b) => Temporal.PlainDate.compare(a, b))
+            .at(-1);
+        const plannedDate = [notBefore, dueDate]
+            .filter((date) => date !== undefined)
+            .sort((a, b) => Temporal.PlainDate.compare(a, b))
+            .at(0);
 
-        if (doneDate.isValid) {
-            return doneDate;
-        }
-        if (cancelledDate.isValid) {
-            return cancelledDate;
-        }
-        if (scheduledDate.isValid && startDate.isValid && dueDate.isValid) {
-            return DateTime.min(DateTime.max(scheduledDate, startDate), dueDate);
-        }
-        if (scheduledDate.isValid && startDate.isValid) {
-            return DateTime.max(scheduledDate, startDate);
-        }
-        if (scheduledDate.isValid && dueDate.isValid) {
-            return DateTime.min(scheduledDate, dueDate);
-        }
-        if (startDate.isValid && dueDate.isValid) {
-            return DateTime.min(startDate, dueDate);
-        }
-        if (scheduledDate.isValid) {
-            return scheduledDate;
-        }
-        if (startDate.isValid) {
-            return startDate;
-        }
-        if (dueDate.isValid) {
-            return dueDate;
-        }
-        if (createdDate.isValid) {
-            return createdDate;
-        }
-
-        return DateTime.invalid("task has no valid dates");
+        return doneDate ?? cancelledDate ?? plannedDate ?? createdDate;
     }
 }
+
+/** Validates raw date data, returning `undefined` when it does not describe a real calendar date. */
+function toPlainDate(value?: Temporal.PlainDateLike | null): Temporal.PlainDate | undefined {
+    if (value === undefined || value === null) return undefined;
+    try {
+        return Temporal.PlainDate.from(value, { overflow: "reject" });
+    } catch {
+        return undefined;
+    }
+}
+
+export type TaskDateField = keyof PickByValueExact<TaskFields, Temporal.PlainDate | undefined>;
+
+/** Raw fields accepted by {@link Task.create}, which validates them into {@link TaskFields}. */
+export type TaskInput = Partial<
+    Omit<TaskFields, TaskDateField> & Record<TaskDateField, Temporal.PlainDateLike | null | undefined>
+>;
 
 export interface TaskFields {
     status: TaskStatus;
@@ -126,12 +118,12 @@ export interface TaskFields {
     description: string;
     priority: number;
     recurrenceRule: string;
-    cancelledDate: DateTime;
-    createdDate: DateTime;
-    doneDate: DateTime;
-    dueDate: DateTime;
-    scheduledDate: DateTime;
-    startDate: DateTime;
+    cancelledDate: Temporal.PlainDate | undefined;
+    createdDate: Temporal.PlainDate | undefined;
+    doneDate: Temporal.PlainDate | undefined;
+    dueDate: Temporal.PlainDate | undefined;
+    scheduledDate: Temporal.PlainDate | undefined;
+    startDate: Temporal.PlainDate | undefined;
     tags: ReadonlySet<string>;
     location: TaskLocation;
     id: string;

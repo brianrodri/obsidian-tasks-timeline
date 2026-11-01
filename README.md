@@ -4,9 +4,16 @@
 
 ## Requirements
 
-The plugin ships no polyfills and relies on ES2025 features (Set methods and
-iterator helpers) being native. That means Obsidian desktop, Obsidian mobile on
-iOS 18.4 or later, or Android with an up-to-date system WebView.
+The plugin relies on ES2025 features (Set methods and iterator helpers) being
+native. That means Obsidian desktop, Obsidian mobile on iOS 18.4 or later, or
+Android with an up-to-date system WebView.
+
+Dates are handled with the [Temporal] API. Where the runtime does not provide
+it yet (notably iOS, and Obsidian desktop builds older than Chromium 144), the
+plugin installs [temporal-polyfill] in its place.
+
+[Temporal]: https://tc39.es/proposal-temporal/docs/
+[temporal-polyfill]: https://github.com/fullcalendar/temporal-polyfill
 
 This is a sample plugin for Obsidian (<https://obsidian.md>).
 
