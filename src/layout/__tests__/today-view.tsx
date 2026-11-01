@@ -1,5 +1,5 @@
-import { act, render } from "@testing-library/preact";
-import { describe, expect, it, vi } from "vitest";
+import { act, cleanup, render, screen } from "@testing-library/preact";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { AppContext } from "@/context/app-context";
 import type { AppContextValue } from "@/context/app-context.types";
@@ -14,6 +14,8 @@ vi.mock("@/lib/obsidian/markdown", () => ({
 }));
 
 describe("TodayView", () => {
+    afterEach(cleanup);
+
     const today = Temporal.PlainDate.from("2024-10-25");
     const onLine = (fileLine: number, input: TaskInput) =>
         Task.create({ ...input, location: { filePath: "a.md", fileLine, fileStartByte: fileLine, fileStopByte: 0 } });
@@ -50,6 +52,31 @@ describe("TodayView", () => {
 
         const rendered = vi.mocked(ObsidianMarkdown).mock.calls.map(([props]) => props.markdown);
         expect(rendered).toEqual(["b, edited"]);
+    });
+
+    it("judges dates against the store's today, not the clock", () => {
+        renderView(
+            onLine(1, { description: "due tomorrow", scheduledDate: today, dueDate: today.add({ days: 1 }) }),
+            onLine(2, { description: "due yesterday", scheduledDate: today, dueDate: today.subtract({ days: 1 }) }),
+            onLine(3, { description: "upcoming", scheduledDate: today.add({ days: 1 }) }),
+        );
+
+        expect(screen.getByText("due tomorrow").closest(".task")?.classList.contains("overdue")).toBe(false);
+        expect(screen.getByText("due yesterday").closest(".task")?.classList.contains("overdue")).toBe(true);
+        expect(screen.getByText("tomorrow")).toBeDefined();
+    });
+
+    it("re-judges an unchanged backlog task as overdue when today advances", async () => {
+        const { store } = renderView(
+            onLine(1, { description: "due today", scheduledDate: today.subtract({ days: 2 }), dueDate: today }),
+        );
+        expect(screen.getByText("due today").closest(".task")?.classList.contains("overdue")).toBe(false);
+
+        await act(() => {
+            store.today.value = today.add({ days: 1 });
+        });
+
+        expect(screen.getByText("due today").closest(".task")?.classList.contains("overdue")).toBe(true);
     });
 });
 
