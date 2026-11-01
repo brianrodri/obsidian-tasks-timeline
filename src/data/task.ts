@@ -1,8 +1,6 @@
 import { isNumber, isSet, isString } from "lodash";
 import type { PickByValueExact } from "utility-types";
 
-import { toPlainDate } from "@/lib/temporal/plain-date";
-
 export const TASK_STATUSES = ["OPEN", "DONE", "DROPPED", "CUSTOM"] as const;
 
 export type TaskStatus = typeof TASK_STATUSES extends readonly (infer T)[] ? T : never;
@@ -116,6 +114,16 @@ export class Task implements TaskFields {
             return createdDate;
         }
 
+        return undefined;
+    }
+}
+
+/** Validates raw date data, returning `undefined` when it does not describe a real calendar date. */
+function toPlainDate(value?: Temporal.PlainDateLike | null): Temporal.PlainDate | undefined {
+    if (value === undefined || value === null) return undefined;
+    try {
+        return Temporal.PlainDate.from(value, { overflow: "reject" });
+    } catch {
         return undefined;
     }
 }

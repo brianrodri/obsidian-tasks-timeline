@@ -19,12 +19,18 @@ describe("Task", () => {
 
     it.each<[string, Temporal.PlainDateLike]>([
         ["an ISO date", "2024-10-26"],
+        ["a PlainDateTime", Temporal.PlainDateTime.from("2024-10-26T13:00")],
         ["a property bag", { year: 2024, month: 10, day: 26 }],
     ])("validates %s", (_, dueDate) => {
         expect(Task.create({ dueDate }).dueDate).toEqual(UNTESTED_DATE);
     });
 
-    it.each(["tomorrow", "2024-02-31"])("drops invalid date %j", (dueDate) => {
+    it.each<[string, Temporal.PlainDateLike | null]>([
+        ["null", null],
+        ["text that is not a date", "tomorrow"],
+        ["an ISO date that does not exist", "2024-02-31"],
+        ["a property bag that does not exist", { year: 2024, month: 2, day: 31 }],
+    ])("drops %s", (_, dueDate) => {
         expect(Task.create({ dueDate }).dueDate).toBeUndefined();
     });
 

@@ -6,7 +6,6 @@ import { Task, type TaskLocation, type TaskStatus } from "@/data/task";
 import { readEmojiTaskFields } from "@/lib/obsidian-tasks/parse-task-fields";
 import { getPlugin, isPluginEnabled } from "@/lib/obsidian/adapters";
 import type { App, Plugin } from "@/lib/obsidian/types";
-import { toPlainDate } from "@/lib/temporal/plain-date";
 
 export class Dataview {
     private readonly plugin: Plugin;
@@ -60,9 +59,9 @@ export class Dataview {
                 const emojiFields = readEmojiTaskFields(sTask.text);
 
                 const scheduledDate =
-                    toPlainDate(this.toPlainDateLike(sTask.scheduled)) ??
-                    toPlainDate(emojiFields.scheduledDate) ??
-                    toPlainDate(this.toPlainDateLike(page.file.day));
+                    this.toPlainDate(sTask.scheduled) ??
+                    this.toPlainDate(emojiFields.scheduledDate) ??
+                    this.toPlainDate(page.file.day);
 
                 const status: TaskStatus =
                     sTask.fullyCompleted ? "DONE"
@@ -86,9 +85,19 @@ export class Dataview {
         );
     }
 
-    /** Dataview hands out Luxon `DateTime`s; convert them so the rest of the plugin only deals with Temporal. */
-    private toPlainDateLike(value: unknown): Temporal.PlainDateLike | undefined {
-        return (this.dv.value.isDate(value) ? value.toISODate() : null) ?? undefined;
+    /**
+     * Validates a raw date, returning `undefined` when it does not describe a real calendar date.
+     *
+     * Dataview hands out Luxon `DateTime`s; they are converted so the rest of the plugin only deals with Temporal.
+     */
+    private toPlainDate(value: unknown): Temporal.PlainDate | undefined {
+        const date = this.dv.value.isDate(value) ? value.toISODate() : value;
+        if (date === undefined || date === null) return undefined;
+        try {
+            return Temporal.PlainDate.from(date as Temporal.PlainDateLike, { overflow: "reject" });
+        } catch {
+            return undefined;
+        }
     }
 }
 

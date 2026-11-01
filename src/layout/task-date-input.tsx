@@ -6,7 +6,6 @@ import { useEventCallback } from "usehooks-ts";
 import { usePluginContext } from "@/context/plugin-context";
 import type { Task, TaskDateField } from "@/data/task";
 import { writeEmojiTaskField } from "@/lib/obsidian-tasks/parse-task-fields";
-import { toPlainDate } from "@/lib/temporal/plain-date";
 
 export interface TaskDateInputProps {
     symbol?: VNode;
@@ -25,7 +24,7 @@ export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
 
     const onInput = useEventCallback((event: Event) => {
         const { value } = event.currentTarget as HTMLInputElement;
-        if (filePath !== undefined && !disabled && toPlainDate(value)) {
+        if (filePath !== undefined && !disabled && isPlainDate(value)) {
             event.preventDefault();
             const process = (text: string) => writeEmojiTaskField(text, field, value);
             setDisabled(true);
@@ -61,4 +60,13 @@ export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
         );
     }
     return null;
+}
+
+function isPlainDate(text: string): boolean {
+    try {
+        Temporal.PlainDate.from(text);
+        return true;
+    } catch {
+        return false;
+    }
 }
