@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import type { App } from "@/lib/obsidian/types";
+import type { App, Plugin } from "@/lib/obsidian/types";
 
-import { getPlugin, isPluginEnabled } from "../adapters";
+import { Obsidian, getPlugin, isPluginEnabled } from "../adapters";
 
 const dataview = { api: { version: "0.5.68" } };
 
@@ -37,5 +37,15 @@ describe("isPluginEnabled", () => {
 
     it("returns false when the plugin registry is unavailable", () => {
         expect(isPluginEnabled(appWithoutRegistry, "dataview")).toBe(false);
+    });
+});
+
+describe("Obsidian.processFileRange", () => {
+    it("rejects when the file is not in the vault", async () => {
+        const plugin = { app: { vault: { getFileByPath: () => null } } } as unknown as Plugin;
+
+        await expect(new Obsidian(plugin).processFileRange("missing.md", 0, 1, (text) => text)).rejects.toThrow(
+            "missing.md",
+        );
     });
 });
