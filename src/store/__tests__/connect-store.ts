@@ -55,4 +55,29 @@ describe("connectStore", () => {
         expect(store.revision.value).toBeGreaterThan(before);
         expect(plugin.registerEvent).toHaveBeenCalledWith({ name: "dataview:metadata-change" });
     });
+
+    it("rolls today over to the next date", () => {
+        vi.setSystemTime(new Date(2024, 9, 25, 23, 59, 30));
+        const store = createStore();
+        const { plugin, obsidian } = createFakePlugin();
+        connectStore(store, obsidian);
+        expect(store.today.value).toEqual(Temporal.PlainDate.from("2024-10-25"));
+
+        vi.advanceTimersByTime(60_000);
+
+        expect(store.today.value).toEqual(Temporal.PlainDate.from("2024-10-26"));
+        expect(plugin.registerInterval).toHaveBeenCalledOnce();
+    });
+
+    it("keeps today unchanged on a same-day tick", () => {
+        vi.setSystemTime(new Date(2024, 9, 25, 12, 0, 0));
+        const store = createStore();
+        const { obsidian } = createFakePlugin();
+        connectStore(store, obsidian);
+        const before = store.today.value;
+
+        vi.advanceTimersByTime(60_000);
+
+        expect(store.today.value).toBe(before);
+    });
 });
