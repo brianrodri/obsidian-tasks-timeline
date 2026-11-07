@@ -1,4 +1,3 @@
-import type { Signal } from "@preact/signals";
 import { vi } from "vitest";
 
 import type { Dataview as RealDataview } from "../api";
@@ -6,7 +5,6 @@ import type { Dataview as RealDataview } from "../api";
 const getTasks = vi.fn();
 
 export class Dataview implements Partial<RealDataview> {
-    public revision = { value: 1 } as Signal<number>;
     public getTasks = getTasks;
 }
 
