@@ -8,4 +8,5 @@ export const Component = vi.fn();
 export const ItemView = vi.fn();
 export const Keymap = { isModEvent: vi.fn() };
 export const MarkdownRenderer = { render: vi.fn() };
+export const Notice = vi.fn();
 export const Plugin = vi.fn();

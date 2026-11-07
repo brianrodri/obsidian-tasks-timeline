@@ -3,9 +3,8 @@ import type { VNode } from "preact";
 import { useRef, useState } from "preact/hooks";
 import { useEventCallback } from "usehooks-ts";
 
-import { usePluginContext } from "@/context/plugin-context";
+import { useAppContext } from "@/context/app-context";
 import type { Task, TaskDateField } from "@/data/task";
-import { writeEmojiTaskField } from "@/lib/obsidian-tasks/parse-task-fields";
 
 export interface TaskDateInputProps {
     symbol?: VNode;
@@ -14,29 +13,25 @@ export interface TaskDateInputProps {
 }
 
 export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
-    const {
-        [field]: fieldValue,
-        location: { filePath, fileStartByte, fileStopByte },
-    } = task;
-    const { obsidian } = usePluginContext();
+    const fieldValue = task[field];
+    const { actions, obsidian } = useAppContext();
     const [disabled, setDisabled] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const onInput = useEventCallback((event: Event) => {
         const { value, valueAsDate } = event.currentTarget as HTMLInputElement;
-        if (filePath !== undefined && !disabled && valueAsDate !== null) {
-            event.preventDefault();
-            const process = (text: string) => writeEmojiTaskField(text, field, value);
-            setDisabled(true);
-            obsidian
-                .processFileRange(filePath, fileStartByte, fileStopByte, process)
-                .catch((error: unknown) => {
-                    console.error(error);
-                })
-                .finally(() => {
-                    setDisabled(false);
-                });
-        }
+        if (disabled) return;
+        if (valueAsDate === null) return;
+        event.preventDefault();
+        setDisabled(true);
+        actions
+            .setTaskDate(task, field, value)
+            .catch((error: unknown) => {
+                obsidian.reportError(`Failed to set the ${lowerCase(field)}`, error);
+            })
+            .finally(() => {
+                setDisabled(false);
+            });
     });
 
     const onClick = useEventCallback(() => {
