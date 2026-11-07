@@ -1,8 +1,10 @@
 import { type Signal, signal } from "@preact/signals";
+import { isEqual } from "lodash";
 import type { DataviewApi } from "obsidian-dataview";
 import type { SMarkdownPage, STask } from "obsidian-dataview/lib/data-model/serialized/markdown";
 
 import { Task, type TaskLocation, type TaskStatus } from "@/data/task";
+import type { CachedTask, RawTaskInputs } from "@/lib/obsidian-dataview/api.types";
 import { readEmojiTaskFields } from "@/lib/obsidian-tasks/parse-task-fields";
 import { getPlugin, isPluginEnabled } from "@/lib/obsidian/adapters";
 import type { App, Plugin } from "@/lib/obsidian/types";
@@ -10,6 +12,7 @@ import type { App, Plugin } from "@/lib/obsidian/types";
 export class Dataview {
     private readonly plugin: Plugin;
     private readonly dv: DataviewApi;
+    private cache: ReadonlyMap<string, CachedTask> = new Map();
 
     public readonly revision: Signal<number>;
 
@@ -49,40 +52,79 @@ export class Dataview {
         });
     }
 
+    /**
+     * Returns the tasks on the pages matching `pageQuery`.
+     *
+     * A task whose inputs are unchanged since the previous call is returned as the same instance, without re-parsing.
+     */
     public getTasks(pageQuery: string, originFile?: string): Task[] {
         // Dataview types `pages()` as generic records, but at runtime it yields serialized pages.
         const pages = this.dv.pages(pageQuery, originFile).array() as SMarkdownPage[];
+        // Rebuilt on every call, so tasks that are no longer read are dropped.
+        const nextCache = new Map<string, CachedTask>();
 
-        return pages.flatMap((page) =>
+        const tasks = pages.flatMap((page) =>
             // Dataview types `file.tasks` as a plain array, but at runtime it is an iterable `DataArray` proxy.
             Array.from(page.file.tasks).map((sTask: STask) => {
-                const emojiFields = readEmojiTaskFields(sTask.text);
-
-                const scheduledDate =
-                    this.toPlainDate(sTask.scheduled) ??
-                    this.toPlainDate(emojiFields.scheduledDate) ??
-                    this.toPlainDate(page.file.day);
-
-                const status: TaskStatus =
-                    sTask.fullyCompleted ? "DONE"
-                    : sTask.checked ? "DROPPED"
-                    : "OPEN";
-
-                const tags = new Set<string>(sTask.tags);
-
-                const location: TaskLocation = {
-                    filePath: sTask.path,
-                    fileName: sTask.section.fileName(),
-                    fileSection: sTask.section.subpath,
-                    fileLine: sTask.line,
-                    fileStartByte: sTask.position.start.offset,
-                    fileStopByte: sTask.position.end.offset,
-                    obsidianHref: sTask.section.obsidianLink(),
-                };
-
-                return Task.create({ ...emojiFields, status, scheduledDate, tags, location });
+                const inputs = this.readTaskInputs(page, sTask);
+                // No two tasks in a file start at the same offset.
+                const cacheKey = `${inputs.path}:${inputs.startOffset}`;
+                const cached = this.cache.get(cacheKey);
+                const task = cached && isEqual(cached.inputs, inputs) ? cached.task : this.buildTask(inputs);
+                nextCache.set(cacheKey, { inputs, task });
+                return task;
             }),
         );
+
+        this.cache = nextCache;
+        return tasks;
+    }
+
+    private readTaskInputs(page: SMarkdownPage, sTask: STask): RawTaskInputs {
+        return {
+            text: sTask.text,
+            scheduled: this.toPlainDate(sTask.scheduled)?.toString(),
+            fullyCompleted: sTask.fullyCompleted,
+            checked: sTask.checked,
+            tags: [...sTask.tags],
+            path: sTask.path,
+            fileName: sTask.section.fileName(),
+            subpath: sTask.section.subpath,
+            line: sTask.line,
+            startOffset: sTask.position.start.offset,
+            stopOffset: sTask.position.end.offset,
+            obsidianHref: sTask.section.obsidianLink(),
+            pageDay: this.toPlainDate(page.file.day)?.toString(),
+        };
+    }
+
+    /** IMPORTANT: Must read nothing but `inputs`, or the cache in {@link getTasks} will serve stale tasks. */
+    private buildTask(inputs: RawTaskInputs): Task {
+        const emojiFields = readEmojiTaskFields(inputs.text);
+
+        const scheduledDate =
+            this.toPlainDate(inputs.scheduled) ??
+            this.toPlainDate(emojiFields.scheduledDate) ??
+            this.toPlainDate(inputs.pageDay);
+
+        const status: TaskStatus =
+            inputs.fullyCompleted ? "DONE"
+            : inputs.checked ? "DROPPED"
+            : "OPEN";
+
+        const tags = new Set<string>(inputs.tags);
+
+        const location: TaskLocation = {
+            filePath: inputs.path,
+            fileName: inputs.fileName,
+            fileSection: inputs.subpath,
+            fileLine: inputs.line,
+            fileStartByte: inputs.startOffset,
+            fileStopByte: inputs.stopOffset,
+            obsidianHref: inputs.obsidianHref,
+        };
+
+        return Task.create({ ...emojiFields, status, scheduledDate, tags, location });
     }
 
     /**
