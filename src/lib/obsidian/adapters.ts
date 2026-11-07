@@ -50,14 +50,13 @@ export class Obsidian {
         process: (payload: string) => string,
     ): Promise<void> {
         const file = this.plugin.app.vault.getFileByPath(filePath);
-        if (file) {
-            await this.plugin.app.vault.process(file, (fileContent: string) => {
-                const head = fileContent.slice(0, startByte);
-                const processed = process(fileContent.slice(startByte, stopByte));
-                const tail = fileContent.slice(stopByte);
-                return `${head}${processed}${tail}`;
-            });
-        }
+        if (!file) throw new Error(`File not found in vault: ${filePath}`);
+        await this.plugin.app.vault.process(file, (fileContent: string) => {
+            const head = fileContent.slice(0, startByte);
+            const processed = process(fileContent.slice(startByte, stopByte));
+            const tail = fileContent.slice(stopByte);
+            return `${head}${processed}${tail}`;
+        });
     }
 
     public async openVaultLink(event: Event, linktext: string, sourcePath: string) {
