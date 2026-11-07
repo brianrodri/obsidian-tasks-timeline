@@ -27,9 +27,9 @@ export interface TaskEntryProps {
 }
 
 export const TaskEntry = ({ task }: TaskEntryProps) => {
-    const overdue = !!task.dueDate && Temporal.PlainDate.compare(task.dueDate, Temporal.Now.plainDateISO()) < 0;
+    const { plugin, store } = useAppContext();
+    const overdue = !!task.dueDate && Temporal.PlainDate.compare(task.dueDate, store.today.value) < 0;
     const { filePath, fileSection, obsidianHref } = task.location;
-    const { plugin } = useAppContext();
 
     const rootElClass =
         task.status === "DONE" ? "task done"
