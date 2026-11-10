@@ -14,10 +14,15 @@ export function createActions(store: Store, obsidian: Obsidian, tasksApi: TasksA
         await obsidian.processFileRange(filePath, fileStartByte, fileStopByte, (text) => process(text, filePath));
     }
 
+    /** Settles after the latest save, so each save starts only once the one before it has settled. */
+    let settingsSaved = Promise.resolve();
+
     return {
-        async updateSettings(part) {
+        updateSettings(part) {
             store.settings.value = { ...store.settings.peek(), ...part };
-            await obsidian.saveData(store.settings.peek());
+            const saved = settingsSaved.catch(() => undefined).then(() => obsidian.saveData(store.settings.peek()));
+            settingsSaved = saved;
+            return saved;
         },
         toggleTask(task) {
             return processTask(task, (text, filePath) => tasksApi.executeToggleTaskDoneCommand(text, filePath));

@@ -41,6 +41,38 @@ describe("createActions", () => {
         await expect(actions.updateSettings({ pageQuery: "#work" })).rejects.toBe(error);
     });
 
+    it("saves settings one at a time, so the newest settings are saved last", async () => {
+        const { store, obsidian, actions } = setup();
+        const { promise, resolve } = Promise.withResolvers<undefined>();
+        obsidian.saveData.mockReturnValueOnce(promise);
+
+        const first = actions.updateSettings({ pageQuery: "#work" });
+        const second = actions.updateSettings({ pageQuery: "#home" });
+        await new Promise((resolve) => setTimeout(resolve));
+
+        expect(obsidian.saveData).toHaveBeenCalledOnce();
+
+        resolve(undefined);
+        await Promise.all([first, second]);
+
+        expect(obsidian.saveData).toHaveBeenCalledTimes(2);
+        expect(obsidian.saveData).toHaveBeenLastCalledWith(store.settings.value);
+        expect(store.settings.value.pageQuery).toBe("#home");
+    });
+
+    it("keeps saving settings after a failed save", async () => {
+        const { obsidian, actions } = setup();
+        const error = new Error("boom");
+        obsidian.saveData.mockRejectedValueOnce(error);
+
+        const first = actions.updateSettings({ pageQuery: "#work" });
+        const second = actions.updateSettings({ pageQuery: "#home" });
+
+        await expect(first).rejects.toBe(error);
+        await expect(second).resolves.toBeUndefined();
+        expect(obsidian.saveData).toHaveBeenCalledTimes(2);
+    });
+
     it("toggles a task through the Tasks plugin, in place", async () => {
         const { obsidian, tasksApi, actions } = setup();
 
