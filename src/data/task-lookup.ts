@@ -3,7 +3,6 @@ import { memoize, partition, sortBy, sortedIndex, sortedLastIndex } from "lodash
 import type { Task } from "@/data/task";
 
 export class TaskLookup {
-    public readonly revision: number;
     public readonly undatedTasks: readonly Task[];
     public readonly isTaskActionable: (task: Task) => boolean;
     public readonly getTasksHappeningOn: (date: Temporal.PlainDate) => readonly Task[];
@@ -13,9 +12,7 @@ export class TaskLookup {
     private readonly sortedDateKeys: readonly string[];
     private readonly openTaskIds: ReadonlySet<string>;
 
-    public constructor(tasks: Task[] = [], revision = 0) {
-        this.revision = revision;
-
+    public constructor(tasks: Task[] = []) {
         this.openTaskIds = new Set(tasks.filter((task) => task.id && task.status === "OPEN").map((task) => task.id));
 
         const [withKeys, withoutKeys] = partition(tasks, getTaskDateKey);

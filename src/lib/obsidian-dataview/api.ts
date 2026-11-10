@@ -1,4 +1,3 @@
-import { type Signal, signal } from "@preact/signals";
 import { isEqual } from "lodash";
 import type { DataviewApi } from "obsidian-dataview";
 import type { SMarkdownPage, STask } from "obsidian-dataview/lib/data-model/serialized/markdown";
@@ -10,28 +9,14 @@ import { getPlugin, isPluginEnabled } from "@/lib/obsidian/adapters";
 import type { App, Plugin } from "@/lib/obsidian/types";
 
 export class Dataview {
-    private readonly plugin: Plugin;
     private readonly dv: DataviewApi;
     private cache: ReadonlyMap<string, CachedTask> = new Map();
-
-    public readonly revision: Signal<number>;
 
     public constructor(plugin?: Plugin) {
         if (!plugin) throw new Error("plugin is required");
         const dv = getDataviewApi(plugin.app);
         if (!dv) throw new Error("obsidian-dataview must be installed and enabled");
-        this.plugin = plugin;
         this.dv = dv;
-
-        this.revision = signal(this.dv.index.revision);
-
-        this.plugin.registerEvent(
-            this.plugin.app.metadataCache.on(
-                // @ts-expect-error - obsidian doesn't define overloads for third-party events.
-                "dataview:metadata-change",
-                () => (this.revision.value = this.dv.index.revision),
-            ),
-        );
     }
 
     /** IMPORTANT: Must be called within `onLayoutReady` callback, otherwise the plugin will freeze! */
