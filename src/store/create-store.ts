@@ -6,6 +6,13 @@ import type { Task } from "@/data/task";
 import { TaskLookup } from "@/data/task-lookup";
 import type { Store, StoreStatus, TaskSource, UpcomingGroup } from "@/store/create-store.types";
 
+/**
+ * Creates a store that is "loading" with the default settings. It holds no tasks until it is "ready" and has a Dataview
+ * source.
+ *
+ * Invariant: a derived section keeps its previous array, and each task its previous instance, while their contents are
+ * unchanged.
+ */
 export function createStore(): Store {
     const status = signal<StoreStatus>("loading");
     const settings = signal<PluginSettings>(DEFAULT_SETTINGS);
@@ -13,27 +20,74 @@ export function createStore(): Store {
     const today = signal(Temporal.Now.plainDateISO());
     const dataview = signal<TaskSource>();
 
+    const intern = createTaskInterner();
     const tasks = computed(() => {
         // Dataview's index is not a signal, so subscribe to its revision to re-run the query when the index changes.
         noop(revision.value);
-        if (status.value !== "ready") return [];
-        return dataview.value?.getTasks(settings.value.pageQuery) ?? [];
+        if (status.value !== "ready") return intern([]);
+        return intern(dataview.value?.getTasks(settings.value.pageQuery) ?? []);
     });
     const lookup = computed(() => new TaskLookup([...tasks.value]));
+    const stablePlanned = createArrayStabilizer<Task>();
     const planned = computed(() => {
         const { getTasksHappeningOn, isTaskActionable } = lookup.value;
-        return getTasksHappeningOn(today.value).filter(isTaskActionable);
+        return stablePlanned(getTasksHappeningOn(today.value).filter(isTaskActionable));
     });
+    const stableBacklog = createArrayStabilizer<Task>();
     const backlog = computed(() => {
         const { getTasksHappeningBefore, undatedTasks, isTaskActionable } = lookup.value;
-        return [...getTasksHappeningBefore(today.value).toReversed(), ...undatedTasks].filter(isTaskActionable);
+        return stableBacklog(
+            [...getTasksHappeningBefore(today.value).toReversed(), ...undatedTasks].filter(isTaskActionable),
+        );
     });
+    const stableUpcoming = createGroupsStabilizer();
     const upcoming = computed(() => {
         const { getTasksHappeningAfter, isTaskActionable } = lookup.value;
-        return groupByDate(getTasksHappeningAfter(today.value).filter(isTaskActionable));
+        return stableUpcoming(groupByDate(getTasksHappeningAfter(today.value).filter(isTaskActionable)));
     });
 
     return { status, settings, revision, today, dataview, tasks, lookup, planned, backlog, upcoming };
+}
+
+/**
+ * Returns a function that swaps each task for the one it returned last time with the same identity, when the two are
+ * {@link Task.equals | equal}, so unchanged tasks keep their instance and downstream equality checks stay cheap.
+ */
+function createTaskInterner(): (tasks: readonly Task[]) => readonly Task[] {
+    let previousByIdentity = new Map<string, Task>();
+    return (tasks) => {
+        const interned = tasks.map((task) => {
+            const previous = previousByIdentity.get(task.identity);
+            return previous?.equals(task) ? previous : task;
+        });
+        previousByIdentity = new Map(interned.map((task) => [task.identity, task]));
+        return interned;
+    };
+}
+
+/** Returns a function that hands back its previous result for as long as the next one holds the same elements. */
+function createArrayStabilizer<T>(): (next: readonly T[]) => readonly T[] {
+    let previous: readonly T[] = [];
+    return (next) => (haveSameElements(previous, next) ? previous : (previous = next));
+}
+
+/** Like {@link createArrayStabilizer}, but also keeps each group whose date and tasks are unchanged. */
+function createGroupsStabilizer(): (next: readonly UpcomingGroup[]) => readonly UpcomingGroup[] {
+    const stableGroups = createArrayStabilizer<UpcomingGroup>();
+    let previousByDate = new Map<string, UpcomingGroup>();
+    return (next) => {
+        const groups = next.map((group) => {
+            const previous = previousByDate.get(group.date.toString());
+            return previous && haveSameElements(previous.tasks, group.tasks) ? previous : group;
+        });
+        previousByDate = new Map(groups.map((group) => [group.date.toString(), group]));
+        return stableGroups(groups);
+    };
+}
+
+/** Returns whether `a` and `b` hold the same elements, compared by reference, in the same order. */
+function haveSameElements<T>(a: readonly T[], b: readonly T[]): boolean {
+    return a.length === b.length && a.every((element, index) => element === b[index]);
 }
 
 /** Groups tasks that are already sorted by {@link Task.happensDate}, keeping their order. */

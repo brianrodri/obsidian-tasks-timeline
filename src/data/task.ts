@@ -6,9 +6,8 @@ export const TASK_STATUSES = ["OPEN", "DONE", "DROPPED", "CUSTOM"] as const;
 export type TaskStatus = typeof TASK_STATUSES extends readonly (infer T)[] ? T : never;
 
 export class Task implements TaskFields {
-    public readonly key: string;
     public readonly status: TaskStatus;
-    public readonly customStatus: TaskStatus extends "CUSTOM" ? string : undefined;
+    public readonly customStatus: string | undefined;
     public readonly description: string;
     public readonly priority: number;
     public readonly recurrenceRule: string;
@@ -39,7 +38,6 @@ export class Task implements TaskFields {
         this.location = fields.location;
         this.id = fields.id;
         this.dependsOn = fields.dependsOn;
-        this.key = JSON.stringify(this);
     }
 
     public static create(part: TaskInput): Task {
@@ -72,6 +70,37 @@ export class Task implements TaskFields {
         });
     }
 
+    /**
+     * Names the same task across re-reads of its file, for use as a key.
+     *
+     * Best-effort without an id: a task without one is named by its line, which shifts when lines are added above it.
+     */
+    public get identity(): string {
+        const { filePath = "", fileLine } = this.location;
+        return this.id ? `id:${filePath}:${this.id}` : `line:${filePath}:${fileLine}`;
+    }
+
+    /** Returns whether every field matches `other`'s, so one may stand in for the other. */
+    public equals(other: Task): boolean {
+        return (
+            this.status === other.status &&
+            this.customStatus === other.customStatus &&
+            this.description === other.description &&
+            this.priority === other.priority &&
+            this.recurrenceRule === other.recurrenceRule &&
+            areDatesEqual(this.cancelledDate, other.cancelledDate) &&
+            areDatesEqual(this.createdDate, other.createdDate) &&
+            areDatesEqual(this.doneDate, other.doneDate) &&
+            areDatesEqual(this.dueDate, other.dueDate) &&
+            areDatesEqual(this.scheduledDate, other.scheduledDate) &&
+            areDatesEqual(this.startDate, other.startDate) &&
+            areSetsEqual(this.tags, other.tags) &&
+            areLocationsEqual(this.location, other.location) &&
+            this.id === other.id &&
+            areSetsEqual(this.dependsOn, other.dependsOn)
+        );
+    }
+
     public get folder(): string | undefined {
         if (this.location.filePath) {
             const parts = this.location.filePath.split("/");
@@ -95,6 +124,26 @@ export class Task implements TaskFields {
     }
 }
 
+function areDatesEqual(a: Temporal.PlainDate | undefined, b: Temporal.PlainDate | undefined): boolean {
+    return a === undefined || b === undefined ? a === b : a.equals(b);
+}
+
+function areSetsEqual(a: ReadonlySet<string>, b: ReadonlySet<string>): boolean {
+    return a.size === b.size && a.isSubsetOf(b);
+}
+
+function areLocationsEqual(a: TaskLocation, b: TaskLocation): boolean {
+    return (
+        a.filePath === b.filePath &&
+        a.fileName === b.fileName &&
+        a.fileSection === b.fileSection &&
+        a.fileLine === b.fileLine &&
+        a.fileStartByte === b.fileStartByte &&
+        a.fileStopByte === b.fileStopByte &&
+        a.obsidianHref === b.obsidianHref
+    );
+}
+
 /** Validates raw date data, returning `undefined` when it does not describe a real calendar date. */
 function toPlainDate(value?: Temporal.PlainDateLike | null): Temporal.PlainDate | undefined {
     if (value === undefined || value === null) return undefined;
@@ -114,7 +163,7 @@ export type TaskInput = Partial<
 
 export interface TaskFields {
     status: TaskStatus;
-    customStatus: TaskStatus extends "CUSTOM" ? string : undefined;
+    customStatus: string | undefined;
     description: string;
     priority: number;
     recurrenceRule: string;
