@@ -5,6 +5,12 @@ import { ErrorView } from "@/layout/error-view";
 import { LoadingView } from "@/layout/loading-view";
 import { TodayView } from "@/layout/today-view";
 
+/**
+ * Shows a loading message until the store is ready, then the timeline.
+ *
+ * Shows the error view instead when the store fails to load or the timeline throws while rendering. Render errors are
+ * logged.
+ */
 export function AppView() {
     const { store } = useAppContext();
     const renderError: unknown = useErrorBoundary((error: unknown) => {

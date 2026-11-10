@@ -22,6 +22,7 @@ export function getPlugin<T extends object>(app: App, id: string): Partial<T> | 
     return plugins?.plugins?.[id] as Partial<T> | undefined;
 }
 
+/** Returns whether the plugin `id` is installed and enabled. False when Obsidian's plugin registry is unavailable. */
 export function isPluginEnabled(app: App, id: string): boolean {
     const { plugins }: AppWithPlugins = app;
     return plugins?.enabledPlugins?.has(id) ?? false;

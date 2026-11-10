@@ -26,6 +26,10 @@ export interface TaskEntryProps {
     task: Task;
 }
 
+/**
+ * Renders one task: its checkbox, description, file location, and fields. Marks the task as done, cancelled, or
+ * overdue, where overdue means it is due before today.
+ */
 export const TaskEntry = ({ task }: TaskEntryProps) => {
     const overdue = !!task.dueDate && Temporal.PlainDate.compare(task.dueDate, Temporal.Now.plainDateISO()) < 0;
     const { filePath, fileSection, obsidianHref } = task.location;

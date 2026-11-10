@@ -12,6 +12,12 @@ export interface TaskDateInputProps {
     task: Task;
 }
 
+/**
+ * Renders the task's `field` date with a date picker. Picking a date writes it to the task's file.
+ *
+ * Renders nothing when the task has no such date, except for the scheduled date, which reads "todo" when unset. The
+ * input is disabled while a write is pending. A failed write is reported to the user.
+ */
 export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
     const fieldValue = task[field];
     const { actions, obsidian } = useAppContext();

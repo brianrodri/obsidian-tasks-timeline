@@ -8,6 +8,7 @@ export interface TodayViewProps {
     showFuture?: boolean;
 }
 
+/** Renders today's tasks, then the backlog, then upcoming tasks grouped by date unless `showFuture` is false. */
 export function TodayView({ showFuture = true }: TodayViewProps) {
     const { store } = useAppContext();
 
