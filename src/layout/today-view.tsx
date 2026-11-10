@@ -1,3 +1,4 @@
+import type { ReadonlySignal } from "@preact/signals";
 import { memo } from "preact/compat";
 
 import { useAppContext } from "@/context/app-context";
@@ -8,17 +9,21 @@ export interface TodayViewProps {
     showFuture?: boolean;
 }
 
-/** Renders today's tasks, then the backlog, then upcoming tasks grouped by date unless `showFuture` is false. */
+/**
+ * Renders today's tasks, then the backlog, then upcoming tasks grouped by date unless `showFuture` is false.
+ *
+ * When a section changes, only its timeline re-renders.
+ */
 export function TodayView({ showFuture = true }: TodayViewProps) {
     const { store } = useAppContext();
 
     return (
         <div class="ott" id="ott">
             <div class="details">
-                <TaskTimeline key="today" label="today" tasks={store.planned.value} />
-                <TaskTimeline key="unplanned" label="backlog" tasks={store.backlog.value} />
+                <TaskTimeline key="today" label="today" tasks={store.planned} />
+                <TaskTimeline key="unplanned" label="backlog" tasks={store.backlog} />
                 {showFuture ?
-                    <GroupedTaskTimelines groups={store.upcoming.value} />
+                    <GroupedTaskTimelines groups={store.upcoming} />
                 :   null}
             </div>
         </div>
@@ -26,14 +31,16 @@ export function TodayView({ showFuture = true }: TodayViewProps) {
 }
 
 interface GroupedTaskTimelinesProps {
-    groups: readonly UpcomingGroup[];
+    groups: ReadonlySignal<readonly UpcomingGroup[]>;
 }
 
 const GroupedTaskTimelines = memo(({ groups }: GroupedTaskTimelinesProps) => {
+    const { store } = useAppContext();
+    const today = store.today.value;
     let prevRelativeDate: string | null = null;
 
-    return groups.map(({ date, tasks }) => {
-        const relativeDate = toRelativeCalendar(date);
+    return groups.value.map(({ date, tasks }) => {
+        const relativeDate = toRelativeCalendar(date, today);
         const timeline = (
             <TaskTimeline
                 key={date.toString()}
@@ -54,7 +61,7 @@ const GroupedTaskTimelines = memo(({ groups }: GroupedTaskTimelinesProps) => {
  */
 export function toRelativeCalendar(
     date: Temporal.PlainDate,
-    base: Temporal.PlainDate = Temporal.Now.plainDateISO(),
+    base: Temporal.PlainDate,
     locales?: Intl.LocalesArgument,
 ): string {
     const formatter = new Intl.RelativeTimeFormat(locales, { numeric: "auto" });

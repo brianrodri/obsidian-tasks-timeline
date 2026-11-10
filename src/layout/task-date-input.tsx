@@ -1,7 +1,7 @@
+import { useSignal } from "@preact/signals";
 import { lowerCase } from "lodash";
 import type { VNode } from "preact";
-import { useRef, useState } from "preact/hooks";
-import { useEventCallback } from "usehooks-ts";
+import { useLayoutEffect, useRef } from "preact/hooks";
 
 import { useAppContext } from "@/context/app-context";
 import type { Task, TaskDateField } from "@/data/task";
@@ -16,33 +16,38 @@ export interface TaskDateInputProps {
  * Renders the task's `field` date with a date picker. Picking a date writes it to the task's file.
  *
  * Renders nothing when the task has no such date, except for the scheduled date, which reads "todo" when unset. The
- * input is disabled while a write is pending. A failed write is reported to the user.
+ * input is disabled while a write is pending. A failed write is reported to the user, and the input shows the task's
+ * latest date again.
  */
 export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
     const fieldValue = task[field];
     const { actions, obsidian } = useAppContext();
-    const [disabled, setDisabled] = useState(false);
+    const disabled = useSignal(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    const latestFieldValueRef = useRef(fieldValue);
+    useLayoutEffect(() => {
+        latestFieldValueRef.current = fieldValue;
+    });
 
-    const onInput = useEventCallback((event: Event) => {
+    const onInput = (event: Event) => {
         const { value, valueAsDate } = event.currentTarget as HTMLInputElement;
-        if (disabled) return;
+        if (disabled.value) return;
         if (valueAsDate === null) return;
         event.preventDefault();
-        setDisabled(true);
+        disabled.value = true;
         actions
             .setTaskDate(task, field, value)
             .catch((error: unknown) => {
+                // The task did not change, so nothing re-renders the input: put its value back by hand.
+                if (inputRef.current) inputRef.current.value = latestFieldValueRef.current?.toString() ?? "";
                 obsidian.reportError(`Failed to set the ${lowerCase(field)}`, error);
             })
-            .finally(() => {
-                setDisabled(false);
-            });
-    });
+            .finally(() => (disabled.value = false));
+    };
 
-    const onClick = useEventCallback(() => {
+    const onClick = () => {
         inputRef.current?.showPicker();
-    });
+    };
 
     if (field === "scheduledDate" || fieldValue) {
         return (

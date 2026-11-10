@@ -1,6 +1,5 @@
 import type { HTMLAttributes } from "preact";
 import type { PropsWithChildren } from "preact/compat";
-import { useEventCallback } from "usehooks-ts";
 
 import { useAppContext } from "@/context/app-context";
 
@@ -17,19 +16,19 @@ export interface VaultLinkProps extends HTMLAttributes<HTMLAnchorElement> {
 export function VaultLink({ href, sourcePath, children, ...rest }: PropsWithChildren<VaultLinkProps>) {
     const { leaf, obsidian } = useAppContext();
 
-    const onClick = useEventCallback((event: Event) => {
+    const onClick = (event: Event) => {
         if (href && sourcePath) {
             obsidian.openVaultLink(event, href, sourcePath).catch((error: unknown) => {
                 console.error(error);
             });
         }
-    });
+    };
 
-    const onMouseOver = useEventCallback((event: Event) => {
+    const onMouseOver = (event: Event) => {
         if (href && sourcePath) {
             obsidian.openVaultHover(event, href, sourcePath, leaf);
         }
-    });
+    };
 
     return (
         <a className="internal-link" {...rest} onClick={onClick} onMouseOver={onMouseOver}>
