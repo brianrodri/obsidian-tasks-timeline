@@ -14,7 +14,7 @@ import {
     TagsIcon,
 } from "@/components/icons";
 import { VaultLink } from "@/components/vault-link";
-import { usePluginContext } from "@/context/plugin-context";
+import { useAppContext } from "@/context/app-context";
 import type { Task } from "@/data/task";
 import { TaskCheckbox } from "@/layout/task-checkbox";
 import { TaskDateInput } from "@/layout/task-date-input";
@@ -26,10 +26,14 @@ export interface TaskEntryProps {
     task: Task;
 }
 
+/**
+ * Renders one task: its checkbox, description, file location, and fields. Marks the task as done, cancelled, or
+ * overdue, where overdue means it is due before today.
+ */
 export const TaskEntry = ({ task }: TaskEntryProps) => {
     const overdue = !!task.dueDate && Temporal.PlainDate.compare(task.dueDate, Temporal.Now.plainDateISO()) < 0;
     const { filePath, fileSection, obsidianHref } = task.location;
-    const { plugin } = usePluginContext();
+    const { plugin } = useAppContext();
 
     const rootElClass =
         task.status === "DONE" ? "task done"
@@ -40,7 +44,7 @@ export const TaskEntry = ({ task }: TaskEntryProps) => {
     return (
         <div class={rootElClass}>
             <div class="timeline">
-                <TaskCheckbox status={task.status} location={task.location} />
+                <TaskCheckbox task={task} />
             </div>
             <div class="lines">
                 <span class="content">

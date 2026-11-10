@@ -3,9 +3,8 @@ import type { VNode } from "preact";
 import { useRef, useState } from "preact/hooks";
 import { useEventCallback } from "usehooks-ts";
 
-import { usePluginContext } from "@/context/plugin-context";
+import { useAppContext } from "@/context/app-context";
 import type { Task, TaskDateField } from "@/data/task";
-import { writeEmojiTaskField } from "@/lib/obsidian-tasks/parse-task-fields";
 
 export interface TaskDateInputProps {
     symbol?: VNode;
@@ -13,30 +12,32 @@ export interface TaskDateInputProps {
     task: Task;
 }
 
+/**
+ * Renders the task's `field` date with a date picker. Picking a date writes it to the task's file.
+ *
+ * Renders nothing when the task has no such date, except for the scheduled date, which reads "todo" when unset. The
+ * input is disabled while a write is pending. A failed write is reported to the user.
+ */
 export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
-    const {
-        [field]: fieldValue,
-        location: { filePath, fileStartByte, fileStopByte },
-    } = task;
-    const { obsidian } = usePluginContext();
+    const fieldValue = task[field];
+    const { actions, obsidian } = useAppContext();
     const [disabled, setDisabled] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const onInput = useEventCallback((event: Event) => {
         const { value, valueAsDate } = event.currentTarget as HTMLInputElement;
-        if (filePath !== undefined && !disabled && valueAsDate !== null) {
-            event.preventDefault();
-            const process = (text: string) => writeEmojiTaskField(text, field, value);
-            setDisabled(true);
-            obsidian
-                .processFileRange(filePath, fileStartByte, fileStopByte, process)
-                .catch((error: unknown) => {
-                    console.error(error);
-                })
-                .finally(() => {
-                    setDisabled(false);
-                });
-        }
+        if (disabled) return;
+        if (valueAsDate === null) return;
+        event.preventDefault();
+        setDisabled(true);
+        actions
+            .setTaskDate(task, field, value)
+            .catch((error: unknown) => {
+                obsidian.reportError(`Failed to set the ${lowerCase(field)}`, error);
+            })
+            .finally(() => {
+                setDisabled(false);
+            });
     });
 
     const onClick = useEventCallback(() => {

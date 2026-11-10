@@ -5,6 +5,7 @@ import {
     type IconName,
     ItemView,
     Keymap,
+    Notice,
     type Plugin,
     type UserEvent,
     type WorkspaceLeaf,
@@ -21,6 +22,7 @@ export function getPlugin<T extends object>(app: App, id: string): Partial<T> | 
     return plugins?.plugins?.[id] as Partial<T> | undefined;
 }
 
+/** Returns whether the plugin `id` is installed and enabled. False when Obsidian's plugin registry is unavailable. */
 export function isPluginEnabled(app: App, id: string): boolean {
     const { plugins }: AppWithPlugins = app;
     return plugins?.enabledPlugins?.has(id) ?? false;
@@ -41,6 +43,12 @@ export class Obsidian {
 
     public async saveData(settings: unknown): Promise<void> {
         await this.plugin.saveData(settings);
+    }
+
+    /** Logs `error` and tells the user that `message`, so failures in response to their actions are never silent. */
+    public reportError(message: string, error: unknown): void {
+        console.error(message, error);
+        new Notice(`${message}: ${error instanceof Error ? error.message : String(error)}`);
     }
 
     public async processFileRange(
