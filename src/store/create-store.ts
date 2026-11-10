@@ -6,6 +6,13 @@ import type { Task } from "@/data/task";
 import { TaskLookup } from "@/data/task-lookup";
 import type { Store, StoreStatus, TaskSource, UpcomingGroup } from "@/store/create-store.types";
 
+/**
+ * Creates a store that is "loading" with the default settings. It holds no tasks until it is "ready" and has a Dataview
+ * source.
+ *
+ * Invariant: a derived section keeps its previous array, and each task its previous instance, while their contents are
+ * unchanged.
+ */
 export function createStore(): Store {
     const status = signal<StoreStatus>("loading");
     const settings = signal<PluginSettings>(DEFAULT_SETTINGS);
@@ -78,6 +85,7 @@ function createGroupsStabilizer(): (next: readonly UpcomingGroup[]) => readonly 
     };
 }
 
+/** Returns whether `a` and `b` hold the same elements, compared by reference, in the same order. */
 function haveSameElements<T>(a: readonly T[], b: readonly T[]): boolean {
     return a.length === b.length && a.every((element, index) => element === b[index]);
 }

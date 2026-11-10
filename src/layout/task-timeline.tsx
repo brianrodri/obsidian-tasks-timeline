@@ -13,6 +13,12 @@ interface TaskTimelineProps {
     showCustom?: boolean;
 }
 
+/**
+ * Renders the tasks under a heading of `date`, or of `label` when there is no date. The heading counts the tasks when
+ * there is more than one.
+ *
+ * Hides done, dropped, and custom-status tasks unless asked to show them. Renders nothing when no task is visible.
+ */
 export function TaskTimeline({
     tasks,
     date,
