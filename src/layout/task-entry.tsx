@@ -28,7 +28,7 @@ export interface TaskEntryProps {
 
 /**
  * Renders one task: its checkbox, description, file location, and fields. Marks the task as done, cancelled, or
- * overdue, where overdue means it is due before today.
+ * overdue, where overdue means it is due before the store's today. Re-checks overdue when the store's today advances.
  */
 export const TaskEntry = ({ task }: TaskEntryProps) => {
     const { plugin, store } = useAppContext();

@@ -21,6 +21,8 @@ interface TaskTimelineProps {
  * there is more than one.
  *
  * Hides done, dropped, and custom-status tasks unless asked to show them. Renders nothing when no task is visible.
+ *
+ * Re-renders only when its props or its section change, and then only renders the entries of new or changed tasks.
  */
 export const TaskTimeline = memo(
     ({

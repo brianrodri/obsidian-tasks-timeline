@@ -11,7 +11,7 @@ export interface TaskCheckboxProps {
  * Renders a checkbox that toggles the task done in its file. It is checked when the task is done and marked when the
  * task is dropped.
  *
- * Ignores clicks while a toggle is pending. A failed toggle is reported to the user.
+ * Disabled while a toggle is pending. A failed toggle is reported to the user.
  */
 export function TaskCheckbox({ task }: TaskCheckboxProps) {
     const { actions, obsidian } = useAppContext();
