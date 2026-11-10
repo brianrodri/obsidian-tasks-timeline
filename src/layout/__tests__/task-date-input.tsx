@@ -54,4 +54,31 @@ describe("TaskDateInput", () => {
         expect(reportError).toHaveBeenCalledExactlyOnceWith("Failed to set the due date", error);
         expect(input.value).toBe("2024-10-25");
     });
+
+    it("restores the latest rendered date when the task changed while a failed write was pending", async () => {
+        const { promise, reject } = Promise.withResolvers<undefined>();
+        const setTaskDate = vi.fn(() => promise);
+        const reportError = vi.fn();
+        const context = { actions: { setTaskDate }, obsidian: { reportError } } as unknown as AppContextValue;
+        const { rerender } = render(
+            <AppContext value={context}>
+                <TaskDateInput field="dueDate" task={Task.create({ dueDate: "2024-10-25" })} />
+            </AppContext>,
+        );
+        const input = screen.getByLabelText<HTMLInputElement>("Set due date");
+
+        fireEvent.input(input, { target: { value: "2024-10-26" } });
+        rerender(
+            <AppContext value={context}>
+                <TaskDateInput field="dueDate" task={Task.create({ dueDate: "2024-10-27" })} />
+            </AppContext>,
+        );
+        await act(async () => {
+            reject(new Error("boom"));
+            await promise.catch(() => undefined);
+        });
+
+        expect(input.disabled).toBe(false);
+        expect(input.value).toBe("2024-10-27");
+    });
 });

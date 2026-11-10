@@ -1,7 +1,7 @@
 import { useSignal } from "@preact/signals";
 import { lowerCase } from "lodash";
 import type { VNode } from "preact";
-import { useRef } from "preact/hooks";
+import { useLayoutEffect, useRef } from "preact/hooks";
 
 import { useAppContext } from "@/context/app-context";
 import type { Task, TaskDateField } from "@/data/task";
@@ -23,6 +23,10 @@ export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
     const { actions, obsidian } = useAppContext();
     const disabled = useSignal(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    const latestFieldValueRef = useRef(fieldValue);
+    useLayoutEffect(() => {
+        latestFieldValueRef.current = fieldValue;
+    });
 
     const onInput = (event: Event) => {
         const { value, valueAsDate } = event.currentTarget as HTMLInputElement;
@@ -34,7 +38,7 @@ export function TaskDateInput({ symbol, field, task }: TaskDateInputProps) {
             .setTaskDate(task, field, value)
             .catch((error: unknown) => {
                 // The task did not change, so nothing re-renders the input: put its value back by hand.
-                if (inputRef.current) inputRef.current.value = fieldValue?.toString() ?? "";
+                if (inputRef.current) inputRef.current.value = latestFieldValueRef.current?.toString() ?? "";
                 obsidian.reportError(`Failed to set the ${lowerCase(field)}`, error);
             })
             .finally(() => (disabled.value = false));
